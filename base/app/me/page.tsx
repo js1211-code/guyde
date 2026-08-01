@@ -14,10 +14,11 @@ import { TemperatureGauge } from "@/components/temperature";
 import { EXPERT_TOP_PERCENT } from "@/lib/constants";
 import { getCurrentUser, getMyActivity } from "@/lib/mock";
 
-const MENU = [
-  { label: "내가 쓴 질문", href: "/me/posts" },
+// href가 없는 항목은 아직 화면이 없다(IA 밖). 죽은 링크 대신 비활성 행으로 둔다.
+const MENU: { label: string; href?: string }[] = [
+  { label: "내가 쓴 질문" },
   { label: "내 유형테스트 결과", href: "/quiz/result/qr-1" },
-  { label: "공지사항", href: "/me/notice" },
+  { label: "공지사항" },
 ];
 
 export default function MePage() {
@@ -120,20 +121,29 @@ export default function MePage() {
         <SectionGap />
 
         <nav className="px-4 pt-1.5">
-          {MENU.map((item, i) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center justify-between py-3 ${
-                i < MENU.length - 1
-                  ? "border-b border-dashed border-neutral-400"
-                  : ""
-              }`}
-            >
-              <span className="text-[14px]">{item.label}</span>
-              <ChevronRightIcon size={16} className="text-neutral-500" />
-            </Link>
-          ))}
+          {MENU.map((item, i) => {
+            const className = `flex items-center justify-between py-3 ${
+              i < MENU.length - 1
+                ? "border-b border-dashed border-neutral-400"
+                : ""
+            }`;
+            const inner = (
+              <>
+                <span className="text-[14px]">{item.label}</span>
+                <ChevronRightIcon size={16} className="text-neutral-500" />
+              </>
+            );
+
+            return item.href ? (
+              <Link key={item.label} href={item.href} className={className}>
+                {inner}
+              </Link>
+            ) : (
+              <div key={item.label} className={className}>
+                {inner}
+              </div>
+            );
+          })}
         </nav>
       </ScreenBody>
 
