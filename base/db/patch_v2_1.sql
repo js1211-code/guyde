@@ -148,7 +148,12 @@ end $$;
 -- 반응 수는 글 유형마다 다르다 (F-14):
 --   선택지투표·무난함판정 → 투표 수 / 정보공유 → 좋아요 수 / 일반질문 → 반응 없음(0)
 -- 무난함 %는 여기서만 계산한다 — 피드 배지와 상세가 같은 값을 쓰도록 단일 소스 (F-16/F-35)
-create or replace view posts_feed as
+--
+-- ※ CREATE OR REPLACE VIEW는 컬럼 타입도 이름도 바꾸지 못한다.
+--   여기서는 temperature 타입(numeric(4,1) → numeric)과
+--   컬럼명(vote_count → reaction_count)이 둘 다 바뀌므로 드롭 후 재생성해야 한다.
+drop view if exists posts_feed cascade;
+create view posts_feed as
 select
   p.id, p.category, p.post_type, p.title, p.body, p.created_at, p.device_id,
   u.nickname,
@@ -173,7 +178,8 @@ join users u on u.device_id = p.device_id;
 
 -- ---------- 6) 댓글 뷰 ----------
 -- 댓글마다 작성자 온도를 계산하면 N+1이 되므로 뷰에서 한 번에 붙인다 (F-41).
-create or replace view comments_view as
+drop view if exists comments_view cascade;
+create view comments_view as
 select
   c.id, c.post_id, c.device_id, c.body, c.likes, c.created_at,
   u.nickname,

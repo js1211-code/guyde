@@ -143,7 +143,7 @@ create table articles (
   published_at timestamptz not null default now()
 );
 create index idx_articles_recent on articles (published_at desc);
-ㄴ
+
 create table quizzes (
   id          uuid primary key default gen_random_uuid(),
   slug        text not null unique,
