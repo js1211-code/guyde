@@ -3,75 +3,70 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ClipboardIcon,
-  ConsultIcon,
+  BookIcon,
+  BriefcaseIcon,
   HomeIcon,
   PlusIcon,
   UserIcon,
 } from "@/components/icons";
+import { Reg } from "@/components/reg";
 
 const TABS = [
-  { href: "/", label: "홈", Icon: HomeIcon },
-  { href: "/quiz", label: "유형테스트", Icon: ClipboardIcon },
-  { href: "/experts", label: "컨설팅", Icon: ConsultIcon },
-  { href: "/me", label: "마이", Icon: UserIcon },
+  { href: "/", label: "커뮤니티", Icon: HomeIcon },
+  { href: "/magazine", label: "매거진", Icon: BookIcon },
+  { href: "/experts", label: "컨설팅", Icon: BriefcaseIcon },
+  { href: "/me", label: "내정보", Icon: UserIcon },
 ] as const;
 
 function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-/** 하단 탭바. 가운데 글쓰기 버튼은 한 칸 띄워 올라간다. */
+/** 하단 4탭. 글쓰기는 탭이 아니라 FAB이다(F-05·F-17). */
 export function TabBar() {
   const pathname = usePathname();
-  const [home, quiz, experts, me] = TABS;
 
   return (
     <nav className="flex items-end justify-around border-t border-neutral-400 bg-paper px-2 pt-2 pb-1">
-      <Tab {...home} active={isActive(pathname, home.href)} />
-      <Tab {...quiz} active={isActive(pathname, quiz.href)} />
-
-      <Link
-        href="/write"
-        aria-label="질문 올리기"
-        className="relative -mt-4 flex flex-col items-center"
-      >
-        <span className="flex h-11 w-11 items-center justify-center bg-accent text-white">
-          <PlusIcon size={22} strokeWidth={1.8} />
-        </span>
-      </Link>
-
-      <Tab {...experts} active={isActive(pathname, experts.href)} />
-      <Tab {...me} active={isActive(pathname, me.href)} />
+      {TABS.map(({ href, label, Icon }) => {
+        const active = isActive(pathname, href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            className={`flex w-14 flex-col items-center gap-0.5 ${
+              active ? "text-brand" : "text-neutral-600"
+            }`}
+          >
+            <Icon
+              size={21}
+              strokeWidth={active ? 1.8 : 1.5}
+              className={active ? "text-brand" : "text-neutral-500"}
+            />
+            <span className={`text-[10px] ${active ? "font-bold" : ""}`}>
+              {label}
+            </span>
+          </Link>
+        );
+      })}
     </nav>
   );
 }
 
-function Tab({
-  href,
-  label,
-  Icon,
-  active,
-}: {
-  href: string;
-  label: string;
-  Icon: typeof HomeIcon;
-  active: boolean;
-}) {
+/**
+ * 글쓰기 FAB — 커뮤니티 탭에서만 보인다(F-17).
+ * 탭바 위에 떠 있어야 해서 셸 기준 absolute로 띄운다.
+ */
+export function WriteFab() {
   return (
     <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={`flex w-14 flex-col items-center gap-0.5 ${
-        active ? "text-accent-700" : "text-neutral-600"
-      }`}
+      href="/write"
+      aria-label="글쓰기"
+      className="absolute right-4 bottom-[82px] flex h-[52px] w-[52px] items-center justify-center bg-brand text-white"
     >
-      <Icon
-        size={21}
-        strokeWidth={active ? 1.8 : 1.5}
-        className={active ? "text-accent-700" : "text-neutral-500"}
-      />
-      <span className={`text-[10px] ${active ? "font-bold" : ""}`}>{label}</span>
+      <Reg corners="tl tr bl br" className="!text-white" />
+      <PlusIcon size={22} strokeWidth={1.8} />
     </Link>
   );
 }

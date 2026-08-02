@@ -8,6 +8,11 @@
 
 const STORAGE_KEY = "base.device_id";
 
+/** 최초 실행인지 판별한다 — 닉네임 발급 화면을 한 번만 보여주기 위해. */
+export function hasDeviceId(): boolean {
+  return localStorage.getItem(STORAGE_KEY) !== null;
+}
+
 export function getOrCreateDeviceId(): string {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return stored;

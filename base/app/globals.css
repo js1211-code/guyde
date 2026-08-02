@@ -1,30 +1,27 @@
 @import "tailwindcss";
 
 /*
-  BASE 디자인 시스템 — Claude Design "BASE Mobile UI v2"에서 가져옴.
-  성격: 청사진(blueprint). 모서리는 각지고(radius 0), 테두리는 헤어라인,
-  강조는 색이 아니라 등록마크(+)와 해칭으로 준다.
+  BASE 디자인 시스템 v3 — Claude Design "BASE Mobile UI v3"에서 가져옴.
+  성격: 청사진(blueprint). 모서리는 전부 각지고, 테두리는 헤어라인,
+  강조는 그림자가 아니라 등록마크(+)와 해칭으로 준다.
 
-  Tailwind v4는 @theme 안의 --color-* / --font-* 를 그대로 유틸리티로 만든다.
-  즉 --color-accent-700 → text-accent-700 / bg-accent-700 / border-accent-700.
-  neutral 스케일은 Tailwind 기본값을 이 디자인 시스템 값으로 의도적으로 덮어쓴다.
+  Tailwind v4는 @theme의 --color-* / --font-* 를 그대로 유틸리티로 만든다.
+  --color-brand-700 → text-brand-700 / bg-brand-700 / border-brand-700
 */
 @theme {
+  /* 포인트: 다크 버건디 */
+  --color-brand: #6b2436;
+  --color-brand-dark: #4a1826;
+  --color-brand-tint: #f7eef0;
+  --color-brand-tint-b: #e8d5d9;
+
+  /* 온도는 브릭 — 버건디와 구분되어야 한다 */
+  --color-temp: #b5562a;
+
   --color-paper: #f2f2f3;
-  --color-surface: #e9e9ea;
   --color-ink: #1d1f20;
 
-  --color-accent: #5980a6;
-  --color-accent-100: #eef6ff;
-  --color-accent-200: #d6ebff;
-  --color-accent-300: #b5d9fd;
-  --color-accent-400: #94bce3;
-  --color-accent-500: #749dc4;
-  --color-accent-600: #597ea3;
-  --color-accent-700: #416180;
-  --color-accent-800: #2c455d;
-  --color-accent-900: #1d2d3d;
-
+  /* neutral 스케일은 Tailwind 기본값을 디자인 시스템 값으로 의도적으로 덮어쓴다 */
   --color-neutral-100: #f5f5f8;
   --color-neutral-200: #e7e7ea;
   --color-neutral-300: #d4d4d7;
@@ -35,17 +32,11 @@
   --color-neutral-800: #424244;
   --color-neutral-900: #2b2b2d;
 
-  /* 온도 색 — 높을수록 뜨겁게. lib/format.ts의 tempColor()와 짝을 이룬다. */
-  --color-temp-hot: #c25e2e;
-  --color-temp-mid: #cf8a52;
-  --color-temp-low: #a58a63;
-
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-cond: var(--font-barlow-condensed), "Pretendard Variable", sans-serif;
 }
 
 html {
-  /* iOS 사파리 자동 확대 방지 */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -56,12 +47,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 숫자·라벨 전용 응축 서체. 디자인 문서의 .cond와 같은 역할. */
+/* 숫자·영문 라벨 전용 응축 서체 */
 .cond {
   font-family: var(--font-cond);
 }
 
-/* 투표에서 진 쪽을 채우는 사선 해칭 — 색을 쓰지 않고 열세를 표현한다. */
+/* 투표에서 진 쪽을 채우는 사선 해칭 — 색을 쓰지 않고 열세를 표현한다 */
 .hatch {
   background: repeating-linear-gradient(
     45deg,
@@ -72,7 +63,16 @@ body {
   );
 }
 
-/* 청사진 스타일: 이 앱에서 둥근 모서리는 쓰지 않는다. */
+/* 등록마크(+) — 청사진 컨셉의 시그니처. components/reg.tsx가 쓴다. */
+.reg {
+  position: absolute;
+  line-height: 1;
+  font-family: var(--font-cond);
+  color: var(--color-brand);
+  pointer-events: none;
+}
+
+/* 이 앱에서 둥근 모서리는 쓰지 않는다 */
 input,
 textarea,
 button,
@@ -85,11 +85,11 @@ select {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--color-neutral-600);
+  color: var(--color-neutral-500);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-brand);
   outline-offset: 1px;
 }
 
@@ -104,4 +104,12 @@ textarea::placeholder {
 }
 .scroll-area::-webkit-scrollbar-thumb {
   background: var(--color-neutral-400);
+}
+
+/* 피드 카드 본문 2줄 미리보기 (F-15) */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

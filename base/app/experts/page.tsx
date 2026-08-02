@@ -1,63 +1,73 @@
+"use client";
+
 import Link from "next/link";
-import { AppShell, ScreenBody } from "@/components/app-shell";
-import { Badge } from "@/components/badge";
-import { InfoIcon, SearchIcon } from "@/components/icons";
-import { AvatarBox } from "@/components/photo";
+import { useState } from "react";
+import { CategoryBadge, Chip } from "@/components/badge";
+import { StarIcon } from "@/components/icons";
+import { Reg } from "@/components/reg";
+import { AppShell, NoticeBar, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
-import { EXPERT_TOP_PERCENT } from "@/lib/constants";
+import { EXPERT_TOP_PERCENT, TEMP_CATEGORIES } from "@/lib/constants";
 import { getExperts } from "@/lib/mock";
 
+/**
+ * ⑭ 고수 목록.
+ * 전문분야는 3개뿐이다 — '자유'는 온도가 쌓이지 않는 카테고리라 제외(F-51).
+ */
 export default function ExpertsPage() {
-  const experts = getExperts();
+  const [specialty, setSpecialty] = useState<string>(TEMP_CATEGORIES[0]);
+  const experts = getExperts(specialty);
 
   return (
     <AppShell>
-      <header className="flex items-center justify-between px-4 pt-3 pb-2.5">
-        <h1 className="text-[19px] font-bold">컨설팅</h1>
-        <button type="button" aria-label="고수 검색">
-          <SearchIcon size={20} />
-        </button>
-      </header>
-
-      <p className="mx-4 mb-3 flex items-center gap-1.5 border border-accent-200 bg-accent-100 px-3 py-2 text-[12px] text-neutral-700">
-        <InfoIcon size={13} className="shrink-0 text-accent-700" />
+      <PageTitle>고수</PageTitle>
+      <NoticeBar>
         온도 상위 {EXPERT_TOP_PERCENT}%만 고수가 될 수 있어요
-      </p>
+      </NoticeBar>
 
-      <ScreenBody>
+      <div className="flex gap-2 px-4 py-2.5">
+        {TEMP_CATEGORIES.map((c) => (
+          <Chip key={c} selected={specialty === c} onClick={() => setSpecialty(c)}>
+            {c}
+          </Chip>
+        ))}
+      </div>
+
+      <ScreenBody className="px-4">
         {experts.map((e) => (
           <Link
             key={e.id}
             href={`/experts/${e.id}`}
-            className="mx-4 mb-2.5 flex items-center gap-3 border border-neutral-500 p-3.5"
+            className="relative mb-3 block border border-neutral-400 p-3.5"
           >
-            <AvatarBox size={48} iconSize={22} />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[15px] font-bold">{e.nickname}</span>
-                <Temperature value={e.temperature} />
-                <Badge>{e.expertise_area}</Badge>
-              </div>
-              <p className="mt-1 text-[12px] text-neutral-600">
-                답변{" "}
-                <span className="cond font-semibold text-neutral-700">
-                  {e.answers}
-                </span>{" "}
-                · 베스트{" "}
-                <span className="cond font-semibold text-neutral-700">
-                  {e.best}
-                </span>
-              </p>
+            <Reg corners="tl br" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[14.5px] font-bold">{e.nickname}</span>
+              <Temperature value={e.temperature} size={12} />
+              <span className="ml-auto">
+                <CategoryBadge>{e.specialty}</CategoryBadge>
+              </span>
             </div>
-            <div className="shrink-0 text-right">
-              <p className="cond text-[16px] leading-none font-bold text-accent-700">
-                ₩{e.from_price.toLocaleString("ko-KR")}
-              </p>
-              <p className="mt-1 text-[10.5px] text-neutral-600">부터</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-700">
+              {e.intro}
+            </p>
+            <div className="mt-2.5 flex items-center justify-between">
+              <span className="cond text-[13px] font-bold text-brand">
+                ₩{e.price_chat.toLocaleString("ko-KR")}부터
+              </span>
+              <span className="flex items-center gap-1 text-[12.5px] font-semibold">
+                <StarIcon />
+                {e.rating.toFixed(1)}
+              </span>
             </div>
           </Link>
         ))}
+        {experts.length === 0 && (
+          <p className="py-10 text-center text-[13px] text-neutral-600">
+            이 분야에는 아직 고수가 없어요
+          </p>
+        )}
       </ScreenBody>
 
       <TabBar />

@@ -1,195 +1,362 @@
-import { notFound } from "next/navigation";
-import { AppShell, ScreenBody, SectionGap, TopBar } from "@/components/app-shell";
-import { Badge } from "@/components/badge";
-import { CommentItem } from "@/components/comment";
-import { InfoIcon, MoreIcon, SendIcon } from "@/components/icons";
-import { PhotoBox } from "@/components/photo";
-import { PostVote } from "@/components/post-vote";
-import { VoteResults } from "@/components/vote-bar";
-import { getPost, getPostIds, splitBody } from "@/lib/mock";
+"use client";
 
-export function generateStaticParams() {
-  return getPostIds().map((id) => ({ id }));
-}
+import { use, useEffect, useState } from "react";
+import { CategoryBadge, MineBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
+import { CheckIcon, MoreIcon, ThumbsUpIcon } from "@/components/icons";
+import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
+import { Temperature } from "@/components/temperature";
+import {
+  addComment,
+  castNanhanVote,
+  castPollVote,
+  fetchPost,
+  toggleCommentLike,
+  type PostDetail,
+} from "@/lib/api";
 
-export default async function PostPage({
+/**
+ * 글 상세 — 유형에 따라 붙는 위젯이 다르다.
+ *   선택지투표 → 투표 전(⑦) / 후(⑧)
+ *   무난함판정 → 판정 버튼 2종(⑨)
+ *   일반질문   → 댓글만(⑩)
+ */
+export default function PostPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const data = getPost(id);
-  if (!data) notFound();
+  const { id } = use(params);
+  const [data, setData] = useState<PostDetail | null>(null);
+  const [missing, setMissing] = useState(false);
 
-  return data.is_mine ? <OwnerView data={data} /> : <VoterView data={data} />;
-}
+  const reload = () =>
+    fetchPost(id)
+      .then(setData)
+      .catch(() => setMissing(true));
 
-type Data = NonNullable<ReturnType<typeof getPost>>;
+  useEffect(() => {
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
-/** 디자인 02 — 남의 질문을 보는 시점 */
-function VoterView({ data }: { data: Data }) {
-  const { post, options, total_votes, my_vote_option_id, comments } = data;
-  const { title, detail } = splitBody(post.body);
+  if (missing) {
+    return (
+      <AppShell>
+        <TopBar backHref="/" title="BASE" />
+        <p className="px-4 py-16 text-center text-[13px] text-neutral-600">
+          없는 글이에요
+        </p>
+      </AppShell>
+    );
+  }
+
+  if (!data) {
+    return (
+      <AppShell>
+        <TopBar backHref="/" title="BASE" />
+        <p className="px-4 py-16 text-center text-[13px] text-neutral-500">
+          불러오는 중…
+        </p>
+      </AppShell>
+    );
+  }
+
+  const { post } = data;
 
   return (
     <AppShell>
       <TopBar
         backHref="/"
-        title={
-          <span className="cond text-[16px] font-semibold tracking-[0.1em]">
-            Q-{post.id}
-          </span>
-        }
+        title={`Q-${post.id.slice(0, 4).toUpperCase()}`}
         right={<MoreIcon size={20} />}
       />
 
       <ScreenBody>
-        <article className="px-4 pt-3.5 pb-4">
+        <article className="border-b-8 border-neutral-200 px-4 pt-3.5 pb-4">
           <div className="mb-2 flex items-center gap-1.5">
-            <Badge>익명</Badge>
-            {post.post_type === "dday" && post.event_label && (
-              <Badge variant="accent">{post.event_label}</Badge>
+            <CategoryBadge>{post.category}</CategoryBadge>
+            {post.post_type === "무난함판정" ? (
+              <span className="border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+                무난함 판정
+              </span>
+            ) : (
+              <PostTypeBadge postType={post.post_type} />
             )}
             <span className="ml-auto text-[11px] text-neutral-600">
-              {post.created_at} · {post.category}
+              {post.created_at}
             </span>
           </div>
 
-          <h1 className="text-[17px] leading-snug font-semibold">{title}</h1>
-          {detail && (
+          <div className="mb-2 flex items-center gap-1.5">
+            <span className="text-[12.5px] font-semibold">{post.nickname}</span>
+            <Temperature value={post.temperature} size={11.5} />
+            {post.is_mine && <MineBadge />}
+          </div>
+
+          <h1 className="text-[17px] leading-snug font-semibold">{post.title}</h1>
+          {post.body && (
             <p className="mt-1.5 text-[13.5px] leading-relaxed text-neutral-600">
-              {detail}
+              {post.body}
             </p>
           )}
 
-          {options.length > 0 && (
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {options.map((o, i) => (
-                <PhotoBox
-                  key={o.id}
-                  className="h-[150px]"
-                  iconSize={20}
-                  tag={i === 0 ? "A" : "B"}
-                  caption={o.label}
-                />
-              ))}
-            </div>
+          {post.images.length > 0 && (
+            <PhotoBox className="mt-3 h-[160px]" iconSize={24} />
           )}
 
-          {options.length > 0 && (
-            <PostVote
-              options={options}
-              totalVotes={total_votes}
-              initialMyOptionId={my_vote_option_id}
-            />
+          {data.poll && <Poll postId={post.id} poll={data.poll} onDone={reload} />}
+          {data.nanhan && (
+            <Nanhan postId={post.id} nanhan={data.nanhan} onDone={reload} />
           )}
         </article>
 
-        <SectionGap />
-
-        <section className="px-4 pt-3.5">
-          <h2 className="mb-2.5 text-[14px] font-bold">
-            댓글 <span className="cond text-accent-700">{comments.length}</span>
-          </h2>
-          <div className="flex flex-col">
-            {comments.map((c, i) => (
-              <CommentItem
-                key={c.id}
-                comment={c}
-                variant={i === 0 && comments.length > 1 ? "best" : "plain"}
-              />
-            ))}
-          </div>
-        </section>
+        <Comments postId={post.id} data={data} onDone={reload} />
       </ScreenBody>
-
-      <div className="flex items-center gap-2 border-t border-neutral-400 bg-paper px-4 py-2.5">
-        <input
-          className="h-9 flex-1 border border-neutral-400 px-3 text-[13px]"
-          placeholder="닉네임으로 답변을 남겨요"
-        />
-        <button
-          type="button"
-          aria-label="답변 보내기"
-          className="flex h-9 w-9 items-center justify-center bg-accent text-white"
-        >
-          <SendIcon size={16} />
-        </button>
-      </div>
     </AppShell>
   );
 }
 
-/** 디자인 14 — 내가 쓴 질문. 결과를 보고 답변을 채택한다. */
-function OwnerView({ data }: { data: Data }) {
-  const { post, options, total_votes, comments } = data;
-  const { title } = splitBody(post.body);
-  const leading = options.reduce(
-    (best, o) => (o.vote_count > best.vote_count ? o : best),
-    options[0],
-  );
-  const leadingLetter = options.indexOf(leading) === 0 ? "A" : "B";
+/** ⑦⑧ 선택지 투표 — 투표해야 결과가 열린다 */
+function Poll({
+  postId,
+  poll,
+  onDone,
+}: {
+  postId: string;
+  poll: NonNullable<PostDetail["poll"]>;
+  onDone: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  async function vote(optionId: string) {
+    setBusy(true);
+    await castPollVote(postId, optionId).catch(() => {});
+    await onDone();
+    setBusy(false);
+  }
+
+  if (!poll.revealed) {
+    return (
+      <>
+        <div className="mt-3 flex flex-col gap-2">
+          {poll.options.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              disabled={busy}
+              onClick={() => vote(o.id)}
+              className="border border-neutral-500 px-3.5 py-3 text-left text-[14.5px] font-semibold"
+            >
+              {o.text}
+            </button>
+          ))}
+        </div>
+        <p className="mt-2.5 text-center text-[12px] text-neutral-600">
+          투표하면 결과를 볼 수 있어요
+        </p>
+      </>
+    );
+  }
+
+  const top = Math.max(...poll.options.map((o) => o.vote_count ?? 0));
 
   return (
-    <AppShell>
-      <TopBar
-        backHref="/"
-        title={
-          <>
-            내 질문{" "}
-            <span className="cond tracking-[0.08em] text-neutral-600">
-              Q-{post.id}
-            </span>
-          </>
-        }
-        right={<MoreIcon size={20} />}
-      />
+    <>
+      <div className="mt-3 flex flex-col gap-2">
+        {poll.options.map((o) => {
+          const mine = o.id === poll.my_option_id;
+          const leading = (o.vote_count ?? 0) === top;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              disabled={busy}
+              onClick={() => !mine && vote(o.id)}
+              className={`relative flex h-[38px] text-[13px] font-bold ${
+                mine ? "border-2 border-brand" : "border border-neutral-400"
+              }`}
+            >
+              <span
+                className={`flex items-center pl-3 ${
+                  leading ? "bg-brand text-white" : "hatch text-neutral-600"
+                }`}
+                style={{ width: `${o.percent ?? 0}%` }}
+              >
+                {o.text} {o.percent}%
+              </span>
+              {leading && (
+                <span className="flex flex-1 items-center pl-3 text-neutral-600">
+                  {100 - (o.percent ?? 0)}%
+                </span>
+              )}
+              {mine && (
+                <CheckIcon
+                  size={15}
+                  className="absolute top-1/2 right-1.5 -translate-y-1/2 text-brand"
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2.5 text-center text-[12px] text-neutral-600">
+        총 {poll.total_votes}표 · 다른 선택지를 누르면 표가 옮겨가요
+      </p>
+    </>
+  );
+}
 
-      <ScreenBody>
-        <article className="px-4 pt-3.5 pb-3.5">
-          <div className="mb-1.5 flex items-center gap-1.5">
-            <Badge variant="ink">내가 쓴 글</Badge>
-            {post.post_type === "dday" && post.event_label && (
-              <Badge variant="accent">{post.event_label}</Badge>
-            )}
-            <span className="ml-auto text-[11px] text-neutral-600">
-              {post.created_at} · {post.category}
-            </span>
+/** ⑨ 무난함 판정 — 고정 2종. 작성자가 선택지를 만들 수 없다. */
+function Nanhan({
+  postId,
+  nanhan,
+  onDone,
+}: {
+  postId: string;
+  nanhan: NonNullable<PostDetail["nanhan"]>;
+  onDone: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  async function vote(choice: "무난해요" | "애매해요") {
+    setBusy(true);
+    await castNanhanVote(postId, choice).catch(() => {});
+    await onDone();
+    setBusy(false);
+  }
+
+  return (
+    <>
+      <p className="mt-4 text-center">
+        <span className="cond text-[42px] leading-none font-bold text-brand">
+          {nanhan.percent === null ? "아직 판정 전" : `무난함 ${nanhan.percent}%`}
+        </span>
+      </p>
+      <div className="mt-3 flex gap-2">
+        {(["무난해요", "애매해요"] as const).map((choice) => {
+          const picked = nanhan.my_choice === choice;
+          return (
+            <button
+              key={choice}
+              type="button"
+              disabled={busy}
+              onClick={() => vote(choice)}
+              className={`relative flex flex-1 flex-col items-center gap-0.5 py-3 ${
+                picked
+                  ? "border-2 border-brand bg-brand-tint"
+                  : "border border-neutral-400"
+              }`}
+            >
+              {picked && (
+                <CheckIcon
+                  size={16}
+                  className="absolute top-1.5 right-1.5 text-brand"
+                />
+              )}
+              <span
+                className={`text-[14px] font-bold ${
+                  picked ? "text-brand-dark" : "text-neutral-600"
+                }`}
+              >
+                {choice}
+              </span>
+              <span
+                className={`cond text-[13px] font-semibold ${
+                  picked ? "text-brand-dark" : "text-neutral-600"
+                }`}
+              >
+                {nanhan[choice]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+/** 댓글 — 추천순 → 최신순 (F-43). 자기 댓글은 추천할 수 없다(F-42). */
+function Comments({
+  postId,
+  data,
+  onDone,
+}: {
+  postId: string;
+  data: PostDetail;
+  onDone: () => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    if (!draft.trim()) return;
+    setBusy(true);
+    await addComment(postId, draft.trim()).catch(() => {});
+    setDraft("");
+    await onDone();
+    setBusy(false);
+  }
+
+  return (
+    <>
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <Kicker className="text-[12.5px]">COMMENTS {data.comments.length}</Kicker>
+        {data.comments.length > 0 && (
+          <span className="text-[12px] font-bold text-brand">추천순</span>
+        )}
+      </div>
+
+      {data.comments.map((c) => (
+        <div
+          key={c.id}
+          className="border-t border-dashed border-neutral-400 px-4 py-3"
+        >
+          <div className="mb-1 flex items-center gap-1.5">
+            <span className="text-[12.5px] font-semibold">{c.nickname}</span>
+            <Temperature value={c.temperature} />
+            {c.is_mine && <MineBadge />}
           </div>
+          <p className="text-[14px] leading-relaxed">{c.body}</p>
+          <button
+            type="button"
+            disabled={c.is_mine || busy}
+            onClick={async () => {
+              setBusy(true);
+              await toggleCommentLike(c.id, c.liked_by_me).catch(() => {});
+              await onDone();
+              setBusy(false);
+            }}
+            className={`mt-1.5 flex items-center gap-1 text-[11.5px] ${
+              c.is_mine
+                ? "text-neutral-400"
+                : c.liked_by_me
+                  ? "text-brand"
+                  : "text-neutral-500"
+            }`}
+          >
+            <ThumbsUpIcon size={13} />
+            <span className="font-bold">{c.likes}</span>
+          </button>
+        </div>
+      ))}
 
-          <h1 className="text-[16px] leading-snug font-semibold">{title}</h1>
-
-          <div className="mt-2.5">
-            <VoteResults options={options} totalVotes={total_votes} compact />
-          </div>
-          <p className="cond mt-2 text-[12px] tracking-wide text-neutral-600">
-            대중의 답은 {leadingLetter}예요
-          </p>
-        </article>
-
-        <SectionGap />
-
-        <section className="px-4 pt-3.5">
-          <div className="mb-3 flex items-center gap-2 border border-accent-200 bg-accent-100 px-3 py-2">
-            <InfoIcon size={14} className="shrink-0 text-accent-700" />
-            <span className="text-[12.5px] text-neutral-700">
-              도움된 답변을 채택하면 상대 온도가{" "}
-              <span className="cond font-bold text-temp-hot">+0.3°C</span>{" "}
-              올라가요
-            </span>
-          </div>
-
-          <div className="flex flex-col">
-            {comments.map((c) => (
-              <CommentItem
-                key={c.id}
-                comment={c}
-                variant={c.is_best ? "adopted" : "adoptable"}
-              />
-            ))}
-          </div>
-        </section>
-      </ScreenBody>
-    </AppShell>
+      <div className="flex items-center gap-2 border-t border-neutral-400 px-4 py-2">
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="댓글을 남겨보세요"
+          className="flex-1 border border-neutral-400 px-3 py-2 text-[13.5px]"
+        />
+        <button
+          type="button"
+          onClick={submit}
+          disabled={busy || !draft.trim()}
+          className="cond text-[13px] font-bold text-brand disabled:text-neutral-400"
+        >
+          등록
+        </button>
+      </div>
+    </>
   );
 }

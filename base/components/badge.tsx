@@ -1,48 +1,58 @@
-/**
- * 뱃지 — 익명 / D-day / 카테고리 / 등급 / BEST / 채택됨 등 전부 여기서 나온다.
- * 모서리는 전부 직각(디자인 시스템 규칙).
- */
+import { ImageIcon } from "@/components/icons";
+import { Reg } from "@/components/reg";
 
-type Variant =
-  | "outline" // 익명, 카테고리 — 회색 테두리
-  | "accent" // D-day, BEST — 강조색 채움
-  | "ink" // 내가 쓴 글, 마스터 — 먹색 채움
-  | "outline-accent" // 성실 답변러, 채택하기 — 강조색 테두리
-  | "soft"; // 안내 배너 톤 — 연한 강조 배경
-
-const VARIANTS: Record<Variant, string> = {
-  outline: "border border-neutral-400 text-neutral-600",
-  accent: "bg-accent text-white",
-  ink: "bg-ink text-white",
-  "outline-accent": "border border-accent text-accent-700",
-  soft: "bg-accent-100 border border-accent-200 text-neutral-700",
-};
-
-export function Badge({
-  children,
-  variant = "outline",
-  cond = false,
-  className = "",
-}: {
-  children: React.ReactNode;
-  variant?: Variant;
-  /** 영문·숫자 라벨이면 Barlow Condensed로 */
-  cond?: boolean;
-  className?: string;
-}) {
+/** 카테고리 뱃지 — 회색 테두리. 주제(옷·스킨케어·바디&향수·자유). */
+export function CategoryBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-1.5 py-px text-[10.5px] font-semibold ${
-        VARIANTS[variant]
-      } ${cond ? "cond tracking-[0.08em] font-bold" : ""} ${className}`}
-    >
+    <span className="border border-neutral-400 px-1.5 py-px text-[10.5px] font-semibold text-neutral-600">
       {children}
     </span>
   );
 }
 
-/** 카테고리 칩 — 글쓰기 화면의 선택 가능한 큰 뱃지 */
-export function CategoryChip({
+/**
+ * 글 유형 뱃지 (F-16) — 카드와 상세 헤더가 같은 문구를 쓴다.
+ *   선택지투표  → [투표]           브랜드 채움
+ *   무난함판정  → [무난함 82%]     틴트. 0표면 % 없이 [무난함]
+ *   일반질문    → 뱃지 없음 (없는 것 자체가 "그냥 질문글" 신호)
+ */
+export function PostTypeBadge({
+  postType,
+  nanhanPercent,
+}: {
+  postType: string;
+  nanhanPercent?: number | null;
+}) {
+  if (postType === "선택지투표") {
+    return (
+      <span className="bg-brand px-1.5 py-px text-[10.5px] font-bold text-white">
+        투표
+      </span>
+    );
+  }
+  if (postType === "무난함판정") {
+    return (
+      <span className="border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+        {nanhanPercent === null || nanhanPercent === undefined
+          ? "무난함"
+          : `무난함 ${nanhanPercent}%`}
+      </span>
+    );
+  }
+  return null;
+}
+
+/** 내가 쓴 댓글 표시 */
+export function MineBadge() {
+  return (
+    <span className="ml-1 border border-neutral-400 px-1 py-px text-[10px] font-semibold text-neutral-500">
+      나
+    </span>
+  );
+}
+
+/** 선택 가능한 카테고리 칩 (글쓰기·고수 필터) */
+export function Chip({
   children,
   selected = false,
   onClick,
@@ -51,37 +61,68 @@ export function CategoryChip({
   selected?: boolean;
   onClick?: () => void;
 }) {
-  const Tag = onClick ? "button" : "span";
+  const cls = `px-2.5 py-1 text-[12px] ${
+    selected
+      ? "bg-brand font-bold text-white"
+      : "border border-neutral-400 text-neutral-600"
+  }`;
+  if (!onClick) return <span className={cls}>{children}</span>;
   return (
-    <Tag
-      type={onClick ? "button" : undefined}
-      onClick={onClick}
-      aria-pressed={onClick ? selected : undefined}
-      className={`px-2.5 py-1 text-[12.5px] ${
-        selected
-          ? "bg-accent font-bold text-white"
-          : "border border-neutral-400 text-neutral-600"
-      }`}
-    >
+    <button type="button" onClick={onClick} aria-pressed={selected} className={cls}>
       {children}
-    </Tag>
+    </button>
   );
 }
 
-/** 하트 잔액 칩 — 피드 헤더의 "♥ 12" */
-export function HeartCount({
-  value,
-  children,
+/**
+ * 사진 자리표시자. Storage 연결 전까지 전 화면이 이걸 쓴다.
+ * 등록마크는 큰 박스에만 붙인다 — 작은 썸네일에 붙이면 지저분해진다.
+ */
+export function PhotoBox({
+  className = "",
+  iconSize = 18,
+  marks = true,
 }: {
-  value: number;
-  children?: React.ReactNode;
+  className?: string;
+  iconSize?: number;
+  marks?: boolean;
 }) {
   return (
-    <span className="flex items-center gap-1.5 border border-neutral-400 px-2 py-1">
-      {children}
-      <span className="cond text-[15px] leading-none font-bold text-accent-700">
-        {value}
-      </span>
-    </span>
+    <div
+      className={`relative flex items-center justify-center border border-neutral-400 bg-brand-tint ${className}`}
+    >
+      {marks && <Reg size="sm" />}
+      <ImageIcon size={iconSize} className="text-brand-dark" />
+    </div>
+  );
+}
+
+/** 빈 사진 추가 슬롯 */
+export function PhotoSlot({ onClick }: { onClick?: () => void }) {
+  const cls =
+    "flex h-[64px] w-[64px] items-center justify-center border border-dashed border-neutral-400 text-neutral-500";
+  if (!onClick) return <div className={cls}><PlusGlyph /></div>;
+  return (
+    <button type="button" onClick={onClick} className={cls} aria-label="사진 추가">
+      <PlusGlyph />
+    </button>
+  );
+}
+
+function PlusGlyph() {
+  return (
+    <svg
+      width={18}
+      height={18}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </svg>
   );
 }

@@ -1,43 +1,48 @@
-import Link from "next/link";
-import { AppShell, ScreenBody } from "@/components/app-shell";
-import { HeartCount } from "@/components/badge";
-import { FeedList } from "@/components/feed-list";
-import { BellIcon, HeartIcon } from "@/components/icons";
-import { TabBar } from "@/components/tab-bar";
-import { getCurrentUser, getFeed, getFeedCount } from "@/lib/mock";
+"use client";
 
-export default function HomePage() {
-  const me = getCurrentUser();
-  const feed = getFeed();
+import { Feed } from "@/components/feed";
+import { FirstRun } from "@/components/first-run";
+import { HeartIcon } from "@/components/icons";
+import { AppShell, ScreenBody } from "@/components/shell";
+import { TabBar, WriteFab } from "@/components/tab-bar";
+import { useMe } from "@/lib/use-me";
+
+export default function CommunityPage() {
+  const { me, isFirstRun, dismissFirstRun, rerollNickname } = useMe();
 
   return (
     <AppShell>
       <header className="flex items-center justify-between px-4 pt-3 pb-2.5">
         <div>
-          <div className="cond text-[24px] leading-none font-bold tracking-[0.14em]">
-            BASE<span className="text-accent">+</span>
-          </div>
+          <p className="cond text-[24px] leading-none font-bold tracking-[0.14em]">
+            BASE<span className="text-brand">+</span>
+          </p>
           <p className="mt-0.5 text-[10px] tracking-wide text-neutral-600">
             일단, 베이스부터.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/me/hearts" aria-label="하트 내역">
-            <HeartCount value={me.heart_balance}>
-              <HeartIcon size={14} className="text-accent-700" />
-            </HeartCount>
-          </Link>
-          <button type="button" aria-label="알림">
-            <BellIcon size={21} />
-          </button>
-        </div>
+        <span className="flex items-center gap-1.5 border border-neutral-400 px-2 py-1">
+          <HeartIcon size={14} className="text-brand" />
+          <span className="cond text-[15px] leading-none font-bold text-brand">
+            {me?.hearts ?? "–"}
+          </span>
+        </span>
       </header>
 
       <ScreenBody>
-        <FeedList items={feed} totalCount={getFeedCount()} />
+        <Feed />
       </ScreenBody>
 
+      <WriteFab />
       <TabBar />
+
+      {isFirstRun && me && (
+        <FirstRun
+          nickname={me.nickname}
+          onReroll={rerollNickname}
+          onStart={dismissFirstRun}
+        />
+      )}
     </AppShell>
   );
 }
