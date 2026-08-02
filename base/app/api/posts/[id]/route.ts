@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { fail, getDeviceId, ok } from "@/lib/api/http";
+import { fail, getDeviceId, ok, stripDevice } from "@/lib/api/http";
 
 /**
  * S3 글 상세 (F-30·31·32·34·38·41·43)
@@ -59,7 +59,7 @@ export async function GET(
 
   return ok({
     post: {
-      ...post,
+      ...stripDevice(post, deviceId),
       images: images.data ?? [],
     },
     poll: post.post_type === "선택지투표" ? await loadPoll(db, id, deviceId) : null,
@@ -67,11 +67,11 @@ export async function GET(
       post.post_type === "무난함판정" ? await loadNanhan(db, id, deviceId) : null,
     likes:
       post.post_type === "정보공유" ? await loadLikes(db, id, deviceId) : null,
+    // is_mine으로 자기 댓글 추천 버튼을 비활성한다 (F-42).
+    // device_id 자체는 내보내지 않는다 — 그게 곧 신원이라서.
     comments: (comments.data ?? []).map((c) => ({
-      ...c,
+      ...stripDevice(c, deviceId),
       liked_by_me: likedComments.has(c.id),
-      // 자기 댓글은 추천 버튼을 비활성해야 한다 (F-42)
-      is_mine: deviceId ? c.device_id === deviceId : false,
     })),
   });
 }

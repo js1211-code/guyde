@@ -18,6 +18,18 @@ export function ok(data: unknown, status = 200) {
   return Response.json(data, { status });
 }
 
+/**
+ * device_id는 이 앱의 신원 그 자체다. 남의 device_id를 알면 그 사람으로
+ * 위장할 수 있으므로 응답에 절대 담지 않는다. 대신 is_mine만 계산해서 준다.
+ */
+export function stripDevice<T extends { device_id: string }>(
+  row: T,
+  viewer: string | null,
+): Omit<T, "device_id"> & { is_mine: boolean } {
+  const { device_id, ...rest } = row;
+  return { ...rest, is_mine: viewer !== null && device_id === viewer };
+}
+
 export function fail(code: string, status: number, detail?: string) {
   return Response.json({ error: code, detail }, { status });
 }

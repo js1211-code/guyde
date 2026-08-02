@@ -5,6 +5,7 @@ import {
   fromDbError,
   getDeviceId,
   ok,
+  stripDevice,
 } from "@/lib/api/http";
 
 const CATEGORIES = ["옷", "스킨케어", "바디&향수", "자유"] as const;
@@ -20,6 +21,7 @@ type PostType = (typeof POST_TYPES)[number];
  * 정렬은 최신순 고정(F-13). 집계는 posts_feed 뷰가 한 번에 준다(N+1 방지).
  */
 export async function GET(req: Request) {
+  const viewer = getDeviceId(req); // 없어도 된다 — 읽기는 열려 있다
   const url = new URL(req.url);
   const category = url.searchParams.get("category");
   const postType = url.searchParams.get("post_type");
@@ -46,7 +48,7 @@ export async function GET(req: Request) {
   const { data, error } = await query;
   if (error) return fail("DB_ERROR", 500, error.message);
 
-  return ok({ items: data });
+  return ok({ items: (data ?? []).map((row) => stripDevice(row, viewer)) });
 }
 
 /**

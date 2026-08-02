@@ -152,8 +152,13 @@ end $$;
 -- ※ CREATE OR REPLACE VIEW는 컬럼 타입도 이름도 바꾸지 못한다.
 --   여기서는 temperature 타입(numeric(4,1) → numeric)과
 --   컬럼명(vote_count → reaction_count)이 둘 다 바뀌므로 드롭 후 재생성해야 한다.
+--
+-- security_invoker = on 이 반드시 필요하다.
+-- 뷰는 기본이 "정의자 권한"이라 밑에 깔린 테이블의 RLS를 통째로 우회한다.
+-- 그대로 두면 공개된 anon 키로 피드 전체와 device_id가 읽힌다 — device_id는
+-- 이 앱의 신원 전체라서 그걸 알면 남으로 위장할 수 있다.
 drop view if exists posts_feed cascade;
-create view posts_feed as
+create view posts_feed with (security_invoker = on) as
 select
   p.id, p.category, p.post_type, p.title, p.body, p.created_at, p.device_id,
   u.nickname,
@@ -179,7 +184,7 @@ join users u on u.device_id = p.device_id;
 -- ---------- 6) 댓글 뷰 ----------
 -- 댓글마다 작성자 온도를 계산하면 N+1이 되므로 뷰에서 한 번에 붙인다 (F-41).
 drop view if exists comments_view cascade;
-create view comments_view as
+create view comments_view with (security_invoker = on) as
 select
   c.id, c.post_id, c.device_id, c.body, c.likes, c.created_at,
   u.nickname,
