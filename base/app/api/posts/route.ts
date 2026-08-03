@@ -8,11 +8,9 @@ import {
   stripDevice,
 } from "@/lib/api/http";
 
-const CATEGORIES = ["옷", "스킨케어", "바디&향수", "자유"] as const;
-const POST_TYPES = ["정보공유", "일반질문", "선택지투표", "무난함판정"] as const;
-
-type Category = (typeof CATEGORIES)[number];
-type PostType = (typeof POST_TYPES)[number];
+// 목록을 여기서 또 정의하면 카테고리를 추가할 때 한쪽만 고쳐서
+// "탭은 생겼는데 저장은 거부"가 된다. 항상 lib/constants.ts 한 곳에서 가져온다.
+import { CATEGORIES, POST_TYPES, type Category, type PostType } from "@/lib/constants";
 
 /**
  * F-11·12·13 피드 조회

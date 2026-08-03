@@ -3,7 +3,12 @@
  * 출처: Updated Feature List (F-06, F-71~73, F-80) + CLAUDE.md v2.
  */
 
-export const CATEGORIES = ["옷", "스킨케어", "바디&향수", "자유"] as const;
+/**
+ * 주제 축. post_type(물어보는 방식)과 완전히 다른 축이다.
+ * 여기를 고치면 db/patch_v2_3.sql의 CHECK 제약도 같이 고쳐야 한다 —
+ * DB가 거부하면 화면에만 탭이 생기고 글은 안 올라간다.
+ */
+export const CATEGORIES = ["헤어", "옷", "스킨케어", "바디&향수", "자유"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 /** 온도가 쌓이는 카테고리. '자유'는 잡담방이라 제외된다(F-06). */

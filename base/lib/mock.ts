@@ -70,6 +70,26 @@ const articles: Article[] = [
     related: ["이 선크림 백탁 없이 무난한가요?"],
   },
   {
+    id: "a-twoblock",
+    title: "투블럭, 이제 안 치는 사람이 더 많다",
+    lead: "옆을 바짝 치는 대신 두상을 살리는 쪽으로 옮겨가는 중이다.",
+    category: "헤어",
+    read_minutes: 3,
+    is_hero: false,
+    published_at: "2026.07.27",
+    sections: [
+      {
+        heading: "왜 덜 치기 시작했나",
+        body: "옆을 짧게 치면 두상이 그대로 드러난다. 뒤통수가 납작한 편이면 오히려 더 도드라져서, 요즘은 6mm 이상 남기고 층으로 정리하는 쪽을 권한다.",
+      },
+      {
+        heading: "미용실에서 뭐라고 말할까",
+        body: "기장보다 원하는 느낌을 사진으로 보여주는 게 정확하다. '옆은 남기고 뒤로 자연스럽게'가 가장 무난한 주문이다.",
+      },
+    ],
+    related: ["투블럭 기르는 중인데 옆머리 어디까지 참아야 하나요"],
+  },
+  {
     id: "a-knit",
     title: "겨울 니트 하나로 3주 버티는 법",
     lead: "세탁 주기를 늘리는 관리법.",
@@ -253,6 +273,39 @@ const experts: Expert[] = [
       { rating: 4, body: "채팅으로도 충분히 자세했습니다" },
     ],
     concerns: ["체형 커버", "소개팅룩", "면접복", "사이즈 고르기", "색 조합"],
+  },
+  {
+    id: "e-deer",
+    nickname: "말쑥한 사슴 #0231",
+    temperature: 38.9,
+    specialty: "헤어",
+    intro: "두상·모질 보고 어울리는 컷을 정확히 짚어드립니다",
+    price_chat: 15000,
+    price_video: 33000,
+    rating: 4.9,
+    highlights: [
+      {
+        body: "투블럭은 옆을 너무 치면 두상이 그대로 드러나요, 6mm부터 가세요",
+        post_title: "투블럭 기르는 중인데 옆머리 어디까지 참아야 하나요",
+        post_id: "seed-twoblock",
+      },
+      {
+        body: "모발이 얇으면 왁스보다 파우더가 훨씬 잘 잡힙니다",
+        post_title: "머리숱 적은데 왁스 뭐가 무난한가요",
+        post_id: "seed-wax",
+      },
+      {
+        body: "미용실에서는 '기장'보다 '어떤 느낌'을 사진으로 보여주는 게 정확해요",
+        post_title: "미용실에서 뭐라고 말해야 원하는 머리가 나오나요",
+        post_id: "seed-salon",
+      },
+    ],
+    reviews: [
+      { rating: 5, body: "두상 얘기 듣고 처음으로 머리가 마음에 들었어요" },
+      { rating: 5, body: "사진 보내니 바로 컷 이름까지 알려주심" },
+      { rating: 4, body: "제품 추천이 구체적이라 좋았습니다" },
+    ],
+    concerns: ["두상 커버", "모질에 맞는 컷", "스타일링 제품", "미용실에서 말하기", "기르는 중 관리"],
   },
   {
     id: "e-owl",
