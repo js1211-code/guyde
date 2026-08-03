@@ -103,21 +103,44 @@ async function loadPoll(db: Db, postId: string, deviceId: string | null) {
   }
   const total = votes.data?.length ?? 0;
   const myOptionId = mine.data?.option_id ?? null;
+  const rows = options.data ?? [];
+  const counts = rows.map((o) => tally.get(o.id) ?? 0);
+  const percents = toPercents(counts, total);
 
   return {
     total_votes: total,
     my_option_id: myOptionId,
     // 투표해야 결과가 공개된다 (F-32)
     revealed: myOptionId !== null,
-    options: (options.data ?? []).map((o) => ({
+    options: rows.map((o, i) => ({
       ...o,
-      vote_count: myOptionId ? (tally.get(o.id) ?? 0) : null,
-      percent:
-        myOptionId && total > 0
-          ? Math.round(((tally.get(o.id) ?? 0) / total) * 100)
-          : null,
+      vote_count: myOptionId ? counts[i] : null,
+      percent: myOptionId && total > 0 ? percents[i] : null,
     })),
   };
+}
+
+/**
+ * 득표율을 정수로 나누되 합이 정확히 100이 되게 한다(최대잔여법).
+ * 선택지마다 따로 반올림하면 62.5→63, 37.5→38 처럼 합이 101%가 되어
+ * 화면에서 바로 티가 난다.
+ */
+function toPercents(counts: number[], total: number): number[] {
+  if (total <= 0) return counts.map(() => 0);
+
+  const exact = counts.map((c) => (c / total) * 100);
+  const out = exact.map(Math.floor);
+  let left = 100 - out.reduce((a, b) => a + b, 0);
+
+  // 소수부가 큰 순서로 남은 1%씩 나눠준다
+  const byFraction = exact
+    .map((v, i) => ({ i, frac: v - Math.floor(v) }))
+    .sort((a, b) => b.frac - a.frac);
+
+  for (let k = 0; k < byFraction.length && left > 0; k++, left--) {
+    out[byFraction[k].i] += 1;
+  }
+  return out;
 }
 
 /** F-34·35 무난해요/애매해요 카운트 + 내 선택 */

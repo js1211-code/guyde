@@ -5,6 +5,7 @@ import { CategoryBadge, MineBadge, PhotoBox, PostTypeBadge } from "@/components/
 import { CheckIcon, MoreIcon, ThumbsUpIcon } from "@/components/icons";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
+import { timeAgo } from "@/lib/format";
 import {
   addComment,
   castNanhanVote,
@@ -83,7 +84,7 @@ export default function PostPage({
               <PostTypeBadge postType={post.post_type} />
             )}
             <span className="ml-auto text-[11px] text-neutral-600">
-              {post.created_at}
+              {timeAgo(post.created_at)}
             </span>
           </div>
 
@@ -172,35 +173,46 @@ function Poll({
         {poll.options.map((o) => {
           const mine = o.id === poll.my_option_id;
           const leading = (o.vote_count ?? 0) === top;
+          const pct = o.percent ?? 0;
+
           return (
             <button
               key={o.id}
               type="button"
               disabled={busy}
               onClick={() => !mine && vote(o.id)}
-              className={`relative flex h-[38px] text-[13px] font-bold ${
-                mine ? "border-2 border-brand" : "border border-neutral-400"
+              className={`relative flex h-[38px] items-center overflow-hidden border text-left ${
+                mine
+                  ? "border-2 border-brand"
+                  : leading
+                    ? "border-brand"
+                    : "border-neutral-400"
               }`}
             >
+              {/*
+                채움은 배경 띠로만 둔다. 라벨을 이 안에 넣으면 0%·100%에서
+                글자가 막대 밖으로 새거나 눌려 버린다.
+              */}
               <span
-                className={`flex items-center pl-3 ${
-                  leading ? "bg-brand text-white" : "hatch text-neutral-600"
+                aria-hidden
+                className={`absolute inset-y-0 left-0 ${
+                  leading ? "bg-brand/15" : "hatch"
                 }`}
-                style={{ width: `${o.percent ?? 0}%` }}
-              >
-                {o.text} {o.percent}%
-              </span>
-              {leading && (
-                <span className="flex flex-1 items-center pl-3 text-neutral-600">
-                  {100 - (o.percent ?? 0)}%
+                style={{ width: `${pct}%` }}
+              />
+              <span className="relative flex w-full items-center justify-between px-3 text-[13px]">
+                <span className={leading ? "font-bold" : "text-neutral-700"}>
+                  {o.text}
                 </span>
-              )}
-              {mine && (
-                <CheckIcon
-                  size={15}
-                  className="absolute top-1/2 right-1.5 -translate-y-1/2 text-brand"
-                />
-              )}
+                <span
+                  className={`flex items-center gap-1 ${
+                    leading ? "font-bold text-brand" : "text-neutral-600"
+                  }`}
+                >
+                  {mine && <CheckIcon size={14} className="text-brand" />}
+                  {pct}%
+                </span>
+              </span>
             </button>
           );
         })}

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CategoryBadge, PostTypeBadge } from "@/components/badge";
 import { ThumbsUpIcon } from "@/components/icons";
 import { AppShell, ScreenBody, TopBar } from "@/components/shell";
+import { timeAgo } from "@/lib/format";
 import {
   fetchMyComments,
   fetchMyPosts,
@@ -89,7 +90,7 @@ function PostList({ items }: { items: FeedItem[] | null }) {
             <CategoryBadge>{p.category}</CategoryBadge>
             <PostTypeBadge postType={p.post_type} nanhanPercent={p.nanhan_percent} />
             <span className="ml-auto text-[11px] text-neutral-600">
-              {p.created_at}
+              {timeAgo(p.created_at)}
             </span>
           </div>
           <p className="text-[14.5px] leading-snug font-medium">{p.title}</p>

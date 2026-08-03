@@ -7,6 +7,7 @@ import { MessageIcon } from "@/components/icons";
 import { NoticeBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
+import { timeAgo } from "@/lib/format";
 import { CATEGORIES, type Category } from "@/lib/constants";
 
 /** 탭 6개 — '무난무난'만 카테고리가 아니라 글 유형 필터다(F-10·F-12). */
@@ -147,7 +148,7 @@ function FeedCard({ item }: { item: FeedItem }) {
           nanhanPercent={item.nanhan_percent}
         />
         <span className="ml-auto text-[11px] text-neutral-600">
-          {item.created_at}
+          {timeAgo(item.created_at)}
         </span>
       </div>
 
