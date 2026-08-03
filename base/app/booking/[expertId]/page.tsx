@@ -80,12 +80,13 @@ export default function BookingPage({
                   setDay(d);
                   setTime(null);
                 }}
-                className={`flex h-8 items-center justify-center text-[12.5px] ${
+                // 선택 = 테두리 유지 + 틴트 채움. 열린 날짜는 테두리만.
+                className={`flex h-8 items-center justify-center border text-[12.5px] ${
                   selected
-                    ? "bg-brand font-bold text-white"
+                    ? "border-brand bg-brand/15 font-bold text-brand-dark"
                     : open
-                      ? "border border-brand font-bold text-brand"
-                      : "text-neutral-300"
+                      ? "border-brand text-brand"
+                      : "border-transparent text-neutral-300"
                 }`}
               >
                 {d}
@@ -105,10 +106,10 @@ export default function BookingPage({
                   key={t}
                   type="button"
                   onClick={() => setTime(t)}
-                  className={`px-3 py-1.5 text-[13px] font-bold ${
+                  className={`border px-3 py-1.5 text-[13px] ${
                     time === t
-                      ? "bg-brand text-white"
-                      : "border border-brand text-brand"
+                      ? "border-brand bg-brand/15 font-bold text-brand-dark"
+                      : "border-brand text-brand"
                   }`}
                 >
                   {t}
@@ -134,11 +135,13 @@ export default function BookingPage({
                 className="flex items-center gap-2 text-left"
               >
                 <span
-                  className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center ${
-                    on ? "bg-brand" : "border border-neutral-400"
+                  className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center border ${
+                    on ? "border-brand bg-brand/15" : "border-neutral-400"
                   }`}
                 >
-                  {on && <CheckIcon size={12} strokeWidth={2.5} className="text-white" />}
+                  {on && (
+                    <CheckIcon size={12} strokeWidth={2.5} className="text-brand-dark" />
+                  )}
                 </span>
                 <span className="text-[13.5px]">{c}</span>
               </button>

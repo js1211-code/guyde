@@ -62,10 +62,12 @@ export function Chip({
   selected?: boolean;
   onClick?: () => void;
 }) {
-  const cls = `px-2.5 py-1 text-[12px] ${
+  // 선택돼도 테두리는 유지하고 버건디 틴트로 연하게 채운다.
+  // 꽉 찬 색으로 바꾸면 박스 선이 사라져서 뭐가 선택된 건지 흐려진다.
+  const cls = `border px-2.5 py-1 text-[12px] ${
     selected
-      ? "bg-brand font-bold text-white"
-      : "border border-neutral-400 text-neutral-600"
+      ? "border-brand bg-brand/15 font-bold text-brand-dark"
+      : "border-neutral-400 text-neutral-600"
   }`;
   if (!onClick) return <span className={cls}>{children}</span>;
   return (

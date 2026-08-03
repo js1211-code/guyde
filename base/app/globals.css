@@ -72,20 +72,26 @@ body {
   pointer-events: none;
 }
 
-/* 이 앱에서 둥근 모서리는 쓰지 않는다 */
-input,
-textarea,
-button,
-select {
-  border-radius: 0;
-  font: inherit;
-  color: inherit;
-  background: transparent;
-}
+/*
+  폼 요소 리셋 — 반드시 @layer base 안에 둔다.
+  레이어 밖에 두면 Tailwind 유틸리티(@layer utilities)를 specificity와 무관하게
+  전부 이겨버려서, 버튼에 붙인 bg-*, text-*, font-* 가 통째로 무시된다.
+*/
+@layer base {
+  input,
+  textarea,
+  button,
+  select {
+    border-radius: 0;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+  }
 
-input::placeholder,
-textarea::placeholder {
-  color: var(--color-neutral-500);
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-neutral-500);
+  }
 }
 
 :focus-visible {
