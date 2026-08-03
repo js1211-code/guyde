@@ -3,22 +3,34 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PostTypeBadge } from "@/components/badge";
+import { ThumbsUpIcon } from "@/components/icons";
 import { AppShell, ScreenBody, TopBar } from "@/components/shell";
-import { fetchFeed, type FeedItem } from "@/lib/api";
+import {
+  fetchMyComments,
+  fetchMyPosts,
+  type FeedItem,
+  type MyComment,
+} from "@/lib/api";
+
+type Tab = "posts" | "comments";
 
 /**
- * ⑲ 내 활동 — 내 글 / 내 댓글 두 섹션.
- * 전부 device_id 기준이다(F-74·F-75). 지금은 피드에서 is_mine으로 걸러 쓰고,
- * 내 댓글 전용 엔드포인트가 생기면 아래 두 번째 탭만 바꾸면 된다.
+ * ⑲ 내 활동 — 내 글 / 내 댓글.
+ * 둘 다 device_id 기준 전용 엔드포인트를 쓴다(F-74·F-75).
+ * 피드를 받아 걸러내면 첫 페이지 밖의 내 글이 빠져서 안 된다.
  */
 export default function ActivityPage() {
-  const [tab, setTab] = useState<"posts" | "comments">("posts");
-  const [mine, setMine] = useState<FeedItem[] | null>(null);
+  const [tab, setTab] = useState<Tab>("posts");
+  const [posts, setPosts] = useState<FeedItem[] | null>(null);
+  const [comments, setComments] = useState<MyComment[] | null>(null);
 
   useEffect(() => {
-    fetchFeed({})
-      .then((rows) => setMine(rows.filter((r) => r.is_mine)))
-      .catch(() => setMine([]));
+    fetchMyPosts()
+      .then(setPosts)
+      .catch(() => setPosts([]));
+    fetchMyComments()
+      .then(setComments)
+      .catch(() => setComments([]));
   }, []);
 
   return (
@@ -28,10 +40,10 @@ export default function ActivityPage() {
       <div className="flex border-b border-neutral-400 px-4 pt-3">
         {(
           [
-            ["posts", "내 글"],
-            ["comments", "내 댓글"],
+            ["posts", "내 글", posts?.length],
+            ["comments", "내 댓글", comments?.length],
           ] as const
-        ).map(([key, label]) => (
+        ).map(([key, label, count]) => (
           <button
             key={key}
             type="button"
@@ -43,61 +55,91 @@ export default function ActivityPage() {
             }`}
           >
             {label}
+            {count !== undefined && (
+              <span className="cond ml-1 font-semibold">{count}</span>
+            )}
           </button>
         ))}
       </div>
 
       <ScreenBody className="px-4">
         {tab === "posts" ? (
-          <>
-            {mine === null && (
-              <p className="py-10 text-center text-[13px] text-neutral-500">
-                불러오는 중…
-              </p>
-            )}
-            {mine?.length === 0 && (
-              <p className="py-10 text-center text-[13px] text-neutral-600">
-                아직 쓴 글이 없어요
-              </p>
-            )}
-            {mine?.map((p) => (
-              <Link
-                key={p.id}
-                href={`/post/${p.id}`}
-                className="block border-b border-dashed border-neutral-400 py-3"
-              >
-                <div className="mb-1 flex items-center gap-1.5">
-                  <CategoryBadge>{p.category}</CategoryBadge>
-                  <PostTypeBadge
-                    postType={p.post_type}
-                    nanhanPercent={p.nanhan_percent}
-                  />
-                  <span className="ml-auto text-[11px] text-neutral-600">
-                    {p.created_at}
-                  </span>
-                </div>
-                <p className="text-[14.5px] leading-snug font-medium">{p.title}</p>
-                <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-600">
-                  {p.post_type === "선택지투표" && (
-                    <span className="cond tracking-wide">
-                      VOTES {p.reaction_count}
-                    </span>
-                  )}
-                  <span>댓글 {p.comment_count}</span>
-                </div>
-              </Link>
-            ))}
-          </>
+          <PostList items={posts} />
         ) : (
-          <p className="py-10 text-center text-[13px] leading-relaxed text-neutral-600">
-            내 댓글 목록은 아직 준비 중이에요.
-            <br />
-            <span className="text-[12px] text-neutral-500">
-              (댓글 전용 조회 API가 붙으면 여기에 표시됩니다)
-            </span>
-          </p>
+          <CommentList items={comments} />
         )}
       </ScreenBody>
     </AppShell>
+  );
+}
+
+function PostList({ items }: { items: FeedItem[] | null }) {
+  if (items === null) return <Loading />;
+  if (items.length === 0) return <Empty>아직 쓴 글이 없어요</Empty>;
+
+  return (
+    <>
+      {items.map((p) => (
+        <Link
+          key={p.id}
+          href={`/post/${p.id}`}
+          className="block border-b border-dashed border-neutral-400 py-3"
+        >
+          <div className="mb-1 flex items-center gap-1.5">
+            <CategoryBadge>{p.category}</CategoryBadge>
+            <PostTypeBadge postType={p.post_type} nanhanPercent={p.nanhan_percent} />
+            <span className="ml-auto text-[11px] text-neutral-600">
+              {p.created_at}
+            </span>
+          </div>
+          <p className="text-[14.5px] leading-snug font-medium">{p.title}</p>
+          <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-600">
+            {p.post_type === "선택지투표" && (
+              <span className="cond tracking-wide">VOTES {p.reaction_count}</span>
+            )}
+            <span>댓글 {p.comment_count}</span>
+          </div>
+        </Link>
+      ))}
+    </>
+  );
+}
+
+function CommentList({ items }: { items: MyComment[] | null }) {
+  if (items === null) return <Loading />;
+  if (items.length === 0) return <Empty>아직 쓴 댓글이 없어요</Empty>;
+
+  return (
+    <>
+      {items.map((c) => (
+        <Link
+          key={c.id}
+          href={c.post ? `/post/${c.post.id}` : "#"}
+          className="block border-b border-dashed border-neutral-400 py-3"
+        >
+          {/* 어느 글에 단 댓글인지 먼저 보여야 맥락이 산다 */}
+          <p className="mb-1 text-[11.5px] text-neutral-600">
+            {c.post?.title ?? "삭제된 글"}
+          </p>
+          <p className="text-[14px] leading-relaxed">{c.body}</p>
+          <span className="mt-1.5 flex items-center gap-1 text-[11.5px] text-neutral-500">
+            <ThumbsUpIcon size={13} />
+            <span className="font-bold">{c.likes}</span>
+          </span>
+        </Link>
+      ))}
+    </>
+  );
+}
+
+function Loading() {
+  return (
+    <p className="py-10 text-center text-[13px] text-neutral-500">불러오는 중…</p>
+  );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="py-10 text-center text-[13px] text-neutral-600">{children}</p>
   );
 }

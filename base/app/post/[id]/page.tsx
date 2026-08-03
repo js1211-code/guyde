@@ -100,9 +100,15 @@ export default function PostPage({
             </p>
           )}
 
-          {post.images.length > 0 && (
-            <PhotoBox className="mt-3 h-[160px]" iconSize={24} />
-          )}
+          {post.images.map((img) => (
+            <PhotoBox
+              key={img.id}
+              src={img.url}
+              alt=""
+              className="mt-3 h-[160px]"
+              iconSize={24}
+            />
+          ))}
 
           {data.poll && <Poll postId={post.id} poll={data.poll} onDone={reload} />}
           {data.nanhan && (

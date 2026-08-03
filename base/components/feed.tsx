@@ -158,7 +158,12 @@ function FeedCard({ item }: { item: FeedItem }) {
             {meta}
             {author}
           </div>
-          <PhotoBox className="h-[68px] w-[68px] shrink-0" marks />
+          <PhotoBox
+            src={item.thumbnail_url}
+            alt=""
+            className="h-[68px] w-[68px] shrink-0"
+            marks
+          />
         </div>
       ) : (
         <>

@@ -13,7 +13,7 @@ import {
   ScreenBody,
   TopBar,
 } from "@/components/shell";
-import { ApiError, createPost } from "@/lib/api";
+import { ApiError, createPost, uploadImage } from "@/lib/api";
 import {
   CATEGORIES,
   POLL_OPTION_MAX,
@@ -98,9 +98,24 @@ function Composer({
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [options, setOptions] = useState(["", ""]);
-  const [images, setImages] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  async function pickImage(file: File) {
+    setUploading(true);
+    setError(null);
+    try {
+      const url = await uploadImage(file);
+      setImages((prev) => [...prev, url]);
+    } catch (e) {
+      setError(
+        e instanceof ApiError && e.detail ? e.detail : "사진을 올리지 못했어요",
+      );
+    }
+    setUploading(false);
+  }
 
   const filledOptions = options.map((o) => o.trim()).filter(Boolean);
   const ready =
@@ -118,6 +133,7 @@ function Composer({
         title: title.trim(),
         body: body.trim(),
         options: postType === "선택지투표" ? filledOptions : undefined,
+        image_urls: images,
       });
       router.push(`/post/${id}`);
     } catch (e) {
@@ -164,12 +180,25 @@ function Composer({
           className="mt-2 h-[92px] w-full resize-none text-[13px] leading-relaxed"
         />
 
-        <div className="mt-3 flex gap-2">
-          {Array.from({ length: images }, (_, i) => (
-            <PhotoBox key={i} className="h-[64px] w-[64px]" iconSize={16} />
+        <div className="mt-3 flex items-center gap-2">
+          {images.map((url, i) => (
+            <span key={url} className="relative">
+              <PhotoBox src={url} alt="" className="h-[64px] w-[64px]" />
+              <button
+                type="button"
+                aria-label="사진 빼기"
+                onClick={() => setImages((prev) => prev.filter((_, x) => x !== i))}
+                className="absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center bg-ink text-[11px] leading-none text-white"
+              >
+                ×
+              </button>
+            </span>
           ))}
-          {images < POST_IMAGE_MAX && (
-            <PhotoSlot onClick={() => setImages((n) => n + 1)} />
+          {images.length < POST_IMAGE_MAX && (
+            <PhotoSlot onPick={pickImage} disabled={uploading} />
+          )}
+          {uploading && (
+            <span className="text-[12px] text-neutral-500">올리는 중…</span>
           )}
         </div>
 

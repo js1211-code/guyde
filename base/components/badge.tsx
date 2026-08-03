@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ImageIcon } from "@/components/icons";
 import { Reg } from "@/components/reg";
 
@@ -75,32 +76,77 @@ export function Chip({
 }
 
 /**
- * 사진 자리표시자. Storage 연결 전까지 전 화면이 이걸 쓴다.
+ * 사진 박스. url이 있으면 실제 이미지를, 없으면 자리표시자를 그린다.
  * 등록마크는 큰 박스에만 붙인다 — 작은 썸네일에 붙이면 지저분해진다.
  */
 export function PhotoBox({
+  src,
+  alt = "",
   className = "",
   iconSize = 18,
   marks = true,
 }: {
+  src?: string | null;
+  alt?: string;
   className?: string;
   iconSize?: number;
   marks?: boolean;
 }) {
   return (
     <div
-      className={`relative flex items-center justify-center border border-neutral-400 bg-brand-tint ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden border border-neutral-400 bg-brand-tint ${className}`}
     >
       {marks && <Reg size="sm" />}
-      <ImageIcon size={iconSize} className="text-brand-dark" />
+      {src ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 430px) 100vw, 430px"
+          className="object-cover"
+        />
+      ) : (
+        <ImageIcon size={iconSize} className="text-brand-dark" />
+      )}
     </div>
   );
 }
 
-/** 빈 사진 추가 슬롯 */
-export function PhotoSlot({ onClick }: { onClick?: () => void }) {
+/**
+ * 빈 사진 추가 슬롯.
+ * onPick을 주면 파일 선택창이 열린다(input은 감춰두고 라벨로 감싼다).
+ */
+export function PhotoSlot({
+  onClick,
+  onPick,
+  disabled = false,
+}: {
+  onClick?: () => void;
+  onPick?: (file: File) => void;
+  disabled?: boolean;
+}) {
   const cls =
-    "flex h-[64px] w-[64px] items-center justify-center border border-dashed border-neutral-400 text-neutral-500";
+    "flex h-[64px] w-[64px] cursor-pointer items-center justify-center border border-dashed border-neutral-400 text-neutral-500";
+
+  if (onPick) {
+    return (
+      <label className={`${cls} ${disabled ? "opacity-50" : ""}`} aria-label="사진 추가">
+        <input
+          type="file"
+          accept="image/*"
+          disabled={disabled}
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onPick(file);
+            e.target.value = "";
+          }}
+        />
+        <PlusGlyph />
+      </label>
+    );
+  }
+
   if (!onClick) return <div className={cls}><PlusGlyph /></div>;
   return (
     <button type="button" onClick={onClick} className={cls} aria-label="사진 추가">

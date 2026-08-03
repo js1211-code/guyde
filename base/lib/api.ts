@@ -6,7 +6,7 @@
  * device_id는 응답에 담기지 않고 대신 is_mine이 온다.
  */
 
-import { apiFetch } from "@/lib/device";
+import { apiFetch, getOrCreateDeviceId } from "@/lib/device";
 import type { Category, PostType } from "@/lib/constants";
 
 export type FeedItem = {
@@ -96,12 +96,52 @@ export async function fetchPost(id: string): Promise<PostDetail> {
   return json<PostDetail>(await apiFetch(`/api/posts/${id}`));
 }
 
+export async function fetchMyPosts(): Promise<FeedItem[]> {
+  const { items } = await json<{ items: FeedItem[] }>(
+    await apiFetch("/api/users/me/posts"),
+  );
+  return items;
+}
+
+export type MyComment = {
+  id: string;
+  body: string;
+  likes: number;
+  created_at: string;
+  post: { id: string; title: string; category: Category; post_type: PostType } | null;
+};
+
+export async function fetchMyComments(): Promise<MyComment[]> {
+  const { items } = await json<{ items: MyComment[] }>(
+    await apiFetch("/api/users/me/comments"),
+  );
+  return items;
+}
+
+/**
+ * 사진 업로드. Content-Type은 브라우저가 boundary까지 붙여서 정해야 하므로
+ * apiFetch의 기본 헤더를 쓰지 않고 직접 만든다.
+ */
+export async function uploadImage(file: File): Promise<string> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("/api/uploads", {
+    method: "POST",
+    headers: { "X-Device-Id": getOrCreateDeviceId() },
+    body: form,
+  });
+  const { url } = await json<{ url: string }>(res);
+  return url;
+}
+
 export async function createPost(input: {
   category: Category;
   post_type: PostType;
   title: string;
   body: string;
   options?: string[];
+  image_urls?: string[];
 }): Promise<{ id: string }> {
   return json<{ id: string }>(
     await apiFetch("/api/posts", {
