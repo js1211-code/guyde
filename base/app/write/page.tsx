@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Chip, PhotoBox, PhotoSlot } from "@/components/badge";
@@ -13,7 +14,9 @@ import {
   ScreenBody,
   TopBar,
 } from "@/components/shell";
+import { AdReward } from "@/components/ad-reward";
 import { ApiError, createPost, uploadImage } from "@/lib/api";
+import { useMe } from "@/lib/use-me";
 import {
   CATEGORIES,
   POLL_OPTION_MAX,
@@ -117,8 +120,16 @@ function Composer({
     setUploading(false);
   }
 
+  const { me } = useMe();
+  const [hearts, setHearts] = useState<number | null>(null);
+  const balance = hearts ?? me?.hearts ?? null;
+  // 하트가 없으면 아예 올릴 수 없다. DB도 INSUFFICIENT_HEARTS로 막지만,
+  // 다 써놓고 마지막에 막히면 헛수고라 여기서 먼저 알린다.
+  const noHearts = balance !== null && balance < POST_COST_HEARTS;
+
   const filledOptions = options.map((o) => o.trim()).filter(Boolean);
   const ready =
+    !noHearts &&
     title.trim().length > 0 &&
     body.trim().length > 0 &&
     (postType !== "선택지투표" || filledOptions.length >= POLL_OPTION_MIN);
@@ -261,9 +272,39 @@ function Composer({
       </ScreenBody>
 
       <BottomBar bordered={false}>
-        <PrimaryButton disabled={!ready || saving} onClick={submit}>
-          {saving ? "올리는 중…" : `하트 ${POST_COST_HEARTS}개로 올리기`}
-        </PrimaryButton>
+        {noHearts ? (
+          <div className="border border-brand bg-brand/15 p-3.5">
+            <p className="text-[13.5px] font-bold text-brand-dark">
+              하트가 없어 글을 올릴 수 없어요
+            </p>
+            <p className="mt-1 mb-3 text-[12px] text-neutral-700">
+              광고를 보거나 충전하면 바로 올릴 수 있어요.
+            </p>
+            <div className="bg-paper">
+              <AdReward
+                compact
+                onGranted={(next) => setHearts(next)}
+              />
+            </div>
+            <Link
+              href="/hearts"
+              className="mt-2 block bg-brand py-2.5 text-center text-[13px] font-bold text-white"
+            >
+              충전하러 가기
+            </Link>
+          </div>
+        ) : (
+          <>
+            <PrimaryButton disabled={!ready || saving} onClick={submit}>
+              {saving ? "올리는 중…" : `하트 ${POST_COST_HEARTS}개로 올리기`}
+            </PrimaryButton>
+            {balance !== null && (
+              <p className="mt-2 text-center text-[11.5px] text-neutral-600">
+                내 하트 {balance}개
+              </p>
+            )}
+          </>
+        )}
       </BottomBar>
     </AppShell>
   );

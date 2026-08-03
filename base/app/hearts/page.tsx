@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AdReward } from "@/components/ad-reward";
 import { HeartIcon } from "@/components/icons";
 import { Reg } from "@/components/reg";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
@@ -77,6 +78,14 @@ export default function HeartShopPage() {
             {error}
           </p>
         )}
+
+        <Kicker className="mt-6 mb-2">무료로 받기</Kicker>
+        <AdReward
+          onGranted={(next, granted) => {
+            setHearts(next);
+            setDone({ granted });
+          }}
+        />
 
         <Kicker className="mt-6 mb-2">충전하기</Kicker>
         <ul className="flex flex-col gap-2">

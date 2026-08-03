@@ -34,6 +34,12 @@ export const TEMP_EXPERT_GATE = 42.0;
 export const EXPERT_TOP_PERCENT = 10;
 
 export const POST_COST_HEARTS = 1;
+
+/** 광고 한 번 보면 주는 하트 (F-80) */
+export const AD_REWARD_HEARTS = 2;
+/** 무한 수급을 막는 상한. 최근 24시간 기준. */
+export const AD_REWARD_LIMIT = 5;
+export const AD_REWARD_WINDOW_HOURS = 24;
 export const POLL_OPTION_MIN = 2;
 export const POLL_OPTION_MAX = 5;
 export const POST_IMAGE_MAX = 2;
