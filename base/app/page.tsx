@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Feed } from "@/components/feed";
 import { FirstRun } from "@/components/first-run";
 import { HeartIcon } from "@/components/icons";
@@ -21,12 +22,17 @@ export default function CommunityPage() {
             일단, 베이스부터.
           </p>
         </div>
-        <span className="flex items-center gap-1.5 border border-neutral-400 px-2 py-1">
+        {/* 하트를 누르면 충전 샵으로 */}
+        <Link
+          href="/hearts"
+          aria-label="하트 충전"
+          className="flex items-center gap-1.5 border border-neutral-400 px-2 py-1"
+        >
           <HeartIcon size={14} className="text-brand" />
           <span className="cond text-[15px] leading-none font-bold text-brand">
             {me?.hearts ?? "–"}
           </span>
-        </span>
+        </Link>
       </header>
 
       <ScreenBody>
