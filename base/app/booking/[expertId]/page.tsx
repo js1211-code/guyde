@@ -1,9 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { use, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, use, useState } from "react";
 import { PhotoSlot } from "@/components/badge";
 import { CheckIcon } from "@/components/icons";
+import {
+  SERVICE_LABEL,
+  type ServiceFormat,
+} from "@/components/expert-booking";
 import {
   AppShell,
   BottomBar,
@@ -18,20 +22,33 @@ const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const AUG_2026_OFFSET = 6;
 const AUG_2026_DAYS = 31;
 
-/**
- * ⑯ 예약 신청.
- * 고수가 열어둔 슬롯만 활성화되고 나머지는 비활성으로 보인다(F-56).
- * 결제는 붙이지 않는다 — 안내 문구만(F-59).
- */
 export default function BookingPage({
   params,
 }: {
   params: Promise<{ expertId: string }>;
 }) {
+  // useSearchParams는 서스펜스 경계가 필요하다
+  return (
+    <Suspense fallback={null}>
+      <BookingForm params={params} />
+    </Suspense>
+  );
+}
+
+/**
+ * ⑯ 예약 신청.
+ * 상담 형식은 앞 화면(고수 프로필)에서 고르고 여기로 넘어온다 — 가격 안내가
+ * 형식에 따라 달라지므로 여기서 다시 묻지 않는다.
+ * 고수가 열어둔 슬롯만 활성화된다(F-56). 결제는 붙이지 않고 안내 문구만(F-59).
+ */
+function BookingForm({ params }: { params: Promise<{ expertId: string }> }) {
   const { expertId } = use(params);
   const router = useRouter();
+  const search = useSearchParams();
   const expert = getExpert(expertId);
   const slots = getSlots(expertId);
+
+  const format: ServiceFormat = search.get("format") === "video" ? "video" : "chat";
 
   const [day, setDay] = useState<number | null>(slots[0]?.day ?? null);
   const [time, setTime] = useState<string | null>(null);
@@ -49,15 +66,36 @@ export default function BookingPage({
     );
   }
 
+  const price = format === "video" ? expert.price_video : expert.price_chat;
   const openDays = new Set(slots.map((s) => s.day));
   const timesForDay = slots.find((s) => s.day === day)?.times ?? [];
   const ready = day !== null && time !== null;
+
+  function submit() {
+    const q = new URLSearchParams({
+      format,
+      day: String(day),
+      time: time ?? "",
+      concerns: concerns.join(","),
+    });
+    router.push(`/booking/done/${expertId}?${q}`);
+  }
 
   return (
     <AppShell>
       <TopBar backHref={`/experts/${expertId}`} title="예약 신청" />
 
       <ScreenBody className="px-4 pt-3">
+        {/* 앞 화면에서 고른 형식을 다시 보여준다 */}
+        <div className="mb-4 flex items-center justify-between border border-brand bg-brand/15 px-3 py-2.5">
+          <span className="text-[13px] font-semibold text-brand-dark">
+            {expert.nickname} · {SERVICE_LABEL[format]}
+          </span>
+          <span className="cond text-[15px] font-bold text-brand">
+            ₩{price.toLocaleString("ko-KR")}
+          </span>
+        </div>
+
         <p className="mb-2 text-[13px] font-bold">날짜 선택 · 2026년 8월</p>
         <div className="grid grid-cols-7 gap-1 text-center text-[12px] text-neutral-500">
           {WEEKDAYS.map((w) => (
@@ -80,7 +118,7 @@ export default function BookingPage({
                   setDay(d);
                   setTime(null);
                 }}
-                // 선택 = 테두리 유지 + 틴트 채움. 열린 날짜는 테두리만.
+                // 선택 = 테두리 유지 + 연한 채움. 열린 날짜는 테두리만.
                 className={`flex h-8 items-center justify-center border text-[12.5px] ${
                   selected
                     ? "border-brand bg-brand/15 font-bold text-brand-dark"
@@ -161,16 +199,13 @@ export default function BookingPage({
         <PhotoSlot />
 
         <p className="mt-5 mb-2 text-[12px] text-neutral-600">
-          상담료 {expert.price_chat.toLocaleString("ko-KR")}원 · 결제는 준비 중입니다
+          상담료 {price.toLocaleString("ko-KR")}원 · 결제는 준비 중입니다
         </p>
       </ScreenBody>
 
       <BottomBar>
-        <PrimaryButton
-          disabled={!ready}
-          onClick={() => router.push(`/booking/done/${expertId}`)}
-        >
-          예약 신청
+        <PrimaryButton disabled={!ready} onClick={submit}>
+          {ready ? "예약 신청" : "날짜와 시간을 골라주세요"}
         </PrimaryButton>
       </BottomBar>
     </AppShell>

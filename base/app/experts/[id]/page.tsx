@@ -1,16 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CategoryBadge } from "@/components/badge";
 import { ArrowUpRightIcon } from "@/components/icons";
-import {
-  AppShell,
-  BottomBar,
-  Kicker,
-  PrimaryButton,
-  ScreenBody,
-  TopBar,
-} from "@/components/shell";
-import { Temperature } from "@/components/temperature";
+import { ExpertBooking } from "@/components/expert-booking";
+import { AppShell, Kicker, TopBar } from "@/components/shell";
 import { getExpert, getExpertIds } from "@/lib/mock";
 
 export function generateStaticParams() {
@@ -21,6 +13,9 @@ export function generateStaticParams() {
  * ⑮ 고수 프로필.
  * 이 화면의 핵심은 "커뮤니티 대표 답변 3개"다(F-55) — 실제로 단 댓글을 인용하고
  * 원본 글로 이어진다. 이게 없으면 크몽·숨고와 구분되지 않는다.
+ *
+ * 프로필 헤더·상담 형식 선택·예약 CTA는 상태를 공유해야 해서 ExpertBooking이 맡고,
+ * 무거운 인용·후기 섹션은 서버에서 그린 채로 children으로 넘긴다.
  */
 export default async function ExpertPage({
   params,
@@ -35,34 +30,15 @@ export default async function ExpertPage({
     <AppShell>
       <TopBar backHref="/experts" />
 
-      <ScreenBody>
-        <section className="border-b-8 border-neutral-200 px-4 pt-4 pb-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[17px] font-bold">{expert.nickname}</span>
-            <Temperature value={expert.temperature} size={13} />
-          </div>
-          <span className="mt-1.5 inline-block">
-            <CategoryBadge>{expert.specialty}</CategoryBadge>
-          </span>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed text-neutral-700">
-            {expert.intro}
-          </p>
-
-          <div className="mt-3 flex gap-2">
-            {[
-              { label: "비동기 채팅", price: expert.price_chat },
-              { label: "화상 상담", price: expert.price_video },
-            ].map((s) => (
-              <div key={s.label} className="flex-1 border border-neutral-400 p-2.5">
-                <p className="text-[12px] text-neutral-600">{s.label}</p>
-                <p className="cond text-[16px] font-bold text-brand">
-                  ₩{s.price.toLocaleString("ko-KR")}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
+      <ExpertBooking
+        expertId={expert.id}
+        nickname={expert.nickname}
+        temperature={expert.temperature}
+        specialty={expert.specialty}
+        intro={expert.intro}
+        priceChat={expert.price_chat}
+        priceVideo={expert.price_video}
+      >
         <section className="border-b-8 border-neutral-200 px-4 pt-4 pb-4">
           <p className="cond mb-3 text-[13px] font-semibold tracking-wide text-brand">
             커뮤니티 대표 답변 3개
@@ -95,11 +71,7 @@ export default async function ExpertPage({
             </div>
           ))}
         </section>
-      </ScreenBody>
-
-      <BottomBar>
-        <PrimaryButton href={`/booking/${expert.id}`}>예약 신청하기</PrimaryButton>
-      </BottomBar>
+      </ExpertBooking>
     </AppShell>
   );
 }

@@ -1,29 +1,43 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckIcon } from "@/components/icons";
+import { SERVICE_LABEL, type ServiceFormat } from "@/components/expert-booking";
 import { Reg } from "@/components/reg";
 import { AppShell, BottomBar } from "@/components/shell";
-import { getBookings, getExpert, getExpertIds } from "@/lib/mock";
+import { getExpert } from "@/lib/mock";
 
-export function generateStaticParams() {
-  return getExpertIds().map((id) => ({ id }));
-}
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const AUG_2026_OFFSET = 6;
 
 /**
  * ⑰ 예약 완료.
  * 상태는 '신청 접수' 하나뿐이고 전환이 없다(F-60) — 상태 머신을 만들지 않는다.
+ * 방금 넣은 신청 내용은 쿼리로 넘어온다(아직 예약 저장 API가 없어서).
  */
 export default async function BookingDonePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    format?: string;
+    day?: string;
+    time?: string;
+    concerns?: string;
+  }>;
 }) {
   const { id } = await params;
+  const q = await searchParams;
   const expert = getExpert(id);
   if (!expert) notFound();
 
-  // 실제로는 방금 만든 예약 레코드를 읽어온다. 지금은 목 예약 1건.
-  const booking = getBookings()[0];
+  const format: ServiceFormat = q.format === "video" ? "video" : "chat";
+  const day = Number(q.day);
+  const slotLabel =
+    Number.isFinite(day) && q.time
+      ? `8월 ${day}일(${WEEKDAYS[(AUG_2026_OFFSET + day - 1) % 7]}) ${q.time}`
+      : "일정 미정";
+  const concerns = q.concerns?.split(",").filter(Boolean) ?? [];
 
   return (
     <AppShell>
@@ -40,8 +54,13 @@ export default async function BookingDonePage({
         <div className="relative mt-5 w-full border border-neutral-400 p-4 text-left">
           <Reg corners="tl br" />
           <Row label="고수" value={expert.nickname} />
-          <Row label="일시" value={booking.slot_label} divider />
-          <Row label="고민 항목" value={booking.concerns.join(", ")} divider />
+          <Row label="상담 형식" value={SERVICE_LABEL[format]} divider />
+          <Row label="일시" value={slotLabel} divider />
+          <Row
+            label="고민 항목"
+            value={concerns.length ? concerns.join(", ") : "선택 안 함"}
+            divider
+          />
         </div>
       </div>
 
@@ -68,12 +87,12 @@ function Row({
 }) {
   return (
     <div
-      className={`flex justify-between py-1.5 text-[13.5px] ${
+      className={`flex justify-between gap-3 py-1.5 text-[13.5px] ${
         divider ? "border-t border-dashed border-neutral-400" : ""
       }`}
     >
-      <span className="text-neutral-600">{label}</span>
-      <span className="font-semibold">{value}</span>
+      <span className="shrink-0 text-neutral-600">{label}</span>
+      <span className="text-right font-semibold">{value}</span>
     </div>
   );
 }
