@@ -78,9 +78,15 @@ export default function BookingSurveyPage({
       }
     };
 
-  // 전신 사진이 없으면 고수가 판단할 근거 자체가 없다. 나머지는 없어도 답이 나온다.
+  // 사진 두 종류가 다 있어야 답이 나온다.
+  // 전신은 체형을, 자주 입는 옷은 이미 가진 것을 알려준다 —
+  // 후자가 없으면 이미 옷장에 있는 걸 다시 사라고 할 위험이 있다.
   const canSubmit =
-    Boolean(purpose) && budget !== null && bodyPhotos.length > 0 && !busy;
+    Boolean(purpose) &&
+    budget !== null &&
+    bodyPhotos.length > 0 &&
+    outfitPhotos.length > 0 &&
+    !busy;
 
   async function submit() {
     if (!expert || !purpose || budget === null) return;
@@ -135,14 +141,15 @@ export default function BookingSurveyPage({
             {CONSULT_BUDGETS[CONSULT_BUDGETS.length - 1] / 10000}만원 예산만
             지원해요.
           </p>
+          {/* "·"를 별도 요소로 두면 flex 아이템이 되어 제 줄로 떨어진다.
+              문장과 한 덩어리로 흘려보내야 자연스럽게 이어진다. */}
           <ul className="mt-1.5 space-y-1">
             {CONSULT_BUDGET_NOTES.map((note) => (
               <li
                 key={note}
-                className="flex gap-1.5 text-[11.5px] leading-relaxed text-neutral-500"
+                className="text-[11.5px] leading-relaxed text-neutral-500"
               >
-                <span aria-hidden="true">·</span>
-                <span>{note}</span>
+                {`· ${note}`}
               </li>
             ))}
           </ul>
@@ -163,9 +170,9 @@ export default function BookingSurveyPage({
           />
         </Field>
 
-        <Field label="자주 입는 옷 사진">
+        <Field label="자주 입는 옷 사진" required>
           <p className="mb-2 text-[11.5px] text-neutral-500">
-            지금 뭘 갖고 있는지 알면 겹치지 않게 골라드릴 수 있어요 · 선택
+            지금 뭘 갖고 있는지 알아야 이미 있는 것과 겹치지 않게 골라드릴 수 있어요
           </p>
           <PhotoRow
             photos={outfitPhotos}
@@ -227,7 +234,7 @@ export default function BookingSurveyPage({
         <p className="mt-2 text-center text-[11.5px] text-neutral-500">
           {canSubmit
             ? `${CONSULTING_SLA_HOURS}시간 안에 답변 · 불만족 시 100% 환불`
-            : "자리·예산·전신 사진을 채우면 신청할 수 있어요"}
+            : "자리·예산·사진을 채우면 신청할 수 있어요"}
         </p>
       </BottomBar>
     </AppShell>
@@ -270,11 +277,13 @@ function Field({
 }) {
   return (
     <section className="mb-5">
-      <p className="mb-2 flex items-center gap-1.5 text-[13.5px] font-bold">
+      <p className="mb-2 text-[13.5px] font-bold">
         {label}
         {required && (
-          <span className="rounded-full bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">
-            필수
+          // 뱃지 대신 별표 하나. 필수 항목이 다섯 개나 되는 화면이라
+          // 뱃지를 붙이면 그것만 눈에 들어와서 정작 질문이 안 읽힌다.
+          <span className="ml-1 text-required" aria-label="필수">
+            *
           </span>
         )}
       </p>

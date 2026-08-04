@@ -54,7 +54,10 @@
   --color-danger: #b23b2e;
   --color-danger-tint: #fbf1f0;
   --color-danger-line: #d98c84;
-  --color-step: #c97a2b;
+  /* 필수 표시(*) — 뱃지 대신 별표 하나로 표시한다.
+     빨강은 이미 오류를 뜻해서, 아직 틀린 게 없는 필수 항목에 쓰면
+     처음부터 잘못한 것처럼 보인다. */
+  --color-required: #c97a2b;
 
   /* 모서리 스케일 — 디자인이 실제로 쓰는 값만 둔다 */
   --radius-xs: 6px;

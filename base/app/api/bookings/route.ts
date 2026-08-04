@@ -3,6 +3,7 @@ import { deviceRequired, fail, fromDbError, getDeviceId, ok } from "@/lib/api/ht
 import { dayLabel, dueLabel, temperaturesOf } from "@/lib/api/consulting";
 import {
   BODY_PHOTO_MIN,
+  OUTFIT_PHOTO_MIN,
   BOOKING_PHOTO_MAX,
   CONSULT_BUDGETS,
   CONSULT_CONCERNS,
@@ -69,9 +70,11 @@ export async function GET(req: Request) {
  * 금액은 요청 본문에서 받지 않고 experts.price를 읽어서 쓴다.
  * 클라이언트가 보낸 숫자를 그대로 저장하면 1원짜리 컨설팅을 만들 수 있다.
  *
- * 전신 사진은 필수다(F-57) — 고수가 체형을 못 보면 답을 쓸 수가 없다.
+ * 사진 두 종류가 다 필수다(F-57) — 전신이 없으면 체형을 못 보고,
+ * 자주 입는 옷이 없으면 이미 옷장에 있는 걸 다시 사라고 할 수 있다.
  * DB CHECK로 걸지 않은 이유: 사진 insert가 bookings insert 뒤에 오므로
  * 제약으로 막으면 순서에 묶여서 오히려 다루기 나빠진다. 대신 여기서 막는다.
+ * 화면에서도 같은 조건으로 버튼을 잠근다 — 한쪽만 막으면 우회된다.
  */
 export async function POST(req: Request) {
   const deviceId = getDeviceId(req);
@@ -104,6 +107,15 @@ export async function POST(req: Request) {
   const bodyImages = (body.body_images ?? []).slice(0, BOOKING_PHOTO_MAX);
   if (bodyImages.length < BODY_PHOTO_MIN) {
     return fail("BODY_PHOTO_REQUIRED", 400, "전신 사진을 최소 1장 올려주세요");
+  }
+
+  const outfitImages = (body.outfit_images ?? []).slice(0, BOOKING_PHOTO_MAX);
+  if (outfitImages.length < OUTFIT_PHOTO_MIN) {
+    return fail(
+      "OUTFIT_PHOTO_REQUIRED",
+      400,
+      "자주 입는 옷 사진을 최소 1장 올려주세요",
+    );
   }
 
   // 목록에 없는 고민 항목은 버린다. 자유 서술은 body_note가 받는다.
@@ -143,9 +155,7 @@ export async function POST(req: Request) {
 
   const images = [
     ...bodyImages.map((url, i) => ({ kind: "전신", url, sort_order: i })),
-    ...(body.outfit_images ?? [])
-      .slice(0, BOOKING_PHOTO_MAX)
-      .map((url, i) => ({ kind: "착장", url, sort_order: i })),
+    ...outfitImages.map((url, i) => ({ kind: "착장", url, sort_order: i })),
   ].map((r) => ({ ...r, booking_id: booking.id }));
 
   const { error: imgError } = await db.from("booking_images").insert(images);

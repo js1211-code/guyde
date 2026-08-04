@@ -117,6 +117,11 @@ export const REVISION_REASON_MIN = 10;
 /** 수정 요청 횟수 상한. bookings_revision_check와 같은 값. */
 export const REVISION_MAX = 1;
 
-/** 사전 설문에 반드시 있어야 하는 전신 사진 최소 장수. */
+/**
+ * 사전 설문의 사진 최소 장수. 두 종류 다 필수다.
+ * 전신은 체형을, 자주 입는 옷은 이미 가진 것을 알려준다 —
+ * 후자가 없으면 옷장에 이미 있는 걸 다시 사라고 할 위험이 있다.
+ */
 export const BODY_PHOTO_MIN = 1;
+export const OUTFIT_PHOTO_MIN = 1;
 export const BOOKING_PHOTO_MAX = 5;
