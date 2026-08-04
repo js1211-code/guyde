@@ -23,19 +23,44 @@ const SEED_EXPERTS = [
   { id: "00000000-0000-4000-8001-000000000004", label: "말끔한 하마 #4455 · 42.5°C" },
 ];
 
+/**
+ * 고수로 바꾸기 직전의 내 UUID를 보관하는 자리.
+ * 이게 없으면 되돌릴 때 새 UUID가 발급돼서, 방금 신청한 컨설팅이
+ * 통째로 안 보이게 된다 — 데모 도중에 제일 당황스러운 지점이다.
+ */
+const PREV_KEY = "base.device_id.prev";
+
 export default function DeviceSwitchPage() {
   const [current, setCurrent] = useState<string>("");
+  const [prev, setPrev] = useState<string | null>(null);
 
-  useEffect(() => setCurrent(getOrCreateDeviceId()), []);
+  useEffect(() => {
+    setCurrent(getOrCreateDeviceId());
+    setPrev(localStorage.getItem(PREV_KEY));
+  }, []);
 
   function switchTo(id: string) {
+    const now = localStorage.getItem(DEVICE_KEY);
+    // 고수→고수로 옮길 때 원래 기기를 덮어쓰면 돌아갈 곳이 사라진다.
+    if (now && !SEED_EXPERTS.some((e) => e.id === now)) {
+      localStorage.setItem(PREV_KEY, now);
+    }
     localStorage.setItem(DEVICE_KEY, id);
     // 화면 곳곳이 첫 렌더에서 기기 ID를 읽으므로 통째로 새로 고친다.
     window.location.href = "/consulting";
   }
 
+  /** 고수로 바꾸기 전 쓰던 기기로 복귀. 신청한 컨설팅이 그대로 보인다. */
+  function restore() {
+    if (!prev) return;
+    localStorage.setItem(DEVICE_KEY, prev);
+    localStorage.removeItem(PREV_KEY);
+    window.location.href = "/me/bookings";
+  }
+
   function reset() {
     localStorage.removeItem(DEVICE_KEY);
+    localStorage.removeItem(PREV_KEY);
     window.location.href = "/";
   }
 
@@ -74,18 +99,34 @@ export default function DeviceSwitchPage() {
         ))}
       </div>
 
+      {prev && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold">원래 기기로 돌아가기</p>
+          <button
+            type="button"
+            onClick={restore}
+            className="w-full rounded-lg bg-amber-700 px-4 py-3 text-sm font-bold text-white"
+          >
+            돌아가기 · 신청한 컨설팅 그대로
+          </button>
+          <p className="font-mono text-xs break-all text-neutral-500">{prev}</p>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={reset}
         className="w-full rounded-lg bg-neutral-800 px-4 py-3 text-sm font-bold text-white"
       >
-        일반 사용자로 되돌리기 (새 UUID 발급)
+        완전 초기화 (새 UUID 발급)
       </button>
 
       <p className="text-xs leading-relaxed text-neutral-500">
-        되돌리면 새 UUID가 발급되므로 그 전에 신청한 컨설팅은 더 이상 보이지
-        않아요. 데모에서는 한 브라우저로 신청하고, 여기서 고수로 바꿔 답변한 뒤,
-        다시 돌아와 확인하는 순서가 편합니다.
+        데모 순서: 일반 사용자로 컨설팅을 신청 → 여기서 고수로 전환해 답변 작성 →
+        <strong>돌아가기</strong>로 복귀해 답변 확인.
+        <br />
+        <strong>완전 초기화</strong>는 새 UUID를 발급하므로 그 전에 신청한
+        컨설팅과 쓴 글이 더 이상 보이지 않아요.
       </p>
     </main>
   );
