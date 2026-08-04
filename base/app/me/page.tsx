@@ -49,7 +49,7 @@ export default function MePage() {
             <input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              className="flex-1 border border-neutral-400 px-3 py-2 text-[15px] font-bold"
+              className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[15px] font-bold"
               autoFocus
             />
             <button
@@ -101,7 +101,7 @@ export default function MePage() {
           </span>
         </div>
 
-        <div className="relative mt-4 flex items-center justify-between border border-neutral-400 p-3.5">
+        <div className="relative mt-4 flex items-center justify-between rounded-xl border border-neutral-400 p-3.5">
           <Reg corners="tl br" />
           <span className="flex items-center gap-1.5">
             <HeartIcon size={16} className="text-brand" />

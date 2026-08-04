@@ -64,7 +64,7 @@ function TypeSelect({ onNext }: { onNext: (t: PostType) => void }) {
               type="button"
               onClick={() => setPicked(t)}
               aria-pressed={picked === t}
-              className={`relative p-3.5 text-left ${
+              className={`relative rounded-xl p-3.5 text-left ${
                 picked === t
                   ? "border-2 border-brand bg-brand-tint"
                   : "border border-neutral-400"
@@ -229,7 +229,7 @@ function Composer({
                     )
                   }
                   placeholder={`선택지 ${LETTERS[i]}`}
-                  className="flex-1 border border-neutral-400 px-3 py-2 text-[14px]"
+                  className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[14px]"
                 />
               </div>
             ))}
@@ -237,7 +237,7 @@ function Composer({
               <button
                 type="button"
                 onClick={() => setOptions((prev) => [...prev, ""])}
-                className="mt-1 flex w-full items-center justify-center gap-1 border border-dashed border-neutral-400 py-2 text-[13px] font-semibold text-brand"
+                className="mt-1 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-neutral-400 py-2 text-[13px] font-semibold text-brand"
               >
                 <PlusIcon size={13} />
                 선택지 추가
@@ -247,7 +247,7 @@ function Composer({
         )}
 
         {postType === "무난함판정" && (
-          <div className="mt-5 border border-brand-tint-b bg-brand-tint p-3">
+          <div className="mt-5 rounded-lg border border-brand-tint-b bg-brand-tint p-3">
             <p className="mb-2 text-[12px] font-semibold text-brand-dark">
               무난해요 / 애매해요 두 버튼이 자동으로 붙어요
             </p>
@@ -255,7 +255,7 @@ function Composer({
               {["무난해요", "애매해요"].map((label) => (
                 <span
                   key={label}
-                  className="flex-1 border border-brand-tint-b bg-white py-2 text-center text-[13px] font-bold text-neutral-500"
+                  className="flex-1 rounded-md border border-brand-tint-b bg-white py-2 text-center text-[13px] font-bold text-neutral-500"
                 >
                   {label}
                 </span>
@@ -273,7 +273,7 @@ function Composer({
 
       <BottomBar bordered={false}>
         {noHearts ? (
-          <div className="border border-brand bg-brand/15 p-3.5">
+          <div className="rounded-xl border border-brand bg-brand/15 p-3.5">
             <p className="text-[13.5px] font-bold text-brand-dark">
               하트가 없어 글을 올릴 수 없어요
             </p>

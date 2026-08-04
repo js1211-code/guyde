@@ -28,7 +28,7 @@ export function FirstRun({
           이 기기에 새 닉네임을 발급했어요
         </p>
 
-        <div className="relative mt-5 w-full border border-neutral-400 px-6 py-6">
+        <div className="relative mt-5 w-full rounded-xl border border-neutral-400 px-6 py-6">
           <Reg corners="tl tr bl br" />
           <p className="text-[21px] font-bold">{nickname}</p>
           <p className="mt-2.5 flex items-center justify-center gap-1.5">

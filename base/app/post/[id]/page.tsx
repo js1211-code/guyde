@@ -364,7 +364,7 @@ function Comments({
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder="댓글을 남겨보세요"
-          className="flex-1 border border-neutral-400 px-3 py-2 text-[13.5px]"
+          className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[13.5px]"
         />
         <button
           type="button"

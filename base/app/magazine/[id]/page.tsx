@@ -54,7 +54,7 @@ export default async function ArticlePage({
         ))}
 
         {article.related.length > 0 && (
-          <div className="mt-5 mb-4 border border-neutral-400 p-3.5">
+          <div className="mt-5 mb-4 rounded-xl border border-neutral-400 p-3.5">
             <Kicker className="mb-2 text-[11px]">RELATED IN COMMUNITY</Kicker>
             {article.related.map((title) => (
               <p

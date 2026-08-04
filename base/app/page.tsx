@@ -26,7 +26,7 @@ export default function CommunityPage() {
         <Link
           href="/hearts"
           aria-label="하트 충전"
-          className="flex items-center gap-1.5 border border-neutral-400 px-2 py-1"
+          className="flex items-center gap-1.5 rounded-xl border border-neutral-400 px-2 py-1"
         >
           <HeartIcon size={14} className="text-brand" />
           <span className="cond text-[15px] leading-none font-bold text-brand">

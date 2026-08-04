@@ -25,7 +25,7 @@ export default async function QuizResultPage({
       <ScreenBody className="px-4 pt-6 text-center">
         <Kicker>{result.quiz_title}</Kicker>
 
-        <div className="relative mt-3 border border-neutral-400 px-4 py-6">
+        <div className="relative mt-3 rounded-xl border border-neutral-400 px-4 py-6">
           <Reg corners="tl tr bl br" />
           <p className="cond text-[30px] leading-tight font-bold text-brand">
             {result.result_type}
@@ -40,7 +40,7 @@ export default async function QuizResultPage({
             <span className="text-neutral-600">같은 결과</span>
             <span className="text-brand">상위 {result.top_percent}%</span>
           </div>
-          <div className="h-[10px] border border-neutral-400">
+          <div className="h-[10px] overflow-hidden rounded-full bg-neutral-200">
             <div
               className="h-full bg-brand"
               style={{ width: `${result.top_percent}%` }}
@@ -72,7 +72,7 @@ export default async function QuizResultPage({
         <div className="flex flex-col gap-2">
           <button
             type="button"
-            className="border border-neutral-400 py-3 text-center text-[14px] font-bold"
+            className="rounded-md border border-neutral-400 py-3 text-center text-[14px] font-bold"
           >
             결과 공유하기
           </button>

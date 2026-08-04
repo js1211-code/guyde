@@ -53,7 +53,7 @@ export default function MagazinePage() {
             <Link
               key={q.id}
               href={`/magazine/quiz/${q.slug}`}
-              className="relative min-w-[128px] flex-1 border border-neutral-400 p-3"
+              className="relative min-w-[128px] flex-1 rounded-xl border border-neutral-400 p-3"
             >
               <Reg corners="tl br" size="sm" />
               <p className="text-[13.5px] leading-snug font-bold">{q.title}</p>

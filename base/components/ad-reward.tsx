@@ -60,7 +60,7 @@ export function AdReward({
         type="button"
         onClick={watch}
         disabled={playing || soldOut}
-        className={`flex w-full items-center justify-center gap-2 border border-brand py-3 text-[14px] font-bold text-brand disabled:border-neutral-300 disabled:text-neutral-500 ${
+        className={`flex w-full items-center justify-center gap-2 rounded-md border border-brand py-3 text-[14px] font-bold text-brand disabled:border-neutral-300 disabled:text-neutral-500 ${
           compact ? "py-2.5 text-[13px]" : ""
         }`}
       >

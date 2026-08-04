@@ -53,7 +53,7 @@ export default function HeartShopPage() {
       <TopBar backHref="/" title="하트 충전" />
 
       <ScreenBody className="px-4 pt-4">
-        <div className="relative border border-neutral-400 p-4">
+        <div className="relative rounded-2xl border border-neutral-400 p-4">
           <Reg corners="tl tr bl br" />
           <Kicker className="text-[11px]">MY HEARTS</Kicker>
           <p className="mt-1 flex items-baseline gap-2">
@@ -69,7 +69,7 @@ export default function HeartShopPage() {
         </div>
 
         {done && (
-          <p className="mt-3 border border-brand bg-brand/15 px-3 py-2.5 text-[13px] font-semibold text-brand-dark">
+          <p className="mt-3 rounded-md border border-brand bg-brand/15 px-3 py-2.5 text-[13px] font-semibold text-brand-dark">
             하트 {done.granted}개를 충전했어요
           </p>
         )}
@@ -109,7 +109,7 @@ export default function HeartShopPage() {
                     </span>
                     <span className="text-[13px]">개</span>
                     {pack.bonus > 0 && (
-                      <span className="cond ml-1 border border-brand px-1.5 py-px text-[11px] font-bold text-brand">
+                      <span className="cond ml-1 rounded-xs border border-brand px-1.5 py-px text-[11px] font-bold text-brand">
                         +{pack.bonus} 보너스
                       </span>
                     )}
