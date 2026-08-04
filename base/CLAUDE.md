@@ -210,6 +210,10 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
   경계는 반드시 `TEMP_EXPERT_GATE`를 쓴다 — 숫자를 직접 박으면 게이트를 옮겼을 때 색과 자격이 어긋난다.
 - 배경 `#F2F2F3` / 본문 차콜 `#1D1F20`
 - 폰트: **Pretendard**(본문) + **Barlow Condensed**(`.cond` — 숫자·영문 라벨)
+- **브랜드 마크는 넥타이.** 위 두 원이 셔츠 깃, 가운데 원이 매듭, 아래 삼각형이 타이. `components/logo.tsx`의 `<LogoMark/>`(마크만) / `<Logo/>`(마크+워드마크).
+  - 색은 `currentColor`다. 원본 디자인 파일의 금색 accent를 따르지 않는다 — 그건 범용 템플릿 팔레트고, 마크는 헤더(브라운)·앱 아이콘(크림)에서 각각 다른 색으로 놓인다.
+  - **크기가 작아지면 획을 굵게 한다**(`strokeFor()`). 72px의 3.5를 22px에 그대로 쓰면 획이 사라져 얼룩으로 보인다.
+  - 앱 아이콘·파비콘은 `app/icon.svg` (Next.js 파일 규약). 16px까지 형태가 남는 걸 확인했다.
 - **모서리는 둥글다** (v2의 "전부 직각" 규칙은 v3에서 폐기).
   `@theme`의 radius 스케일을 쓴다 — 카드/패널 `rounded-xl`(14) `rounded-2xl`(16), 입력·버튼 `rounded-md`(10), 작은 뱃지 `rounded-xs`(6), 칩·진행바 `rounded-full`.
   `globals.css`의 `@layer base`에 남아 있는 `border-radius:0`은 **직각 규칙이 아니라 브라우저 기본 버튼 모서리를 막는 UA 리셋**이다.

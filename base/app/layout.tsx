@@ -13,6 +13,8 @@ const barlowCondensed = Barlow_Condensed({
 export const metadata: Metadata = {
   title: "GUYDE — GUY를 위한 GUIDE.",
   description: "익명으로 묻고 대중에게 검증받는 남자 자기관리 커뮤니티",
+  // 아이콘은 app/icon.svg 파일 규약이 자동으로 잡는다.
+  appleWebApp: { title: "GUYDE", capable: true, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

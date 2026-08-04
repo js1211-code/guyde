@@ -2,6 +2,7 @@
 
 import { PrimaryButton } from "@/components/shell";
 import { RefreshIcon } from "@/components/icons";
+import { Logo } from "@/components/logo";
 import { Reg } from "@/components/reg";
 import { Temperature } from "@/components/temperature";
 import { TEMP_START } from "@/lib/constants";
@@ -23,7 +24,7 @@ export function FirstRun({
   return (
     <div className="absolute inset-0 z-30 flex flex-col bg-paper">
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-        <p className="cond mb-8 text-[26px] font-bold tracking-[0.14em]">GUYDE</p>
+        <Logo size={30} className="mb-8" />
         <p className="text-[13px] text-neutral-600">
           이 기기에 새 닉네임을 발급했어요
         </p>

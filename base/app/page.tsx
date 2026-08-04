@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Feed } from "@/components/feed";
 import { FirstRun } from "@/components/first-run";
 import { HeartIcon } from "@/components/icons";
+import { Logo } from "@/components/logo";
 import { AppShell, ScreenBody } from "@/components/shell";
 import { TabBar, WriteFab } from "@/components/tab-bar";
 import { useMe } from "@/lib/use-me";
@@ -15,10 +16,10 @@ export default function CommunityPage() {
     <AppShell>
       <header className="flex items-center justify-between px-4 pt-3 pb-2.5">
         <div>
-          <p className="cond text-[24px] leading-none font-bold tracking-[0.14em]">
-            GUYDE<span className="text-brand">+</span>
-          </p>
-          <p className="mt-0.5 text-[10px] tracking-wide text-neutral-600">
+          {/* 마크 + 워드마크. 예전엔 GUYDE+ 였는데 '+'는 로고가 정해지기 전
+              임시 강조였다. 이제 마크가 그 자리를 대신한다. */}
+          <Logo size={24} />
+          <p className="mt-1 text-[10px] tracking-wide text-neutral-600">
             GUY를 위한 GUIDE.
           </p>
         </div>
