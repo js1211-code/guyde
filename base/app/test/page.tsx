@@ -18,7 +18,7 @@ export default async function TestPage() {
 
   return (
     <main className="mx-auto max-w-md space-y-4 p-8">
-      <h1 className="text-2xl font-bold">BASE — Supabase 연결 테스트</h1>
+      <h1 className="text-2xl font-bold">GUYDE — Supabase 연결 테스트</h1>
 
       {ok ? (
         <div className="rounded-lg border border-green-300 bg-green-50 p-4 text-green-800">

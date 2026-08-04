@@ -110,7 +110,7 @@ export function PrimaryButton({
   disabled?: boolean;
   type?: "button" | "submit";
 }) {
-  const cls = `cond block w-full py-3.5 text-center text-[15px] font-bold ${
+  const cls = `cond block w-full rounded-md py-3.5 text-center text-[15px] font-bold ${
     disabled ? "bg-neutral-300 text-neutral-500" : "bg-brand text-white"
   }`;
 

@@ -9,7 +9,6 @@ import {
   PlusIcon,
   UserIcon,
 } from "@/components/icons";
-import { Reg } from "@/components/reg";
 
 const TABS = [
   { href: "/", label: "커뮤니티", Icon: HomeIcon },
@@ -63,9 +62,8 @@ export function WriteFab() {
     <Link
       href="/write"
       aria-label="글쓰기"
-      className="absolute right-4 bottom-[82px] flex h-[52px] w-[52px] items-center justify-center bg-brand text-white"
+      className="absolute right-4 bottom-[82px] flex h-[52px] w-[52px] items-center justify-center rounded-full bg-brand text-white shadow-lg"
     >
-      <Reg corners="tl tr bl br" className="!text-white" />
       <PlusIcon size={22} strokeWidth={1.8} />
     </Link>
   );

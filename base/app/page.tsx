@@ -16,10 +16,10 @@ export default function CommunityPage() {
       <header className="flex items-center justify-between px-4 pt-3 pb-2.5">
         <div>
           <p className="cond text-[24px] leading-none font-bold tracking-[0.14em]">
-            BASE<span className="text-brand">+</span>
+            GUYDE<span className="text-brand">+</span>
           </p>
           <p className="mt-0.5 text-[10px] tracking-wide text-neutral-600">
-            일단, 베이스부터.
+            GUY를 위한 GUIDE.
           </p>
         </div>
         {/* 하트를 누르면 충전 샵으로 */}

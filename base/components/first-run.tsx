@@ -23,7 +23,7 @@ export function FirstRun({
   return (
     <div className="absolute inset-0 z-30 flex flex-col bg-paper">
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-        <p className="cond mb-8 text-[26px] font-bold tracking-[0.14em]">BASE</p>
+        <p className="cond mb-8 text-[26px] font-bold tracking-[0.14em]">GUYDE</p>
         <p className="text-[13px] text-neutral-600">
           이 기기에 새 닉네임을 발급했어요
         </p>

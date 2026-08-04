@@ -11,7 +11,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "BASE — 일단, 베이스부터.",
+  title: "GUYDE — GUY를 위한 GUIDE.",
   description: "익명으로 묻고 대중에게 검증받는 남자 자기관리 커뮤니티",
 };
 
@@ -19,7 +19,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#f2f2f3",
+  themeColor: "#f6f3ef",
 };
 
 export default function RootLayout({

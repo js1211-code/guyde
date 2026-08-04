@@ -5,7 +5,7 @@ import { Reg } from "@/components/reg";
 /** 카테고리 뱃지 — 회색 테두리. 주제(옷·스킨케어·바디&향수·자유). */
 export function CategoryBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="border border-neutral-400 px-1.5 py-px text-[10.5px] font-semibold text-neutral-600">
+    <span className="rounded-xs border border-neutral-400 px-1.5 py-px text-[10.5px] font-semibold text-neutral-600">
       {children}
     </span>
   );
@@ -26,14 +26,14 @@ export function PostTypeBadge({
 }) {
   if (postType === "선택지투표") {
     return (
-      <span className="bg-brand px-1.5 py-px text-[10.5px] font-bold text-white">
+      <span className="rounded-xs bg-brand px-1.5 py-px text-[10.5px] font-bold text-white">
         투표
       </span>
     );
   }
   if (postType === "무난함판정") {
     return (
-      <span className="border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+      <span className="rounded-xs border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
         {nanhanPercent === null || nanhanPercent === undefined
           ? "무난함"
           : `무난함 ${nanhanPercent}%`}
@@ -46,7 +46,7 @@ export function PostTypeBadge({
 /** 내가 쓴 댓글 표시 */
 export function MineBadge() {
   return (
-    <span className="ml-1 border border-neutral-400 px-1 py-px text-[10px] font-semibold text-neutral-500">
+    <span className="ml-1 rounded-xs border border-neutral-400 px-1 py-px text-[10px] font-semibold text-neutral-500">
       나
     </span>
   );
@@ -62,9 +62,9 @@ export function Chip({
   selected?: boolean;
   onClick?: () => void;
 }) {
-  // 선택돼도 테두리는 유지하고 버건디 틴트로 연하게 채운다.
+  // 선택돼도 테두리는 유지하고 브랜드 틴트로 연하게 채운다.
   // 꽉 찬 색으로 바꾸면 박스 선이 사라져서 뭐가 선택된 건지 흐려진다.
-  const cls = `border px-2.5 py-1 text-[12px] ${
+  const cls = `rounded-full border px-2.5 py-1 text-[12px] ${
     selected
       ? "border-brand bg-brand/15 font-bold text-brand-dark"
       : "border-neutral-400 text-neutral-600"
@@ -96,7 +96,7 @@ export function PhotoBox({
 }) {
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden border border-neutral-400 bg-brand-tint ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden rounded-lg border border-neutral-400 bg-brand-tint ${className}`}
     >
       {marks && <Reg size="sm" />}
       {src ? (
@@ -128,7 +128,7 @@ export function PhotoSlot({
   disabled?: boolean;
 }) {
   const cls =
-    "flex h-[64px] w-[64px] cursor-pointer items-center justify-center border border-dashed border-neutral-400 text-neutral-500";
+    "flex h-[64px] w-[64px] cursor-pointer items-center justify-center rounded-lg border border-dashed border-neutral-400 text-neutral-500";
 
   if (onPick) {
     return (

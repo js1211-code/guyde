@@ -1,36 +1,70 @@
 @import "tailwindcss";
 
 /*
-  BASE 디자인 시스템 v3 — Claude Design "BASE Mobile UI v3"에서 가져옴.
-  성격: 청사진(blueprint). 모서리는 전부 각지고, 테두리는 헤어라인,
-  강조는 그림자가 아니라 등록마크(+)와 해칭으로 준다.
+  GUYDE 디자인 시스템 v3 — Claude Design "BASE Mobile UI v3"(2026-08-03 개정판)에서 가져옴.
 
-  Tailwind v4는 @theme의 --color-* / --font-* 를 그대로 유틸리티로 만든다.
-  --color-brand-700 → text-brand-700 / bg-brand-700 / border-brand-700
+  v2 → v3에서 바뀐 것:
+  - 브랜드가 다크 버건디(#6B2436) → 다크 브라운(#4A3222)
+  - 종이 질감의 따뜻한 배경(#fdfbf9 / #f6f3ef)
+  - 모서리가 직각 → 둥근 모서리. 예전엔 전역에서 border-radius:0을 강제했는데,
+    개정 디자인이 8~18px과 pill을 240곳 넘게 쓴다. 강제를 걷어내고 스케일로 관리한다.
+  - 등록마크(+)와 해칭은 그대로 남는다. 청사진의 흔적은 유지하되 각짐만 버렸다.
+
+  Tailwind v4는 @theme의 --color-* / --radius-* 를 그대로 유틸리티로 만든다.
+  --color-brand → text-brand / bg-brand / border-brand
+  --radius-xl   → rounded-xl
 */
 @theme {
-  /* 포인트: 다크 버건디 */
-  --color-brand: #6b2436;
-  --color-brand-dark: #4a1826;
-  --color-brand-tint: #f7eef0;
-  --color-brand-tint-b: #e8d5d9;
+  /* 포인트: 다크 브라운 */
+  --color-brand: #4a3222;
+  --color-brand-dark: #2e2015;
+  --color-brand-tint: #f5eee6;
+  --color-brand-tint-b: #e3d3c1;
 
-  /* 온도는 브릭 — 버건디와 구분되어야 한다 */
-  --color-temp: #b5562a;
+  /*
+    온도는 42.0°C(고수 게이트)를 경계로 색이 바뀐다.
+    아래는 초록(평범한 사람), 위는 금색(고수). lib/constants.ts의
+    TEMP_EXPERT_GATE와 반드시 같은 값을 기준으로 해야 한다.
+  */
+  --color-temp: #7c9a3d;
+  --color-temp-hot: #d4a017;
 
-  --color-paper: #f2f2f3;
+  /* 종이 — 카드는 밝고(bg) 바탕은 한 톤 어둡다(paper) */
+  --color-bg: #fdfbf9;
+  --color-paper: #f6f3ef;
   --color-ink: #1d1f20;
 
-  /* neutral 스케일은 Tailwind 기본값을 디자인 시스템 값으로 의도적으로 덮어쓴다 */
-  --color-neutral-100: #f5f5f8;
-  --color-neutral-200: #e7e7ea;
-  --color-neutral-300: #d4d4d7;
-  --color-neutral-400: #b7b7ba;
-  --color-neutral-500: #98989b;
-  --color-neutral-600: #7a7a7d;
-  --color-neutral-700: #5d5d60;
-  --color-neutral-800: #424244;
-  --color-neutral-900: #2b2b2d;
+  /* neutral 스케일은 Tailwind 기본값을 디자인 시스템 값으로 의도적으로 덮어쓴다.
+     v3에서 따뜻한 쪽으로 옮겼다 — 회색이 아니라 바랜 종이에 가깝다. */
+  --color-neutral-100: #f7f4f0;
+  --color-neutral-200: #f1ede8;
+  --color-neutral-300: #ddd8d1;
+  --color-neutral-400: #bdb7ae;
+  --color-neutral-500: #9b948a;
+  --color-neutral-600: #7c766d;
+  --color-neutral-700: #5d5852;
+  --color-neutral-800: #423e39;
+  --color-neutral-900: #2b2825;
+
+  /* 상태색 — 착장 합계 배지, 수정 요청, 완료 표시에 쓴다 */
+  --color-ok: #4c7a32;
+  --color-ok-deep: #355c22;
+  --color-ok-tint: #e3efda;
+  --color-warn: #b35c00;
+  --color-danger: #b23b2e;
+  --color-danger-tint: #fbf1f0;
+  --color-danger-line: #d98c84;
+  --color-step: #c97a2b;
+
+  /* 모서리 스케일 — 디자인이 실제로 쓰는 값만 둔다 */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 18px;
+  --radius-full: 9999px;
 
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-cond: var(--font-barlow-condensed), "Pretendard Variable", sans-serif;
@@ -41,7 +75,7 @@ html {
 }
 
 body {
-  background: var(--color-neutral-200);
+  background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -72,10 +106,20 @@ body {
   pointer-events: none;
 }
 
+/* 카드 그림자 — 디자인이 쓰는 값 하나로 통일 */
+.card {
+  background: var(--color-bg);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
 /*
   폼 요소 리셋 — 반드시 @layer base 안에 둔다.
   레이어 밖에 두면 Tailwind 유틸리티(@layer utilities)를 specificity와 무관하게
   전부 이겨버려서, 버튼에 붙인 bg-*, text-*, font-* 가 통째로 무시된다.
+
+  border-radius:0 은 "직각 디자인"이라서가 아니라 브라우저 기본 버튼 모서리가
+  새어 들어오는 걸 막는 UA 리셋이다. @layer base < @layer utilities 라서
+  요소에 rounded-* 를 붙이면 그쪽이 이긴다 — 둥근 모서리는 각자 명시한다.
 */
 @layer base {
   input,

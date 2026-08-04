@@ -43,7 +43,7 @@ export default function PostPage({
   if (missing) {
     return (
       <AppShell>
-        <TopBar backHref="/" title="BASE" />
+        <TopBar backHref="/" title="GUYDE" />
         <p className="px-4 py-16 text-center text-[13px] text-neutral-600">
           없는 글이에요
         </p>
@@ -54,7 +54,7 @@ export default function PostPage({
   if (!data) {
     return (
       <AppShell>
-        <TopBar backHref="/" title="BASE" />
+        <TopBar backHref="/" title="GUYDE" />
         <p className="px-4 py-16 text-center text-[13px] text-neutral-500">
           불러오는 중…
         </p>
