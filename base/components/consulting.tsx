@@ -1,22 +1,17 @@
 import Link from "next/link";
 import { CheckIcon } from "@/components/icons";
-import {
-  type Booking,
-  type BookingStatus,
-  type ConsultingAnswer,
-  outfitTotal,
-} from "@/lib/mock";
+import { BOOKING_STATUSES, type BookingStatus } from "@/lib/constants";
+import type {
+  BookingListItem,
+  ConsultingAnswer,
+} from "@/lib/api/consulting-client";
 
 /**
- * 컨설팅 진행 단계. bookings.status의 4개 값과 순서까지 같다 —
- * 화면에서 문자열을 다시 나열하면 DB 상태가 늘었을 때 조용히 어긋난다.
+ * 컨설팅 진행 단계. bookings.status의 4개 값과 순서까지 같아야 해서
+ * lib/constants.ts의 목록을 그대로 쓴다 — 여기서 다시 나열하면
+ * DB 상태가 늘었을 때 스테퍼만 조용히 옛날 것으로 남는다.
  */
-export const CONSULT_STEPS: BookingStatus[] = [
-  "신청 접수",
-  "답변 도착",
-  "수정 요청됨",
-  "완료",
-];
+export const CONSULT_STEPS = BOOKING_STATUSES;
 
 /**
  * ⑰·㉒ 4단계 스테퍼.
@@ -64,12 +59,12 @@ export function ConsultStepper({ status }: { status: BookingStatus }) {
  */
 export function BudgetBadge({
   total,
-  budgetMax,
+  budget,
 }: {
   total: number;
-  budgetMax: number;
+  budget: number;
 }) {
-  const pct = budgetMax > 0 ? Math.round((total * 100) / budgetMax) : 0;
+  const pct = budget > 0 ? Math.round((total * 100) / budget) : 0;
   const tone =
     pct > 100
       ? { box: "bg-danger-tint", label: "text-danger", num: "text-danger" }
@@ -88,7 +83,7 @@ export function BudgetBadge({
       <span
         className={`rounded-full bg-white px-2.5 py-1.5 text-[12px] font-bold ${tone.label}`}
       >
-        예산 {budgetMax.toLocaleString("ko-KR")}원의 {pct}%
+        예산 {budget.toLocaleString("ko-KR")}원의 {pct}%
       </span>
     </div>
   );
@@ -97,10 +92,10 @@ export function BudgetBadge({
 /** ㉗·㉙ 고수 답변 한 회차를 통째로 그린다. 읽기 전용. */
 export function AnswerView({
   answer,
-  budgetMax,
+  budget,
 }: {
   answer: ConsultingAnswer;
-  budgetMax: number;
+  budget: number;
 }) {
   return (
     <div>
@@ -122,7 +117,7 @@ export function AnswerView({
       </Section>
 
       <Section title="③ 착장 1세트">
-        <BudgetBadge total={outfitTotal(answer)} budgetMax={budgetMax} />
+        <BudgetBadge total={answer.total} budget={budget} />
         <div className="mt-3">
           {answer.items.map((item) => (
             <div key={item.slot} className="card mb-3 rounded-3xl p-4">
@@ -182,18 +177,18 @@ function Section({
 }
 
 /** 내 컨설팅 목록의 카드 한 장. */
-export function BookingCard({ booking }: { booking: Booking }) {
+export function BookingCard({ booking }: { booking: BookingListItem }) {
   return (
     <Link
       href={`/booking/done/${booking.id}`}
       className="card mb-3 block rounded-2xl p-4"
     >
       <div className="flex items-center gap-2">
-        <span className="text-[14px] font-bold">{booking.expert_nickname}</span>
+        <span className="text-[14px] font-bold">{booking.expert.nickname}</span>
         <StatusPill status={booking.status} />
       </div>
       <p className="mt-1.5 text-[12.5px] text-neutral-600">
-        {booking.purpose} · 예산 {(booking.budget_max / 10000).toFixed(0)}만원 ·{" "}
+        {booking.purpose} · 예산 {(booking.budget / 10000).toFixed(0)}만원 ·{" "}
         {booking.created_label} 신청
       </p>
       <p className="mt-1 text-[11.5px] text-neutral-500">{booking.due_label}</p>

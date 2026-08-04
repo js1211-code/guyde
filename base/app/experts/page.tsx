@@ -1,20 +1,34 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { StarIcon } from "@/components/icons";
 import { AppShell, NoticeBar, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
-import { EXPERT_TOP_PERCENT } from "@/lib/constants";
-import { CONSULTING_PRICE, getExperts } from "@/lib/mock";
+import {
+  CONSULTING_PRICE,
+  CONSULTING_SLA_HOURS,
+  EXPERT_TOP_PERCENT,
+} from "@/lib/constants";
+import { fetchExperts, type ExpertListItem } from "@/lib/api/consulting-client";
 
 /**
  * ⑭ 고수 목록.
  *
  * v3에서 전문분야 필터가 사라졌다. 지금 여는 컨설팅은 '옷' 하나뿐이고
  * 가격도 전원 동일해서, 고를 축이 "누구에게 맡길까" 밖에 없다.
- * 필터 칩을 남겨두면 선택지가 하나뿐인 필터가 돼서 오히려 헷갈린다.
+ * 선택지가 하나뿐인 필터를 두면 오히려 헷갈린다.
  */
 export default function ExpertsPage() {
-  const experts = getExperts();
+  const [experts, setExperts] = useState<ExpertListItem[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    fetchExperts()
+      .then(setExperts)
+      .catch(() => setFailed(true));
+  }, []);
 
   return (
     <AppShell>
@@ -25,12 +39,31 @@ export default function ExpertsPage() {
 
       <ScreenBody className="px-4 pt-3">
         <p className="mb-3 text-[12.5px] leading-relaxed text-neutral-600">
-          설문을 넣으면 48시간 안에 진단·피해야 할 것·착장 1세트가 도착해요.
+          설문을 넣으면 {CONSULTING_SLA_HOURS}시간 안에 진단·피해야 할 것·착장
+          1세트가 도착해요.
           <br />
           답변이 불만족스러우면 100% 환불돼요.
         </p>
 
-        {experts.map((e) => (
+        {failed && (
+          <p className="py-10 text-center text-[13px] text-neutral-600">
+            고수 목록을 불러오지 못했어요
+          </p>
+        )}
+
+        {!failed && experts === null && (
+          <p className="py-10 text-center text-[13px] text-neutral-500">
+            불러오는 중…
+          </p>
+        )}
+
+        {experts?.length === 0 && (
+          <p className="py-10 text-center text-[13px] text-neutral-600">
+            아직 등록된 고수가 없어요
+          </p>
+        )}
+
+        {experts?.map((e) => (
           <Link
             key={e.id}
             href={`/experts/${e.id}`}
@@ -39,17 +72,19 @@ export default function ExpertsPage() {
             <div className="flex items-center gap-1.5">
               <span className="text-[14.5px] font-bold">{e.nickname}</span>
               <Temperature value={e.temperature} size={13} />
-              <span className="ml-auto flex items-center gap-1 text-[12.5px] font-semibold">
-                <StarIcon />
-                {e.rating.toFixed(1)}
-              </span>
+              {e.rating !== null && (
+                <span className="ml-auto flex items-center gap-1 text-[12.5px] font-semibold">
+                  <StarIcon />
+                  {e.rating.toFixed(1)}
+                </span>
+              )}
             </div>
             <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-700">
               {e.intro}
             </p>
             <div className="mt-3 flex items-center justify-between">
               <span className="text-[12px] text-neutral-500">
-                답변 {e.answered_count}건
+                커뮤니티 답변 {e.answered_count}건
               </span>
               <span className="cond rounded-md bg-brand px-3 py-1.5 text-[13px] font-bold text-white">
                 ₩{e.price.toLocaleString("ko-KR")}
@@ -58,9 +93,11 @@ export default function ExpertsPage() {
           </Link>
         ))}
 
-        <p className="mt-1 mb-4 text-center text-[11.5px] text-neutral-500">
-          컨설팅은 건당 ₩{CONSULTING_PRICE.toLocaleString("ko-KR")} 단일가예요
-        </p>
+        {experts && experts.length > 0 && (
+          <p className="mt-1 mb-4 text-center text-[11.5px] text-neutral-500">
+            컨설팅은 건당 ₩{CONSULTING_PRICE.toLocaleString("ko-KR")} 단일가예요
+          </p>
+        )}
       </ScreenBody>
 
       <TabBar />

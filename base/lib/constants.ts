@@ -48,3 +48,75 @@ export const AD_REWARD_WINDOW_HOURS = 24;
 export const POLL_OPTION_MIN = 2;
 export const POLL_OPTION_MAX = 5;
 export const POST_IMAGE_MAX = 2;
+
+// ─────────────────────────────────────────────────────────────
+// 컨설팅 (v3)
+// 화면과 API가 같은 값을 봐야 한다. 예전에 카테고리를 API가 따로 들고
+// 있다가 "탭은 생겼는데 저장은 거부"가 난 적이 있다 — 같은 실수를 막는다.
+// ─────────────────────────────────────────────────────────────
+
+/** 컨설팅 단가. 고수마다 다르지 않다 — 상담 방식 선택이 없어졌다. */
+export const CONSULTING_PRICE = 14900;
+
+/** 답변 SLA. 화면 ⑰의 "48시간 안에 1회차 답변이 도착해요"와 같은 값. */
+export const CONSULTING_SLA_HOURS = 48;
+
+export const CONSULT_PURPOSES = [
+  "소개팅",
+  "데이트",
+  "면접",
+  "결혼식 하객",
+  "일상",
+] as const;
+export type ConsultPurpose = (typeof CONSULT_PURPOSES)[number];
+
+/**
+ * 예산 — 구간이 아니라 단일 금액이다(bookings.budget).
+ * 15만원 미만은 상의·하의·신발을 새로 갖추기엔 빠듯해서 열지 않고,
+ * 30만원 초과는 아직 준비가 안 됐다. 둘 다 왜 없는지 화면에 적어준다 —
+ * 이유를 안 적으면 "내 예산은 취급 안 하는구나"로만 읽힌다.
+ */
+export const CONSULT_BUDGETS = [150000, 200000, 250000, 300000] as const;
+export type ConsultBudget = (typeof CONSULT_BUDGETS)[number];
+
+export const CONSULT_BUDGET_MIN = CONSULT_BUDGETS[0];
+export const CONSULT_BUDGET_MAX = CONSULT_BUDGETS[CONSULT_BUDGETS.length - 1];
+
+export const CONSULT_BUDGET_NOTES = [
+  `${CONSULT_BUDGET_MIN / 10000}만원 미만 — 상의/하의/신발을 새로 갖추기엔 예산이 빠듯해 만족스러운 제안이 어려워요.`,
+  `${CONSULT_BUDGET_MAX / 10000}만원 초과 — 더 큰 예산의 컨설팅은 준비 중이에요.`,
+] as const;
+
+export const CONSULT_CONCERNS = [
+  "어깨·상체",
+  "배·허리",
+  "다리 길이",
+  "마른 체형",
+  "통통한 체형",
+  "키",
+  "피부톤",
+] as const;
+
+/** 착장 1세트. 셋 다 필수 — 하나라도 비면 "입을 수 있는 한 벌"이 안 된다. */
+export const OUTFIT_SLOTS = ["상의", "하의", "신발"] as const;
+export type OutfitSlot = (typeof OUTFIT_SLOTS)[number];
+
+/** bookings.status. DB CHECK 제약과 순서까지 같아야 한다. */
+export const BOOKING_STATUSES = [
+  "신청 접수",
+  "답변 도착",
+  "수정 요청됨",
+  "완료",
+] as const;
+export type BookingStatus = (typeof BOOKING_STATUSES)[number];
+
+/** outfit_items.reason의 DB CHECK와 같은 값. 화면에서만 막으면 API로 우회된다. */
+export const OUTFIT_REASON_MIN = 20;
+/** feedbacks_reason_required CHECK와 같은 값. */
+export const REVISION_REASON_MIN = 10;
+/** 수정 요청 횟수 상한. bookings_revision_check와 같은 값. */
+export const REVISION_MAX = 1;
+
+/** 사전 설문에 반드시 있어야 하는 전신 사진 최소 장수. */
+export const BODY_PHOTO_MIN = 1;
+export const BOOKING_PHOTO_MAX = 5;

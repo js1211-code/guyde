@@ -6,19 +6,19 @@
  * 온보딩·로그인 화면이 없으므로 진입과 동시에 조용히 발급된다.
  */
 
-const STORAGE_KEY = "base.device_id";
+export const DEVICE_KEY = "base.device_id";
 
 /** 최초 실행인지 판별한다 — 닉네임 발급 화면을 한 번만 보여주기 위해. */
 export function hasDeviceId(): boolean {
-  return localStorage.getItem(STORAGE_KEY) !== null;
+  return localStorage.getItem(DEVICE_KEY) !== null;
 }
 
 export function getOrCreateDeviceId(): string {
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = localStorage.getItem(DEVICE_KEY);
   if (stored) return stored;
 
   const id = crypto.randomUUID();
-  localStorage.setItem(STORAGE_KEY, id);
+  localStorage.setItem(DEVICE_KEY, id);
   return id;
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRightIcon, HeartIcon, LockIcon, PencilIcon } from "@/components/icons";
 import { Reg } from "@/components/reg";
 import { AppShell, PageTitle, ScreenBody } from "@/components/shell";
@@ -9,21 +9,36 @@ import { TabBar } from "@/components/tab-bar";
 import { Temperature, TemperatureProgress } from "@/components/temperature";
 import { TEMP_EXPERT_GATE } from "@/lib/constants";
 import { useMe } from "@/lib/use-me";
+import { fetchExpertInbox } from "@/lib/api/consulting-client";
 
 const MENU = [
   { label: "내 글", href: "/me/activity" },
   { label: "내 댓글", href: "/me/activity?tab=comments" },
-  { label: "내 예약", href: "/me/bookings" },
+  { label: "내 컨설팅", href: "/me/bookings" },
 ];
+
+/**
+ * 고수에게만 보이는 메뉴. 온도 42도를 넘겼다고 자동으로 고수가 되는 건
+ * 아니라서(experts 행이 있어야 한다) 자격이 아니라 실제 등록 여부로 가른다.
+ */
+const EXPERT_MENU = { label: "고수 콘솔 · 받은 신청", href: "/consulting" };
 
 /** ⑱ 내정보 */
 export default function MePage() {
   const { me, renameNickname } = useMe();
+  const [isExpert, setIsExpert] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const qualified = (me?.temperature ?? 0) >= TEMP_EXPERT_GATE;
+
+  // 고수로 등록된 기기인지 확인한다. 아니면 403이 오고 메뉴는 숨긴 채로 둔다.
+  useEffect(() => {
+    fetchExpertInbox()
+      .then(() => setIsExpert(true))
+      .catch(() => setIsExpert(false));
+  }, []);
 
   async function save() {
     try {
@@ -113,7 +128,7 @@ export default function MePage() {
         </div>
 
         <nav className="mt-5">
-          {MENU.map((item, i) => (
+          {[...MENU, ...(isExpert ? [EXPERT_MENU] : [])].map((item, i) => (
             <Link
               key={item.label}
               href={item.href}

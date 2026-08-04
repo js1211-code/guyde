@@ -9,10 +9,8 @@ import {
   ScreenBody,
   TopBar,
 } from "@/components/shell";
-import { getBooking } from "@/lib/mock";
-
-/** DB의 feedbacks_reason_required 제약과 같은 값이어야 한다. */
-const REASON_MIN = 10;
+import { REVISION_REASON_MIN } from "@/lib/constants";
+import { sendFeedback } from "@/lib/api/consulting-client";
 
 /**
  * ㉔ 수정 요청 사유 — 1회 한정.
@@ -27,28 +25,28 @@ export default function RevisePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const booking = getBooking(id);
   const router = useRouter();
   const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!booking) {
-    return (
-      <AppShell>
-        <TopBar backHref="/me/bookings" title="수정 요청" />
-        <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-600">
-            컨설팅을 찾을 수 없어요
-          </p>
-        </ScreenBody>
-      </AppShell>
-    );
+  const enough = reason.trim().length >= REVISION_REASON_MIN;
+
+  async function submit() {
+    setBusy(true);
+    setError(null);
+    try {
+      await sendFeedback(id, "수정요청", reason.trim());
+      router.push(`/booking/done/${id}`);
+    } catch (e) {
+      setError((e as { detail?: string }).detail ?? "요청을 보내지 못했어요");
+      setBusy(false);
+    }
   }
-
-  const enough = reason.trim().length >= REASON_MIN;
 
   return (
     <AppShell>
-      <TopBar backHref={`/booking/done/${booking.id}`} title="수정 요청" />
+      <TopBar backHref={`/booking/done/${id}`} title="수정 요청" />
 
       <ScreenBody className="px-4 pt-4">
         <div className="rounded-2xl bg-danger-tint p-4">
@@ -77,16 +75,19 @@ export default function RevisePage({
             enough ? "text-neutral-500" : "text-danger"
           }`}
         >
-          {reason.trim().length} / 최소 {REASON_MIN}자
+          {reason.trim().length} / 최소 {REVISION_REASON_MIN}자
         </p>
+
+        {error && (
+          <p className="mt-3 rounded-md bg-danger-tint px-3 py-2.5 text-[12.5px] text-danger">
+            {error}
+          </p>
+        )}
       </ScreenBody>
 
       <BottomBar>
-        <PrimaryButton
-          disabled={!enough}
-          onClick={() => router.push(`/booking/done/${booking.id}`)}
-        >
-          수정 요청 보내기
+        <PrimaryButton disabled={!enough || busy} onClick={submit}>
+          {busy ? "보내는 중…" : "수정 요청 보내기"}
         </PrimaryButton>
       </BottomBar>
     </AppShell>
