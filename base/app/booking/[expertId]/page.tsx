@@ -258,7 +258,6 @@ function PhotoRow({
           src={src}
           alt={`${alt} ${i + 1}`}
           className="h-[64px] w-[64px]"
-          marks={false}
         />
       ))}
       {photos.length < BOOKING_PHOTO_MAX && <PhotoSlot onPick={onPick} />}

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
 import { HeartIcon, MessageIcon } from "@/components/icons";
-import { Reg } from "@/components/reg";
 import { AppShell, Kicker, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
@@ -87,7 +86,6 @@ function Articles() {
           <PhotoBox
             className="h-[64px] w-[64px] shrink-0"
             iconSize={16}
-            marks={false}
           />
           <div className="min-w-0 flex-1">
             <p className="text-[14px] leading-snug font-semibold">{a.title}</p>
@@ -105,9 +103,8 @@ function Articles() {
           <Link
             key={q.id}
             href={`/library/quiz/${q.slug}`}
-            className="relative min-w-[128px] flex-1 rounded-xl border border-neutral-400 p-3"
+            className="min-w-[128px] flex-1 rounded-xl border border-neutral-400 p-3"
           >
-            <Reg corners="tl br" size="sm" />
             <p className="text-[13.5px] leading-snug font-bold">{q.title}</p>
             <p className="cond mt-2 text-[11px] text-neutral-600">
               {q.taker_count.toLocaleString("ko-KR")}명 참여

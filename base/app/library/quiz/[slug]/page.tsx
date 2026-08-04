@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Reg } from "@/components/reg";
 import { AppShell, BottomBar, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { getQuizResult, getQuizSlugs } from "@/lib/mock";
 
@@ -23,10 +22,10 @@ export default async function QuizResultPage({
       <TopBar backHref="/library" title="TEST RESULT" />
 
       <ScreenBody className="px-4 pt-6 text-center">
+
         <Kicker>{result.quiz_title}</Kicker>
 
-        <div className="relative mt-3 rounded-xl border border-neutral-400 px-4 py-6">
-          <Reg corners="tl tr bl br" />
+        <div className="mt-3 rounded-xl border border-neutral-400 px-4 py-6">
           <p className="cond text-[30px] leading-tight font-bold text-brand">
             {result.result_type}
           </p>
@@ -36,11 +35,14 @@ export default async function QuizResultPage({
         </div>
 
         <div className="mt-5 text-left">
+
           <div className="mb-1.5 flex items-center justify-between text-[12px] font-semibold">
+
             <span className="text-neutral-600">같은 결과</span>
             <span className="text-brand">상위 {result.top_percent}%</span>
           </div>
           <div className="h-[10px] overflow-hidden rounded-full bg-neutral-200">
+
             <div
               className="h-full bg-brand"
               style={{ width: `${result.top_percent}%` }}
@@ -49,6 +51,7 @@ export default async function QuizResultPage({
         </div>
 
         <div className="mt-5 text-left">
+
           <Kicker className="mb-2 text-[11px]">RECOMMENDED</Kicker>
           {result.recommendations.map((r, i) => (
             <p
@@ -70,6 +73,7 @@ export default async function QuizResultPage({
 
       <BottomBar bordered={false}>
         <div className="flex flex-col gap-2">
+
           <button
             type="button"
             className="rounded-md border border-neutral-400 py-3 text-center text-[14px] font-bold"

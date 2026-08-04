@@ -168,18 +168,33 @@ function Likes({
     setBusy(false);
   }
 
+  // 내 글에는 버튼을 그리지 않는다. 대신 몇 명이 도움받았는지만 보여준다.
+  if (isMine) {
+    return (
+      <div className="mt-4 flex flex-col items-center gap-1.5">
+        <span className="flex items-center gap-2 text-[14px] font-bold text-neutral-600">
+          <HeartIcon size={16} className="text-neutral-500" />
+          {likes.count > 0 ? `${likes.count}명이 도움받았어요` : "아직 반응이 없어요"}
+        </span>
+        <p className="text-[11.5px] text-neutral-500">
+          받은 좋아요는 내 온도에 쌓여요
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4 flex flex-col items-center gap-2">
       <button
         type="button"
         onClick={toggle}
-        disabled={busy || isMine}
+        disabled={busy}
         aria-pressed={likes.liked_by_me}
         className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-[14px] font-bold transition-colors ${
           likes.liked_by_me
             ? "border-brand bg-brand/15 text-brand-dark"
             : "border-neutral-400 text-neutral-700"
-        } ${isMine ? "opacity-45" : ""}`}
+        }`}
       >
         <HeartIcon
           size={16}
@@ -191,9 +206,7 @@ function Likes({
         )}
       </button>
       <p className="text-[11.5px] text-neutral-500">
-        {isMine
-          ? "내 글에는 누를 수 없어요"
-          : "받은 좋아요는 글쓴이 온도에 쌓여요"}
+        받은 좋아요는 글쓴이 온도에 쌓여요
       </p>
     </div>
   );
@@ -386,6 +399,7 @@ function Comments({
   // 답글은 접어둔다. 원댓글이 답글에 밀려 안 보이면 흐름을 못 따라간다.
   const [opened, setOpened] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
+  const submitting = useRef(false);
 
   // 서버는 평평한 목록을 추천순으로 준다. 답글을 부모 밑으로 다시 묶는다.
   // 답글끼리는 오래된 순 — 대화 순서가 뒤집히면 읽을 수가 없다.
@@ -400,7 +414,11 @@ function Comments({
   }
 
   async function submit() {
-    if (!draft.trim()) return;
+    // busy(state)만으로는 못 막는다. 같은 프레임에 두 번 불리면 둘 다 옛 값을
+    // 읽어서 통과한다. 한글 IME는 Enter로 조합을 확정할 때 keydown을 두 번
+    // 쏘기 때문에 실제로 댓글이 두 개 달렸다. ref는 즉시 반영되므로 여기서 막는다.
+    if (submitting.current || !draft.trim()) return;
+    submitting.current = true;
     setBusy(true);
     await addComment(postId, draft.trim(), replyTo?.id).catch(() => {});
     setDraft("");
@@ -409,6 +427,7 @@ function Comments({
     setReplyTo(null);
     await onDone();
     setBusy(false);
+    submitting.current = false;
   }
 
   function startReply(c: Comment) {
@@ -499,7 +518,12 @@ function Comments({
             ref={inputRef}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submit()}
+            onKeyDown={(e) => {
+              // isComposing이면 한글을 조합 중이라 Enter가 "확정"이지 "전송"이 아니다.
+              if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
+              e.preventDefault();
+              submit();
+            }}
             placeholder={replyTo ? "답글을 남겨보세요" : "댓글을 남겨보세요"}
             className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[13.5px]"
           />
@@ -536,7 +560,9 @@ function CommentRow({
   onReply: () => void;
 }) {
   return (
-    <div className={`flex gap-3 px-4 ${compact ? "py-2" : "py-3"}`}>
+    <div className={`flex gap-2.5 px-4 ${compact ? "py-2" : "py-3"}`}>
+      <Avatar nickname={c.nickname} size={compact ? 26 : 30} />
+
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex flex-wrap items-center gap-1.5">
           {/* 고수 뱃지는 닉네임 왼쪽. 온도가 아니라 experts 소속으로 판별한다. */}
@@ -551,7 +577,6 @@ function CommentRow({
         </p>
 
         <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-500">
-          <span>{timeAgo(c.created_at)}</span>
           {c.likes > 0 && <span>좋아요 {c.likes}개</span>}
           <button type="button" onClick={onReply} className="font-semibold">
             답글 달기
@@ -559,23 +584,46 @@ function CommentRow({
         </div>
       </div>
 
-      <button
-        type="button"
-        disabled={c.is_mine || busy}
-        onClick={onLike}
-        aria-pressed={c.liked_by_me}
-        aria-label={c.liked_by_me ? "좋아요 취소" : "좋아요"}
-        className={`flex w-6 shrink-0 flex-col items-center gap-0.5 pt-0.5 ${
-          c.is_mine
-            ? "text-neutral-400"
-            : c.liked_by_me
-              ? "text-brand"
-              : "text-neutral-500"
-        }`}
-      >
-        <HeartIcon size={15} strokeWidth={c.liked_by_me ? 2.2 : 1.5} />
-        {c.likes > 0 && <span className="cond text-[11px]">{c.likes}</span>}
-      </button>
+      {/* 내 댓글에는 버튼을 아예 그리지 않는다. 눌리지 않는 버튼을 남겨두면
+          왜 안 되는지 알 수 없어서 고장으로 읽힌다. */}
+      {!c.is_mine && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onLike}
+          aria-pressed={c.liked_by_me}
+          aria-label={c.liked_by_me ? "좋아요 취소" : "좋아요"}
+          className={`flex w-6 shrink-0 flex-col items-center gap-0.5 pt-0.5 ${
+            c.liked_by_me ? "text-brand" : "text-neutral-500"
+          }`}
+        >
+          <HeartIcon size={15} strokeWidth={c.liked_by_me ? 2.2 : 1.5} />
+          {c.likes > 0 && <span className="cond text-[11px]">{c.likes}</span>}
+        </button>
+      )}
     </div>
+  );
+}
+
+/**
+ * 프로필 자리.
+ *
+ * 이 앱에는 사진 업로드가 없다(닉네임만 있는 익명 서비스). 그래도 자리를
+ * 비워두면 댓글이 전부 한 덩어리로 보여서 누가 말했는지 눈으로 안 갈린다.
+ * 닉네임의 동물 글자를 넣어 최소한의 구분을 준다 —
+ * "정갈한 여우 #0192" → 여
+ */
+function Avatar({ nickname, size = 30 }: { nickname: string; size?: number }) {
+  const parts = nickname.trim().split(/\s+/);
+  const ch = (parts[1] ?? parts[0] ?? "?").charAt(0);
+
+  return (
+    <span
+      aria-hidden="true"
+      className="flex shrink-0 items-center justify-center rounded-full bg-brand-tint font-semibold text-brand-dark"
+      style={{ width: size, height: size, fontSize: size * 0.42 }}
+    >
+      {ch}
+    </span>
   );
 }

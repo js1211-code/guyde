@@ -188,7 +188,6 @@ function FeedCard({ item }: { item: FeedItem }) {
             src={item.thumbnail_url}
             alt=""
             className="h-[68px] w-[68px] shrink-0"
-            marks
           />
         </div>
       ) : (

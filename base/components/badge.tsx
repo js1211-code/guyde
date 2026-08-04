@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ImageIcon } from "@/components/icons";
-import { Reg } from "@/components/reg";
 
 /** 카테고리 뱃지 — 회색 테두리. 주제(옷·스킨케어·바디&향수·자유). */
 export function CategoryBadge({ children }: { children: React.ReactNode }) {
@@ -108,26 +107,22 @@ export function Chip({
 
 /**
  * 사진 박스. url이 있으면 실제 이미지를, 없으면 자리표시자를 그린다.
- * 등록마크는 큰 박스에만 붙인다 — 작은 썸네일에 붙이면 지저분해진다.
  */
 export function PhotoBox({
   src,
   alt = "",
   className = "",
   iconSize = 18,
-  marks = true,
 }: {
   src?: string | null;
   alt?: string;
   className?: string;
   iconSize?: number;
-  marks?: boolean;
 }) {
   return (
     <div
       className={`relative flex items-center justify-center overflow-hidden rounded-lg border border-neutral-400 bg-brand-tint ${className}`}
     >
-      {marks && <Reg size="sm" />}
       {src ? (
         <Image
           src={src}

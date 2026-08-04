@@ -8,7 +8,8 @@
   - 종이 질감의 따뜻한 배경(#fdfbf9 / #f6f3ef)
   - 모서리가 직각 → 둥근 모서리. 예전엔 전역에서 border-radius:0을 강제했는데,
     개정 디자인이 8~18px과 pill을 240곳 넘게 쓴다. 강제를 걷어내고 스케일로 관리한다.
-  - 등록마크(+)와 해칭은 그대로 남는다. 청사진의 흔적은 유지하되 각짐만 버렸다.
+  - 등록마크(+)는 폐기했다. 간격을 채우려고 넣은 장식이라 화면마다 눈에 걸렸다.
+    해칭(.hatch)은 남는다 — 투표에서 진 쪽을 색 없이 표현하는 실제 기능이다.
 
   Tailwind v4는 @theme의 --color-* / --radius-* 를 그대로 유틸리티로 만든다.
   --color-brand → text-brand / bg-brand / border-brand
@@ -98,15 +99,6 @@ body {
     var(--color-neutral-300) 3px,
     var(--color-neutral-300) 4px
   );
-}
-
-/* 등록마크(+) — 청사진 컨셉의 시그니처. components/reg.tsx가 쓴다. */
-.reg {
-  position: absolute;
-  line-height: 1;
-  font-family: var(--font-cond);
-  color: var(--color-brand);
-  pointer-events: none;
 }
 
 /* 카드 그림자 — 디자인이 쓰는 값 하나로 통일 */

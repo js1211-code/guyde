@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Chip, PhotoBox, PhotoSlot } from "@/components/badge";
 import { PlusIcon } from "@/components/icons";
-import { Reg } from "@/components/reg";
 import {
   AppShell,
   BottomBar,
@@ -70,9 +69,7 @@ function TypeSelect({ onNext }: { onNext: (t: PostType) => void }) {
                   ? "border-2 border-brand bg-brand-tint"
                   : "border border-neutral-400"
               }`}
-            >
-              <Reg corners="tl br" />
-              <p className="text-[15px] font-bold">{POST_TYPE_LABEL[t]}</p>
+            >              <p className="text-[15px] font-bold">{POST_TYPE_LABEL[t]}</p>
               <p className="mt-1 text-[12.5px] leading-relaxed text-neutral-600">
                 {POST_TYPE_HINT[t]}
               </p>

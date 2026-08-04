@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChevronRightIcon, HeartIcon, LockIcon, PencilIcon } from "@/components/icons";
-import { Reg } from "@/components/reg";
 import { AppShell, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature, TemperatureProgress } from "@/components/temperature";
@@ -61,6 +60,7 @@ export default function MePage() {
       <ScreenBody className="px-4">
         {editing ? (
           <div className="flex items-center gap-2">
+
             <input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
@@ -77,6 +77,7 @@ export default function MePage() {
           </div>
         ) : (
           <div className="flex items-center gap-1.5">
+
             <span className="text-[18px] font-bold">{me?.nickname ?? "…"}</span>
             <button
               type="button"
@@ -93,6 +94,7 @@ export default function MePage() {
         {error && <p className="mt-1 text-[12px] text-temp">{error}</p>}
 
         <div className="mt-1.5">
+
           <Temperature value={me?.temperature ?? 36.5} size={24} />
         </div>
 
@@ -116,9 +118,9 @@ export default function MePage() {
           </span>
         </div>
 
-        <div className="relative mt-4 flex items-center justify-between rounded-xl border border-neutral-400 p-3.5">
-          <Reg corners="tl br" />
+        <div className="mt-4 flex items-center justify-between rounded-xl border border-neutral-400 p-3.5">
           <span className="flex items-center gap-1.5">
+
             <HeartIcon size={16} className="text-brand" />
             <span className="text-[13.5px] font-semibold">보유 하트</span>
           </span>

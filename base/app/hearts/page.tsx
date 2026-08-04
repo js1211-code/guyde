@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { AdReward } from "@/components/ad-reward";
 import { HeartIcon } from "@/components/icons";
-import { Reg } from "@/components/reg";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { apiFetch } from "@/lib/device";
 import { HEART_PACKS, packTotal, pricePerHeart, type HeartPack } from "@/lib/hearts";
@@ -53,10 +52,11 @@ export default function HeartShopPage() {
       <TopBar backHref="/" title="하트 충전" />
 
       <ScreenBody className="px-4 pt-4">
-        <div className="relative rounded-2xl border border-neutral-400 p-4">
-          <Reg corners="tl tr bl br" />
+
+        <div className="rounded-2xl border border-neutral-400 p-4">
           <Kicker className="text-[11px]">MY HEARTS</Kicker>
           <p className="mt-1 flex items-baseline gap-2">
+
             <HeartIcon size={20} className="text-brand" />
             <span className="cond text-[36px] leading-none font-bold text-brand">
               {balance ?? "–"}
@@ -99,11 +99,12 @@ export default function HeartShopPage() {
                   isBest ? "border-brand" : "border-neutral-400"
                 }`}
               >
-                {isBest && <Reg corners="tl br" />}
                 <HeartIcon size={22} className="shrink-0 text-brand" />
 
                 <div className="min-w-0 flex-1">
+
                   <p className="flex items-baseline gap-1">
+
                     <span className="cond text-[20px] leading-none font-bold">
                       {pack.hearts}
                     </span>

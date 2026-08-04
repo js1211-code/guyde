@@ -3,7 +3,6 @@
 import { PrimaryButton } from "@/components/shell";
 import { RefreshIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
-import { Reg } from "@/components/reg";
 import { Temperature } from "@/components/temperature";
 import { TEMP_START } from "@/lib/constants";
 
@@ -23,16 +22,18 @@ export function FirstRun({
 }) {
   return (
     <div className="absolute inset-0 z-30 flex flex-col bg-paper">
+
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+
         <Logo size={30} className="mb-8" />
         <p className="text-[13px] text-neutral-600">
           이 기기에 새 닉네임을 발급했어요
         </p>
 
-        <div className="relative mt-5 w-full rounded-xl border border-neutral-400 px-6 py-6">
-          <Reg corners="tl tr bl br" />
+        <div className="mt-5 w-full rounded-xl border border-neutral-400 px-6 py-6">
           <p className="text-[21px] font-bold">{nickname}</p>
           <p className="mt-2.5 flex items-center justify-center gap-1.5">
+
             <span className="text-[12px] text-neutral-600">시작 온도</span>
             <Temperature value={TEMP_START} size={16} />
           </p>
@@ -55,6 +56,7 @@ export function FirstRun({
       </div>
 
       <div className="px-6 pt-2 pb-4">
+
         <PrimaryButton onClick={onStart}>시작하기</PrimaryButton>
       </div>
     </div>

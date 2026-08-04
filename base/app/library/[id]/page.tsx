@@ -22,7 +22,7 @@ export default async function ArticlePage({
   return (
     <AppShell>
       <div className="relative flex h-[240px] shrink-0 items-center justify-center border-b border-neutral-400 bg-brand-tint">
-        <PhotoBox className="absolute inset-0 border-0" iconSize={28} marks={false} />
+        <PhotoBox className="absolute inset-0 border-0" iconSize={28} />
         <Link
           href="/library"
           aria-label="뒤로"
@@ -48,7 +48,7 @@ export default async function ArticlePage({
               {s.body}
             </p>
             {s.has_image && (
-              <PhotoBox className="mt-3 h-[130px]" iconSize={20} marks={false} />
+              <PhotoBox className="mt-3 h-[130px]" iconSize={20} />
             )}
           </section>
         ))}
