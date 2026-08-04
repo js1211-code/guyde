@@ -39,7 +39,9 @@ export async function GET(
       .from("comments_view")
       .select("*")
       .eq("post_id", id)
-      // F-43 추천 많은 순 → 최신순
+      // F-43 추천 많은 순 → 최신순.
+      // 답글은 클라이언트가 부모 밑에 다시 묶으면서 오래된 순으로 뒤집는다 —
+      // 답글끼리는 대화 순서가 중요해서 추천순으로 세우면 흐름이 끊긴다.
       .order("likes", { ascending: false })
       .order("created_at", { ascending: false }),
   ]);

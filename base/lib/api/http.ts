@@ -49,6 +49,9 @@ const ERROR_STATUS: Record<string, number> = {
   POLL_OPTIONS_OUT_OF_RANGE: 400,
   POLL_OPTIONS_NOT_ALLOWED: 400,
   USER_NOT_FOUND: 404,
+  REPLY_DEPTH_EXCEEDED: 400,
+  PARENT_COMMENT_NOT_FOUND: 404,
+  PARENT_POST_MISMATCH: 400,
 };
 
 export function fromDbError(message: string | undefined) {

@@ -53,6 +53,25 @@ export function PostTypeBadge({
   return null;
 }
 
+/**
+ * 고수 뱃지.
+ *
+ * ⚠️ 온도로 판별하지 말 것. 42.0도는 고수가 되기 위한 **자격 조건**이지
+ * 고수라는 뜻이 아니다. 실제 고수는 `experts`에 행이 있는 사람이고,
+ * 그 값이 뷰의 is_expert로 내려온다.
+ * 온도로 붙이면 42도 넘긴 일반 유저에게 고수 표시가 달린다 —
+ * 이 서비스에서 제일 하면 안 되는 거짓 표시다.
+ *
+ * 색은 고수 온도와 같은 금색. 숫자를 안 읽어도 같은 신호로 보이게.
+ */
+export function ExpertBadge() {
+  return (
+    <span className="rounded-xs bg-temp-hot px-1.5 py-px text-[10px] font-bold text-brand-dark">
+      고수
+    </span>
+  );
+}
+
 /** 내가 쓴 댓글 표시 */
 export function MineBadge() {
   return (

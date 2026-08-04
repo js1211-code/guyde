@@ -18,6 +18,8 @@ export type FeedItem = {
   created_at: string;
   nickname: string;
   temperature: number;
+  /** experts에 등록된 사람인지. 온도 42도를 넘겼다고 고수인 게 아니다. */
+  is_expert: boolean;
   thumbnail_url: string | null;
   comment_count: number;
   reaction_count: number;
@@ -50,16 +52,22 @@ export type PostDetail = {
     percent: number | null;
   } | null;
   likes: { count: number; liked_by_me: boolean } | null;
-  comments: {
-    id: string;
-    body: string;
-    likes: number;
-    created_at: string;
-    nickname: string;
-    temperature: number;
-    liked_by_me: boolean;
-    is_mine: boolean;
-  }[];
+  comments: Comment[];
+};
+
+export type Comment = {
+  id: string;
+  body: string;
+  likes: number;
+  created_at: string;
+  nickname: string;
+  temperature: number;
+  /** experts에 등록된 사람인지. 온도로 판별하면 안 된다. */
+  is_expert: boolean;
+  /** 답글이면 부모 댓글 id. 최상위 댓글이면 null. */
+  parent_id: string | null;
+  liked_by_me: boolean;
+  is_mine: boolean;
 };
 
 async function json<T>(res: Response): Promise<T> {
@@ -177,11 +185,15 @@ export async function castNanhanVote(
   );
 }
 
-export async function addComment(postId: string, body: string) {
+export async function addComment(
+  postId: string,
+  body: string,
+  parentId?: string,
+) {
   return json(
     await apiFetch(`/api/posts/${postId}/comments`, {
       method: "POST",
-      body: JSON.stringify({ body }),
+      body: JSON.stringify({ body, parent_id: parentId }),
     }),
   );
 }

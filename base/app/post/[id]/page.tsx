@@ -1,8 +1,14 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import { CategoryBadge, MineBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
-import { CheckIcon, HeartIcon, MoreIcon, ThumbsUpIcon } from "@/components/icons";
+import { use, useEffect, useRef, useState } from "react";
+import {
+  CategoryBadge,
+  ExpertBadge,
+  MineBadge,
+  PhotoBox,
+  PostTypeBadge,
+} from "@/components/badge";
+import { CheckIcon, HeartIcon, MoreIcon } from "@/components/icons";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { timeAgo } from "@/lib/format";
@@ -13,6 +19,7 @@ import {
   fetchPost,
   togglePostLike,
   toggleCommentLike,
+  type Comment,
   type PostDetail,
 } from "@/lib/api";
 
@@ -374,12 +381,44 @@ function Comments({
 }) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  // 답글을 달 대상. null이면 새 댓글.
+  const [replyTo, setReplyTo] = useState<Comment | null>(null);
+  // 답글은 접어둔다. 원댓글이 답글에 밀려 안 보이면 흐름을 못 따라간다.
+  const [opened, setOpened] = useState<Set<string>>(new Set());
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 서버는 평평한 목록을 추천순으로 준다. 답글을 부모 밑으로 다시 묶는다.
+  // 답글끼리는 오래된 순 — 대화 순서가 뒤집히면 읽을 수가 없다.
+  const roots = data.comments.filter((c) => c.parent_id === null);
+  const repliesOf = new Map<string, Comment[]>();
+  for (const c of data.comments) {
+    if (!c.parent_id) continue;
+    repliesOf.set(c.parent_id, [...(repliesOf.get(c.parent_id) ?? []), c]);
+  }
+  for (const list of repliesOf.values()) {
+    list.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
 
   async function submit() {
     if (!draft.trim()) return;
     setBusy(true);
-    await addComment(postId, draft.trim()).catch(() => {});
+    await addComment(postId, draft.trim(), replyTo?.id).catch(() => {});
     setDraft("");
+    // 답글을 달면 그 묶음을 펼쳐둔다. 접혀 있으면 방금 쓴 게 안 보인다.
+    if (replyTo) setOpened((prev) => new Set(prev).add(replyTo.id));
+    setReplyTo(null);
+    await onDone();
+    setBusy(false);
+  }
+
+  function startReply(c: Comment) {
+    setReplyTo(c);
+    inputRef.current?.focus();
+  }
+
+  async function toggleLike(c: Comment) {
+    setBusy(true);
+    await toggleCommentLike(c.id, c.liked_by_me).catch(() => {});
     await onDone();
     setBusy(false);
   }
@@ -388,62 +427,155 @@ function Comments({
     <>
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <Kicker className="text-[12.5px]">COMMENTS {data.comments.length}</Kicker>
-        {data.comments.length > 0 && (
+        {roots.length > 0 && (
           <span className="text-[12px] font-bold text-brand">추천순</span>
         )}
       </div>
 
-      {data.comments.map((c) => (
-        <div
-          key={c.id}
-          className="border-t border-dashed border-neutral-400 px-4 py-3"
-        >
-          <div className="mb-1 flex items-center gap-1.5">
-            <span className="text-[12.5px] font-semibold">{c.nickname}</span>
-            <Temperature value={c.temperature} />
-            {c.is_mine && <MineBadge />}
+      {roots.map((c) => {
+        const replies = repliesOf.get(c.id) ?? [];
+        const isOpen = opened.has(c.id);
+        return (
+          <div key={c.id} className="border-t border-dashed border-neutral-400">
+            <CommentRow
+              comment={c}
+              busy={busy}
+              onLike={() => toggleLike(c)}
+              onReply={() => startReply(c)}
+            />
+
+            {replies.length > 0 && (
+              <div className="pl-10">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOpened((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(c.id)) next.delete(c.id);
+                      else next.add(c.id);
+                      return next;
+                    })
+                  }
+                  className="flex items-center gap-2 py-1.5 text-[12px] font-semibold text-neutral-500"
+                >
+                  <span className="h-px w-5 bg-neutral-400" />
+                  {isOpen ? "답글 숨기기" : `답글 ${replies.length}개 보기`}
+                </button>
+
+                {isOpen &&
+                  replies.map((r) => (
+                    <CommentRow
+                      key={r.id}
+                      comment={r}
+                      busy={busy}
+                      compact
+                      onLike={() => toggleLike(r)}
+                      onReply={() => startReply(c)}
+                    />
+                  ))}
+              </div>
+            )}
           </div>
-          <p className="text-[14px] leading-relaxed">{c.body}</p>
+        );
+      })}
+
+      <div className="border-t border-neutral-400">
+        {replyTo && (
+          <div className="flex items-center gap-2 bg-neutral-100 px-4 py-1.5">
+            <span className="flex-1 truncate text-[12px] text-neutral-600">
+              {replyTo.nickname}님에게 답글 다는 중
+            </span>
+            <button
+              type="button"
+              onClick={() => setReplyTo(null)}
+              className="text-[12px] font-bold text-neutral-500"
+            >
+              취소
+            </button>
+          </div>
+        )}
+        <div className="flex items-center gap-2 px-4 py-2">
+          <input
+            ref={inputRef}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder={replyTo ? "답글을 남겨보세요" : "댓글을 남겨보세요"}
+            className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[13.5px]"
+          />
           <button
             type="button"
-            disabled={c.is_mine || busy}
-            onClick={async () => {
-              setBusy(true);
-              await toggleCommentLike(c.id, c.liked_by_me).catch(() => {});
-              await onDone();
-              setBusy(false);
-            }}
-            className={`mt-1.5 flex items-center gap-1 text-[11.5px] ${
-              c.is_mine
-                ? "text-neutral-400"
-                : c.liked_by_me
-                  ? "text-brand"
-                  : "text-neutral-500"
-            }`}
+            onClick={submit}
+            disabled={busy || !draft.trim()}
+            className="cond text-[13px] font-bold text-brand disabled:text-neutral-400"
           >
-            <ThumbsUpIcon size={13} />
-            <span className="font-bold">{c.likes}</span>
+            등록
           </button>
         </div>
-      ))}
-
-      <div className="flex items-center gap-2 border-t border-neutral-400 px-4 py-2">
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder="댓글을 남겨보세요"
-          className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[13.5px]"
-        />
-        <button
-          type="button"
-          onClick={submit}
-          disabled={busy || !draft.trim()}
-          className="cond text-[13px] font-bold text-brand disabled:text-neutral-400"
-        >
-          등록
-        </button>
       </div>
     </>
+  );
+}
+
+/**
+ * 댓글 한 줄 — 인스타 형태.
+ * 본문은 왼쪽에 흐르고 좋아요는 오른쪽 끝에 세로로 붙는다(하트 + 개수).
+ * 시간·좋아요 수·답글 달기는 본문 아래 한 줄에 모은다.
+ */
+function CommentRow({
+  comment: c,
+  busy,
+  compact = false,
+  onLike,
+  onReply,
+}: {
+  comment: Comment;
+  busy: boolean;
+  compact?: boolean;
+  onLike: () => void;
+  onReply: () => void;
+}) {
+  return (
+    <div className={`flex gap-3 px-4 ${compact ? "py-2" : "py-3"}`}>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 flex flex-wrap items-center gap-1.5">
+          {/* 고수 뱃지는 닉네임 왼쪽. 온도가 아니라 experts 소속으로 판별한다. */}
+          {c.is_expert && <ExpertBadge />}
+          <span className="text-[12.5px] font-semibold">{c.nickname}</span>
+          <Temperature value={c.temperature} />
+          {c.is_mine && <MineBadge />}
+        </div>
+
+        <p className={`leading-relaxed ${compact ? "text-[13.5px]" : "text-[14px]"}`}>
+          {c.body}
+        </p>
+
+        <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-500">
+          <span>{timeAgo(c.created_at)}</span>
+          {c.likes > 0 && <span>좋아요 {c.likes}개</span>}
+          <button type="button" onClick={onReply} className="font-semibold">
+            답글 달기
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        disabled={c.is_mine || busy}
+        onClick={onLike}
+        aria-pressed={c.liked_by_me}
+        aria-label={c.liked_by_me ? "좋아요 취소" : "좋아요"}
+        className={`flex w-6 shrink-0 flex-col items-center gap-0.5 pt-0.5 ${
+          c.is_mine
+            ? "text-neutral-400"
+            : c.liked_by_me
+              ? "text-brand"
+              : "text-neutral-500"
+        }`}
+      >
+        <HeartIcon size={15} strokeWidth={c.liked_by_me ? 2.2 : 1.5} />
+        {c.likes > 0 && <span className="cond text-[11px]">{c.likes}</span>}
+      </button>
+    </div>
   );
 }
