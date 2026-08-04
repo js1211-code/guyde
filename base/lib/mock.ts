@@ -219,10 +219,19 @@ const quizResults: Record<string, QuizResult> = {
     ],
   },
 };
+// ─────────────────────────────────────────────────────────────
+// 컨설팅 v3 — experts / bookings / consulting_answers / outfit_items
+//
+// v2의 달력·시간 슬롯 예약은 사라졌다. 지금은 설문을 넣고 선결제하면
+// 48시간 안에 "진단 + 피해야 할 것 + 착장 1세트"가 문서로 오는 구조다.
+// 필드명은 db/patch_v3.sql의 컬럼명을 그대로 쓴다 — 나중에 Supabase로
+// 갈아끼울 때 이름을 바꾸지 않으려는 것.
+// ─────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────────────────────
-// 컨설팅 — experts / reviews / expert_slots / bookings
-// ─────────────────────────────────────────────────────────────
+/** 컨설팅 단가. 고수마다 다르지 않다 — 상담 방식 선택이 없어졌다. */
+export const CONSULTING_PRICE = 14900;
+/** 답변 SLA. 화면 ⑰의 "48시간 안에 1회차 답변이 도착해요"와 같은 값. */
+export const CONSULTING_SLA_HOURS = 48;
 
 export type Expert = {
   id: string;
@@ -230,26 +239,24 @@ export type Expert = {
   temperature: number;
   specialty: Exclude<Category, "자유">;
   intro: string;
-  price_chat: number;
-  price_video: number;
+  price: number;
   rating: number;
+  answered_count: number;
   /** 커뮤니티에 실제로 단 댓글 3개 (F-55) — 더미 텍스트가 아니라 원본 글로 이어진다 */
   highlights: { body: string; post_title: string; post_id: string }[];
   reviews: { rating: number; body: string }[];
-  /** 상담 가능한 고민 항목 (F-57) — 전문분야마다 다르다 */
-  concerns: string[];
 };
 
 const experts: Expert[] = [
   {
     id: "e-fox",
     nickname: "정갈한 여우 #0192",
-    temperature: 39.1,
+    temperature: 44.1,
     specialty: "옷",
     intro: "체형 상관없이 무난하게 입는 법, 8년째 알려드립니다",
-    price_chat: 15000,
-    price_video: 35000,
+    price: CONSULTING_PRICE,
     rating: 4.9,
+    answered_count: 212,
     highlights: [
       {
         body: "블랙이 무난하긴 한데 카멜도 요즘 많이 입더라고요",
@@ -268,140 +275,180 @@ const experts: Expert[] = [
       },
     ],
     reviews: [
-      { rating: 5, body: "설명이 꼼꼼해서 좋았어요" },
-      { rating: 5, body: "화상 상담 추천, 직접 입어보면서 봐주셔서 도움됐어요" },
-      { rating: 4, body: "채팅으로도 충분히 자세했습니다" },
+      { rating: 5, body: "왜 이 옷인지까지 설명해줘서 다음에 혼자 고를 때도 도움돼요" },
+      { rating: 5, body: "예산 안에서 딱 맞춰주셨습니다" },
+      { rating: 4, body: "링크가 다 살아 있어서 그대로 샀어요" },
     ],
-    concerns: ["체형 커버", "소개팅룩", "면접복", "사이즈 고르기", "색 조합"],
   },
   {
     id: "e-deer",
     nickname: "말쑥한 사슴 #0231",
-    temperature: 38.9,
-    specialty: "헤어",
-    intro: "두상·모질 보고 어울리는 컷을 정확히 짚어드립니다",
-    price_chat: 15000,
-    price_video: 33000,
+    temperature: 43.6,
+    specialty: "옷",
+    intro: "마른 체형·좁은 어깨 커버가 전문입니다",
+    price: CONSULTING_PRICE,
     rating: 4.9,
+    answered_count: 168,
     highlights: [
       {
-        body: "투블럭은 옆을 너무 치면 두상이 그대로 드러나요, 6mm부터 가세요",
-        post_title: "투블럭 기르는 중인데 옆머리 어디까지 참아야 하나요",
-        post_id: "seed-twoblock",
+        body: "마른 편이면 오버핏보다 정핏에 레이어드가 훨씬 안전해요",
+        post_title: "마른 체형인데 오버핏 입어도 되나요",
+        post_id: "seed-slim",
       },
       {
-        body: "모발이 얇으면 왁스보다 파우더가 훨씬 잘 잡힙니다",
-        post_title: "머리숱 적은데 왁스 뭐가 무난한가요",
-        post_id: "seed-wax",
+        body: "어깨가 좁으면 셔츠 어깨선을 1cm만 넓게 봐도 달라집니다",
+        post_title: "어깨 좁은 편인데 셔츠 사이즈 어떻게 고르나요",
+        post_id: "seed-shoulder",
       },
       {
-        body: "미용실에서는 '기장'보다 '어떤 느낌'을 사진으로 보여주는 게 정확해요",
-        post_title: "미용실에서 뭐라고 말해야 원하는 머리가 나오나요",
-        post_id: "seed-salon",
+        body: "밝은 하의는 다리가 짧아 보여서 초심자는 어두운 쪽이 무난해요",
+        post_title: "베이지 팬츠 무난한가요?",
+        post_id: "seed-beige",
       },
     ],
     reviews: [
-      { rating: 5, body: "두상 얘기 듣고 처음으로 머리가 마음에 들었어요" },
-      { rating: 5, body: "사진 보내니 바로 컷 이름까지 알려주심" },
-      { rating: 4, body: "제품 추천이 구체적이라 좋았습니다" },
+      { rating: 5, body: "피해야 할 것 목록이 제일 도움됐어요" },
+      { rating: 5, body: "수정 요청했더니 바로 다른 안 주셨습니다" },
+      { rating: 5, body: "처음으로 옷 사고 후회 안 했어요" },
     ],
-    concerns: ["두상 커버", "모질에 맞는 컷", "스타일링 제품", "미용실에서 말하기", "기르는 중 관리"],
   },
   {
     id: "e-owl",
     nickname: "차분한 부엉이 #0774",
-    temperature: 38.6,
-    specialty: "스킨케어",
-    intro: "지성·복합성 피부 루틴 잡아드립니다",
-    price_chat: 18000,
-    price_video: 38000,
+    temperature: 42.9,
+    specialty: "옷",
+    intro: "면접·상견례처럼 실수하면 안 되는 자리 위주로 봐드립니다",
+    price: CONSULTING_PRICE,
     rating: 4.8,
+    answered_count: 96,
     highlights: [
       {
-        body: "지성이면 아침은 물세안만 해도 충분해요",
-        post_title: "지성 피부인데 세안 몇 번 하세요?",
-        post_id: "seed-wash",
+        body: "면접은 튀지 않는 게 목적이라 네이비 아니면 차콜입니다",
+        post_title: "면접 정장 색 뭐가 무난한가요",
+        post_id: "seed-suit",
       },
       {
-        body: "톤업 빠진 무기자차 쓰시면 백탁 거의 없습니다",
-        post_title: "이 선크림 백탁 없이 무난한가요?",
-        post_id: "seed-sun",
+        body: "구두는 새것보다 하루 신어보고 가는 게 낫습니다",
+        post_title: "구두 처음 사는데 뭘 봐야 하나요",
+        post_id: "seed-shoes",
       },
       {
-        body: "토너 - 로션 두 단계면 시작으로 충분합니다",
-        post_title: "스킨케어 기본템 추천해주세요",
-        post_id: "seed-basic",
+        body: "상견례는 재킷만 걸쳐도 인상이 크게 달라져요",
+        post_title: "상견례 복장 어디까지 갖춰야 하나요",
+        post_id: "seed-formal",
       },
     ],
     reviews: [
-      { rating: 5, body: "제품명까지 짚어주셔서 바로 샀습니다" },
-      { rating: 5, body: "루틴이 단순해져서 좋아요" },
-      { rating: 4, body: "질문에 다 답해주셨어요" },
+      { rating: 5, body: "면접 당일에 안심이 됐습니다" },
+      { rating: 5, body: "사이즈 산정이 정확했어요" },
+      { rating: 4, body: "설명이 길지만 그만큼 꼼꼼합니다" },
     ],
-    concerns: ["유분 관리", "건조함", "트러블", "제품 고르기", "루틴 순서"],
   },
   {
     id: "e-hippo",
     nickname: "말끔한 하마 #0455",
-    temperature: 39.4,
-    specialty: "바디&향수",
-    intro: "향수 첫 구매부터 데일리 조합까지",
-    price_chat: 15000,
-    price_video: 32000,
+    temperature: 42.5,
+    specialty: "옷",
+    intro: "10~20만원 예산에서 최대치를 뽑는 걸 잘합니다",
+    price: CONSULTING_PRICE,
     rating: 5.0,
+    answered_count: 74,
     highlights: [
       {
-        body: "우디 계열은 대체로 무난해요, 양만 조절하면 될 듯",
-        post_title: "이 향수 데일리로 뿌리기 무난한가요?",
-        post_id: "seed-perfume",
+        body: "예산이 빠듯하면 상의보다 신발에 먼저 쓰세요, 티가 제일 큽니다",
+        post_title: "20만원으로 한 벌 맞추려면 어디에 써야 하나요",
+        post_id: "seed-budget",
       },
       {
-        body: "첫 향수는 오드뚜왈렛으로 시작하시는 걸 권해요",
-        post_title: "향수 처음 사는데 뭐부터 봐야 하나요",
-        post_id: "seed-first",
+        body: "세일 기다리다 시즌 놓치는 것보다 정가가 나을 때가 많아요",
+        post_title: "지금 살까요 세일 기다릴까요",
+        post_id: "seed-sale",
       },
       {
-        body: "겨울엔 두 번 뿌려도 과하지 않습니다",
-        post_title: "겨울에 향이 금방 날아가요",
-        post_id: "seed-winter",
+        body: "기본템은 브랜드보다 원단 두께를 보세요",
+        post_title: "무신사 스탠다드 무난한가요",
+        post_id: "seed-basicwear",
       },
     ],
     reviews: [
-      { rating: 5, body: "취향을 정확히 짚어주셨어요" },
-      { rating: 5, body: "예산 안에서 골라주셔서 좋았습니다" },
-      { rating: 5, body: "시향 순서까지 알려주심" },
+      { rating: 5, body: "예산을 정확히 지켜주셨어요" },
+      { rating: 5, body: "대체 링크까지 줘서 품절 났을 때 편했습니다" },
+      { rating: 5, body: "가성비 컨설팅 맞습니다" },
     ],
-    concerns: ["첫 향수 고르기", "데일리 향", "계절별 조합", "지속력", "예산 맞추기"],
   },
 ];
 
-/** 슬롯 — 고수마다 요일·시간대를 다르게 열어둔다(D-05). 8월 기준. */
-const slots: Record<string, { day: number; times: string[] }[]> = {
-  "e-fox": [
-    { day: 6, times: ["10:00", "14:00"] },
-    { day: 9, times: ["10:00", "14:00"] },
-    { day: 13, times: ["11:30", "16:00"] },
-    { day: 20, times: ["10:00"] },
-  ],
-  "e-owl": [
-    { day: 5, times: ["09:00", "13:00"] },
-    { day: 12, times: ["13:00", "18:00"] },
-    { day: 19, times: ["09:00"] },
-  ],
-  "e-hippo": [
-    { day: 7, times: ["15:00"] },
-    { day: 8, times: ["11:00", "15:00", "19:00"] },
-    { day: 15, times: ["11:00"] },
-  ],
+// ── 사전 설문 선택지 (화면 ⑯) ──────────────────────────────
+export const CONSULT_PURPOSES = [
+  "소개팅",
+  "데이트",
+  "면접",
+  "결혼식 하객",
+  "일상",
+] as const;
+
+/** 예산 구간. budget_min / budget_max 로 저장된다. */
+export const CONSULT_BUDGETS = [
+  { label: "10~20만원", min: 100000, max: 200000 },
+  { label: "15~30만원", min: 150000, max: 300000 },
+  { label: "30~50만원", min: 300000, max: 500000 },
+] as const;
+
+/** 지금 지원하는 구간. 나머지는 "준비 중"으로 잠근다. */
+export const CONSULT_BUDGET_SUPPORTED = "15~30만원";
+
+export const CONSULT_CONCERNS = [
+  "어깨·상체",
+  "배·허리",
+  "다리 길이",
+  "마른 체형",
+  "통통한 체형",
+  "키",
+  "피부톤",
+] as const;
+
+// ── 진행 중인 컨설팅 ──────────────────────────────────────
+export type OutfitSlot = "상의" | "하의" | "신발";
+
+export type OutfitItem = {
+  slot: OutfitSlot;
+  url: string;
+  alt_url?: string;
+  brand: string;
+  name: string;
+  price: number;
+  reason: string;
 };
+
+export type ConsultingAnswer = {
+  round: 1 | 2;
+  diagnosis: string;
+  avoid: string[];
+  items: OutfitItem[];
+};
+
+export type BookingStatus = "신청 접수" | "답변 도착" | "수정 요청됨" | "완료";
 
 export type Booking = {
   id: string;
   expert_id: string;
   expert_nickname: string;
-  slot_label: string;
+  expert_temperature: number;
+  status: BookingStatus;
+  purpose: string;
+  budget_min: number;
+  budget_max: number;
   concerns: string[];
-  status: "신청 접수";
+  body_note: string;
+  style_note: string;
+  price: number;
+  created_label: string;
+  /** SLA 남은 시간. 데모라 계산하지 않고 문구로 박는다. */
+  due_label: string;
+  revision_count: 0 | 1;
+  revision_reason?: string;
+  answers: ConsultingAnswer[];
+  review?: { rating: number; body: string };
 };
 
 const bookings: Booking[] = [
@@ -409,12 +456,168 @@ const bookings: Booking[] = [
     id: "bk-1",
     expert_id: "e-fox",
     expert_nickname: "정갈한 여우 #0192",
-    slot_label: "8월 9일(일) 오전 10:00",
-    concerns: ["체형 커버", "색 조합"],
+    expert_temperature: 44.1,
+    status: "답변 도착",
+    purpose: "소개팅",
+    budget_min: 150000,
+    budget_max: 300000,
+    concerns: ["어깨·상체", "마른 체형"],
+    body_note: "어깨가 좁은 편이라 상의가 항상 커 보여요.",
+    style_note: "튀지 않으면서 단정해 보였으면 좋겠어요.",
+    price: CONSULTING_PRICE,
+    created_label: "8월 2일",
+    due_label: "12시간 남음",
+    revision_count: 0,
+    answers: [
+      {
+        round: 1,
+        diagnosis:
+          "어깨가 좁고 상체가 마른 편이라 오버핏은 옷이 사람을 먹습니다. 어깨선이 정확히 맞는 세미오버핏으로 가고, 상의를 어둡게 잡아 상체에 무게를 주는 방향이 안전합니다.",
+        avoid: ["오버핏 후드", "밝은 카고팬츠", "굽 없는 납작한 스니커즈"],
+        items: [
+          {
+            slot: "상의",
+            url: "musinsa.com/goods/3928471",
+            alt_url: "29cm.co.kr/item/882014",
+            brand: "무신사 스탠다드",
+            name: "세미오버핏 코튼 셔츠 · 네이비",
+            price: 89000,
+            reason:
+              "어깨선이 넓은 편이라 세미오버핏이 훨씬 유리하고, 네이비는 하의 색과 무난하게 맞아요.",
+          },
+          {
+            slot: "하의",
+            url: "musinsa.com/goods/2201883",
+            brand: "토피",
+            name: "와이드 슬랙스 · 차콜",
+            price: 98000,
+            reason:
+              "다리 길이를 길어 보이게 하려면 상의보다 하의를 더 어둡게 잡는 게 확실합니다.",
+          },
+          {
+            slot: "신발",
+            url: "musinsa.com/goods/1104520",
+            alt_url: "kream.co.kr/products/44120",
+            brand: "뉴발란스",
+            name: "480 로우 · 화이트",
+            price: 89000,
+            reason:
+              "차콜 슬랙스에 흰 신발이면 아래가 밝아져서 전체가 무거워 보이지 않습니다.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "bk-2",
+    expert_id: "e-hippo",
+    expert_nickname: "말끔한 하마 #0455",
+    expert_temperature: 42.5,
     status: "신청 접수",
+    purpose: "면접",
+    budget_min: 150000,
+    budget_max: 300000,
+    concerns: ["배·허리"],
+    body_note: "허리 쪽이 신경 쓰여서 붙는 옷은 피하고 싶어요.",
+    style_note: "무난하게 갖춰 입은 느낌이면 됩니다.",
+    price: CONSULTING_PRICE,
+    created_label: "8월 4일",
+    due_label: "46시간 남음",
+    revision_count: 0,
+    answers: [],
+  },
+  {
+    id: "bk-3",
+    expert_id: "e-deer",
+    expert_nickname: "말쑥한 사슴 #0231",
+    expert_temperature: 43.6,
+    status: "완료",
+    purpose: "데이트",
+    budget_min: 100000,
+    budget_max: 200000,
+    concerns: ["마른 체형", "키"],
+    body_note: "키가 작은 편이라 다리가 짧아 보이는 게 고민이에요.",
+    style_note: "편해 보이지만 신경 쓴 티는 나면 좋겠어요.",
+    price: CONSULTING_PRICE,
+    created_label: "7월 21일",
+    due_label: "완료됨",
+    revision_count: 1,
+    revision_reason: "상의 색이 제 피부톤과 안 맞는 것 같아요.",
+    answers: [
+      {
+        round: 1,
+        diagnosis:
+          "허리선을 높여 보이게 하는 게 최우선입니다. 상의를 짧게 가져가고 하의를 하이웨이스트로 잡으면 비율이 정리됩니다.",
+        avoid: ["롱 아우터", "밑위 짧은 팬츠"],
+        items: [
+          {
+            slot: "상의",
+            url: "musinsa.com/goods/7710233",
+            brand: "라퍼지스토어",
+            name: "크롭 스웨트셔츠 · 아이보리",
+            price: 45000,
+            reason:
+              "기장이 짧아야 허리선이 위로 올라가 보여서 다리가 길어 보입니다.",
+          },
+          {
+            slot: "하의",
+            url: "musinsa.com/goods/6620119",
+            brand: "무신사 스탠다드",
+            name: "하이웨이스트 데님 · 미드블루",
+            price: 59000,
+            reason:
+              "밑위가 높은 데님이라 상의를 넣어 입으면 비율이 확실히 달라집니다.",
+          },
+          {
+            slot: "신발",
+            url: "musinsa.com/goods/9902314",
+            brand: "컨버스",
+            name: "척 70 하이 · 블랙",
+            price: 79000,
+            reason:
+              "하이탑이라 발목까지 이어져서 다리 라인이 끊기지 않고 길어 보입니다.",
+          },
+        ],
+      },
+      {
+        round: 2,
+        diagnosis:
+          "피부톤이 쿨한 편이라 아이보리가 얼굴을 뜨게 만들었습니다. 같은 실루엣에서 색만 그레이로 바꿨습니다.",
+        avoid: ["아이보리·크림 계열 상의", "노란 기 도는 베이지"],
+        items: [
+          {
+            slot: "상의",
+            url: "musinsa.com/goods/7710240",
+            brand: "라퍼지스토어",
+            name: "크롭 스웨트셔츠 · 멜란지 그레이",
+            price: 45000,
+            reason:
+              "쿨톤에는 노란 기가 없는 회색이 얼굴색을 훨씬 안정적으로 받쳐줍니다.",
+          },
+          {
+            slot: "하의",
+            url: "musinsa.com/goods/6620119",
+            brand: "무신사 스탠다드",
+            name: "하이웨이스트 데님 · 미드블루",
+            price: 59000,
+            reason:
+              "밑위가 높은 데님이라 상의를 넣어 입으면 비율이 확실히 달라집니다.",
+          },
+          {
+            slot: "신발",
+            url: "musinsa.com/goods/9902314",
+            brand: "컨버스",
+            name: "척 70 하이 · 블랙",
+            price: 79000,
+            reason:
+              "하이탑이라 발목까지 이어져서 다리 라인이 끊기지 않고 길어 보입니다.",
+          },
+        ],
+      },
+    ],
+    review: { rating: 5, body: "수정 요청 한 번에 딱 맞는 걸 주셨어요." },
   },
 ];
-
 // ─────────────────────────────────────────────────────────────
 // 조회 함수
 // ─────────────────────────────────────────────────────────────
@@ -433,8 +636,14 @@ export const getExperts = (specialty?: string) =>
   experts.filter((e) => !specialty || e.specialty === specialty);
 export const getExpert = (id: string) => experts.find((e) => e.id === id) ?? null;
 export const getExpertIds = () => experts.map((e) => e.id);
-export const getSlots = (expertId: string) => slots[expertId] ?? [];
 
 export const getBookings = () => bookings;
 export const getBooking = (id: string) => bookings.find((b) => b.id === id) ?? null;
 export const getBookingIds = () => bookings.map((b) => b.id);
+
+/** 마지막 회차 답변. 없으면 아직 고수가 안 썼다는 뜻. */
+export const latestAnswer = (b: Booking) => b.answers.at(-1) ?? null;
+
+/** 착장 합계 — DB에선 outfit_totals 뷰가 주는 값이다. */
+export const outfitTotal = (a: ConsultingAnswer) =>
+  a.items.reduce((sum, i) => sum + i.price, 0);

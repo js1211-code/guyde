@@ -1,13 +1,8 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, use, useState } from "react";
-import { PhotoSlot } from "@/components/badge";
-import { CheckIcon } from "@/components/icons";
-import {
-  SERVICE_LABEL,
-  type ServiceFormat,
-} from "@/components/expert-booking";
+import { useRouter } from "next/navigation";
+import { use, useState } from "react";
+import { Chip, PhotoBox, PhotoSlot } from "@/components/badge";
 import {
   AppShell,
   BottomBar,
@@ -15,199 +10,240 @@ import {
   ScreenBody,
   TopBar,
 } from "@/components/shell";
-import { getExpert, getSlots } from "@/lib/mock";
+import {
+  CONSULT_BUDGETS,
+  CONSULT_BUDGET_SUPPORTED,
+  CONSULT_CONCERNS,
+  CONSULT_PURPOSES,
+  CONSULTING_SLA_HOURS,
+  getExpert,
+} from "@/lib/mock";
 
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-/** 2026년 8월: 1일이 토요일 → 앞에 빈칸 6개 */
-const AUG_2026_OFFSET = 6;
-const AUG_2026_DAYS = 31;
+const PHOTO_MAX = 5;
 
-export default function BookingPage({
+/**
+ * ⑯ 사전 설문.
+ *
+ * v2의 달력·시간 슬롯을 대체하는 화면이다. 고수가 답을 쓰려면 체형이 보여야
+ * 하므로 전신 사진이 필수고, 이게 없으면 신청 버튼이 열리지 않는다.
+ *
+ * "얼굴은 가려도 괜찮아요"를 사진 영역 바로 옆에 붙여둔다.
+ * 이 문구가 없으면 대부분 여기서 그만둔다 — 사진 요구가 이 흐름의 최대 관문이다.
+ *
+ * 예산은 지금 15~30만원만 지원한다. 나머지 구간을 목록에서 빼는 대신
+ * 잠근 채로 보여준다 — 없는 줄 알고 떠나는 것보다 기다리게 하는 편이 낫다.
+ */
+export default function BookingSurveyPage({
   params,
 }: {
   params: Promise<{ expertId: string }>;
 }) {
-  // useSearchParams는 서스펜스 경계가 필요하다
-  return (
-    <Suspense fallback={null}>
-      <BookingForm params={params} />
-    </Suspense>
-  );
-}
-
-/**
- * ⑯ 예약 신청.
- * 상담 형식은 앞 화면(고수 프로필)에서 고르고 여기로 넘어온다 — 가격 안내가
- * 형식에 따라 달라지므로 여기서 다시 묻지 않는다.
- * 고수가 열어둔 슬롯만 활성화된다(F-56). 결제는 붙이지 않고 안내 문구만(F-59).
- */
-function BookingForm({ params }: { params: Promise<{ expertId: string }> }) {
   const { expertId } = use(params);
-  const router = useRouter();
-  const search = useSearchParams();
   const expert = getExpert(expertId);
-  const slots = getSlots(expertId);
+  const router = useRouter();
 
-  const format: ServiceFormat = search.get("format") === "video" ? "video" : "chat";
-
-  const [day, setDay] = useState<number | null>(slots[0]?.day ?? null);
-  const [time, setTime] = useState<string | null>(null);
+  const [purpose, setPurpose] = useState<string | null>(null);
+  const [budget, setBudget] = useState<string>(CONSULT_BUDGET_SUPPORTED);
+  const [bodyPhotos, setBodyPhotos] = useState<string[]>([]);
+  const [outfitPhotos, setOutfitPhotos] = useState<string[]>([]);
   const [concerns, setConcerns] = useState<string[]>([]);
-  const [memo, setMemo] = useState("");
+  const [bodyNote, setBodyNote] = useState("");
+  const [styleNote, setStyleNote] = useState("");
 
   if (!expert) {
     return (
       <AppShell>
-        <TopBar backHref="/experts" title="예약 신청" />
-        <p className="px-4 py-16 text-center text-[13px] text-neutral-600">
-          없는 고수예요
-        </p>
+        <TopBar backHref="/experts" title="사전 설문" />
+        <ScreenBody className="px-4 pt-10">
+          <p className="text-center text-[13px] text-neutral-600">
+            고수를 찾을 수 없어요
+          </p>
+        </ScreenBody>
       </AppShell>
     );
   }
 
-  const price = format === "video" ? expert.price_video : expert.price_chat;
-  const openDays = new Set(slots.map((s) => s.day));
-  const timesForDay = slots.find((s) => s.day === day)?.times ?? [];
-  const ready = day !== null && time !== null;
+  const toggleConcern = (c: string) =>
+    setConcerns((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c],
+    );
 
-  function submit() {
-    const q = new URLSearchParams({
-      format,
-      day: String(day),
-      time: time ?? "",
-      concerns: concerns.join(","),
-    });
-    router.push(`/booking/done/${expertId}?${q}`);
-  }
+  const addPhoto =
+    (set: React.Dispatch<React.SetStateAction<string[]>>) => (file: File) =>
+      set((prev) =>
+        prev.length >= PHOTO_MAX ? prev : [...prev, URL.createObjectURL(file)],
+      );
+
+  // 전신 사진이 없으면 고수가 판단할 근거 자체가 없다. 나머지는 없어도 답이 나온다.
+  const canSubmit = Boolean(purpose) && bodyPhotos.length > 0;
 
   return (
     <AppShell>
-      <TopBar backHref={`/experts/${expertId}`} title="예약 신청" />
+      <TopBar backHref={`/experts/${expert.id}`} title="사전 설문" />
 
-      <ScreenBody className="px-4 pt-3">
-        {/* 앞 화면에서 고른 형식을 다시 보여준다 */}
-        <div className="mb-4 flex items-center justify-between border border-brand bg-brand/15 px-3 py-2.5">
-          <span className="text-[13px] font-semibold text-brand-dark">
-            {expert.nickname} · {SERVICE_LABEL[format]}
-          </span>
-          <span className="cond text-[15px] font-bold text-brand">
-            ₩{price.toLocaleString("ko-KR")}
-          </span>
-        </div>
-
-        <p className="mb-2 text-[13px] font-bold">날짜 선택 · 2026년 8월</p>
-        <div className="grid grid-cols-7 gap-1 text-center text-[12px] text-neutral-500">
-          {WEEKDAYS.map((w) => (
-            <span key={w}>{w}</span>
-          ))}
-        </div>
-        <div className="mt-1.5 grid grid-cols-7 gap-1">
-          {Array.from({ length: AUG_2026_OFFSET }, (_, i) => (
-            <span key={`pad-${i}`} />
-          ))}
-          {Array.from({ length: AUG_2026_DAYS }, (_, i) => i + 1).map((d) => {
-            const open = openDays.has(d);
-            const selected = day === d;
-            return (
-              <button
-                key={d}
-                type="button"
-                disabled={!open}
-                onClick={() => {
-                  setDay(d);
-                  setTime(null);
-                }}
-                // 선택 = 테두리 유지 + 연한 채움. 열린 날짜는 테두리만.
-                className={`flex h-8 items-center justify-center border text-[12.5px] ${
-                  selected
-                    ? "border-brand bg-brand/15 font-bold text-brand-dark"
-                    : open
-                      ? "border-brand text-brand"
-                      : "border-transparent text-neutral-300"
-                }`}
-              >
-                {d}
-              </button>
-            );
-          })}
-        </div>
-
-        {day !== null && (
-          <>
-            <p className="mt-4 mb-2 text-[13px] font-bold">
-              8월 {day}일({WEEKDAYS[(AUG_2026_OFFSET + day - 1) % 7]}) 시간 선택
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {timesForDay.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTime(t)}
-                  className={`border px-3 py-1.5 text-[13px] ${
-                    time === t
-                      ? "border-brand bg-brand/15 font-bold text-brand-dark"
-                      : "border-brand text-brand"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        <p className="mt-5 mb-2 text-[13px] font-bold">고민 항목 (복수 선택)</p>
-        <div className="flex flex-col gap-2">
-          {expert.concerns.map((c) => {
-            const on = concerns.includes(c);
-            return (
-              <button
-                key={c}
-                type="button"
-                onClick={() =>
-                  setConcerns((prev) =>
-                    on ? prev.filter((x) => x !== c) : [...prev, c],
-                  )
-                }
-                className="flex items-center gap-2 text-left"
-              >
-                <span
-                  className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center border ${
-                    on ? "border-brand bg-brand/15" : "border-neutral-400"
-                  }`}
-                >
-                  {on && (
-                    <CheckIcon size={12} strokeWidth={2.5} className="text-brand-dark" />
-                  )}
-                </span>
-                <span className="text-[13.5px]">{c}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="mt-5 mb-2 text-[13px] font-bold">자유 메모</p>
-        <textarea
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="상담 전 고민을 자유롭게 적어주세요"
-          className="min-h-[60px] w-full resize-none border border-neutral-400 px-3 py-2.5 text-[13.5px]"
-        />
-
-        <p className="mt-4 mb-2 text-[13px] font-bold">사진 첨부 (선택)</p>
-        <PhotoSlot />
-
-        <p className="mt-5 mb-2 text-[12px] text-neutral-600">
-          상담료 {price.toLocaleString("ko-KR")}원 · 결제는 준비 중입니다
+      <ScreenBody className="px-4 pt-3 pb-2">
+        <p className="mb-4 text-[12.5px] leading-relaxed text-neutral-600">
+          {expert.nickname} 님에게 보낼 정보예요.
+          <br />
+          자세할수록 답변이 정확해져요.
         </p>
+
+        <Field label="어떤 자리인가요?" required>
+          <div className="flex flex-wrap gap-2">
+            {CONSULT_PURPOSES.map((p) => (
+              <Chip key={p} selected={purpose === p} onClick={() => setPurpose(p)}>
+                {p}
+              </Chip>
+            ))}
+          </div>
+        </Field>
+
+        <Field label="예산" required>
+          <div className="flex flex-wrap gap-2">
+            {CONSULT_BUDGETS.map((b) => {
+              const supported = b.label === CONSULT_BUDGET_SUPPORTED;
+              return (
+                <Chip
+                  key={b.label}
+                  selected={budget === b.label}
+                  onClick={supported ? () => setBudget(b.label) : undefined}
+                >
+                  {b.label}
+                  {!supported && " · 준비 중"}
+                </Chip>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[11.5px] text-neutral-500">
+            현재 {CONSULT_BUDGET_SUPPORTED} 예산만 지원해요.
+          </p>
+        </Field>
+
+        <Field label="전신 사진" required>
+          <p className="mb-2 text-[11.5px] leading-relaxed text-neutral-500">
+            체형 판단과 최종 확정안 사이즈 산정에 쓰여요 · 최대 {PHOTO_MAX}장
+            <br />
+            <span className="font-semibold text-brand">얼굴은 가려도 괜찮아요</span>
+            {" — "}모자이크·크롭한 사진도 컨설팅엔 충분해요.
+          </p>
+          <PhotoRow
+            photos={bodyPhotos}
+            alt="전신 사진"
+            onPick={addPhoto(setBodyPhotos)}
+          />
+        </Field>
+
+        <Field label="자주 입는 옷 사진">
+          <p className="mb-2 text-[11.5px] text-neutral-500">
+            지금 뭘 갖고 있는지 알면 겹치지 않게 골라드릴 수 있어요 · 선택
+          </p>
+          <PhotoRow
+            photos={outfitPhotos}
+            alt="착장 사진"
+            onPick={addPhoto(setOutfitPhotos)}
+          />
+        </Field>
+
+        <Field label="신경 쓰이는 부위">
+          <div className="flex flex-wrap gap-2">
+            {CONSULT_CONCERNS.map((c) => (
+              <Chip
+                key={c}
+                selected={concerns.includes(c)}
+                onClick={() => toggleConcern(c)}
+              >
+                {c}
+              </Chip>
+            ))}
+          </div>
+          <textarea
+            value={bodyNote}
+            onChange={(e) => setBodyNote(e.target.value)}
+            rows={2}
+            placeholder="어떤 부분이 신경 쓰이는지 적어주세요"
+            className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+          />
+        </Field>
+
+        <Field label="원하는 스타일">
+          <textarea
+            value={styleNote}
+            onChange={(e) => setStyleNote(e.target.value)}
+            rows={3}
+            placeholder="그 외에 고수에게 전하고 싶은 정보를 적어주세요"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+          />
+        </Field>
       </ScreenBody>
 
       <BottomBar>
-        <PrimaryButton disabled={!ready} onClick={submit}>
-          {ready ? "예약 신청" : "날짜와 시간을 골라주세요"}
+        <div className="mb-2 flex items-baseline justify-between">
+          <span className="text-[12.5px] text-neutral-600">컨설팅비</span>
+          <span className="cond text-[19px] font-bold">
+            ₩{expert.price.toLocaleString("ko-KR")}
+          </span>
+        </div>
+        <PrimaryButton
+          disabled={!canSubmit}
+          onClick={() => router.push("/booking/done/bk-2")}
+        >
+          ₩{expert.price.toLocaleString("ko-KR")} 결제하고 제출
         </PrimaryButton>
+        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+          {canSubmit
+            ? `${CONSULTING_SLA_HOURS}시간 안에 답변 · 불만족 시 100% 환불`
+            : "자리와 전신 사진을 채우면 신청할 수 있어요"}
+        </p>
       </BottomBar>
     </AppShell>
+  );
+}
+
+function PhotoRow({
+  photos,
+  alt,
+  onPick,
+}: {
+  photos: string[];
+  alt: string;
+  onPick: (file: File) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {photos.map((src, i) => (
+        <PhotoBox
+          key={i}
+          src={src}
+          alt={`${alt} ${i + 1}`}
+          className="h-[64px] w-[64px]"
+          marks={false}
+        />
+      ))}
+      {photos.length < PHOTO_MAX && <PhotoSlot onPick={onPick} />}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  required = false,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mb-5">
+      <p className="mb-2 flex items-center gap-1.5 text-[13.5px] font-bold">
+        {label}
+        {required && (
+          <span className="rounded-full bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">
+            필수
+          </span>
+        )}
+      </p>
+      {children}
+    </section>
   );
 }

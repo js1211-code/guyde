@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRightIcon } from "@/components/icons";
-import { ExpertBooking } from "@/components/expert-booking";
-import { AppShell, Kicker, TopBar } from "@/components/shell";
-import { getExpert, getExpertIds } from "@/lib/mock";
+import { ArrowUpRightIcon, StarIcon } from "@/components/icons";
+import {
+  AppShell,
+  BottomBar,
+  Kicker,
+  PrimaryButton,
+  ScreenBody,
+  TopBar,
+} from "@/components/shell";
+import { Temperature } from "@/components/temperature";
+import { CONSULTING_SLA_HOURS, getExpert, getExpertIds } from "@/lib/mock";
 
 export function generateStaticParams() {
   return getExpertIds().map((id) => ({ id }));
@@ -14,8 +21,9 @@ export function generateStaticParams() {
  * 이 화면의 핵심은 "커뮤니티 대표 답변 3개"다(F-55) — 실제로 단 댓글을 인용하고
  * 원본 글로 이어진다. 이게 없으면 크몽·숨고와 구분되지 않는다.
  *
- * 프로필 헤더·상담 형식 선택·예약 CTA는 상태를 공유해야 해서 ExpertBooking이 맡고,
- * 무거운 인용·후기 섹션은 서버에서 그린 채로 children으로 넘긴다.
+ * v2에선 채팅/화상 중 무엇을 고르느냐에 따라 가격과 CTA가 바뀌어서
+ * 클라이언트 컴포넌트(ExpertBooking)로 상태를 들고 있었다.
+ * v3는 방식 선택이 없고 단일가라 고를 게 없다 — 전부 서버에서 그린다.
  */
 export default async function ExpertPage({
   params,
@@ -30,15 +38,24 @@ export default async function ExpertPage({
     <AppShell>
       <TopBar backHref="/experts" />
 
-      <ExpertBooking
-        expertId={expert.id}
-        nickname={expert.nickname}
-        temperature={expert.temperature}
-        specialty={expert.specialty}
-        intro={expert.intro}
-        priceChat={expert.price_chat}
-        priceVideo={expert.price_video}
-      >
+      <ScreenBody>
+        <section className="px-4 pt-2 pb-4">
+          <div className="flex items-center gap-2">
+            <h1 className="text-[19px] font-bold">{expert.nickname}</h1>
+            <Temperature value={expert.temperature} size={15} />
+          </div>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-neutral-700">
+            {expert.intro}
+          </p>
+          <div className="mt-3 flex items-center gap-3 text-[12.5px] text-neutral-600">
+            <span className="flex items-center gap-1 font-semibold text-ink">
+              <StarIcon />
+              {expert.rating.toFixed(1)}
+            </span>
+            <span>답변 {expert.answered_count}건</span>
+          </div>
+        </section>
+
         <section className="border-b-8 border-neutral-200 px-4 pt-4 pb-4">
           <p className="cond mb-3 text-[13px] font-semibold tracking-wide text-brand">
             커뮤니티 대표 답변 3개
@@ -47,7 +64,7 @@ export default async function ExpertPage({
             <Link
               key={h.post_id}
               href={`/post/${h.post_id}`}
-              className="mb-2.5 block border border-brand-tint-b bg-brand-tint p-3 last:mb-0"
+              className="mb-2.5 block rounded-lg border border-brand-tint-b bg-brand-tint p-3 last:mb-0"
             >
               <p className="text-[14px] leading-relaxed">“{h.body}”</p>
               <span className="mt-2 flex items-center justify-between">
@@ -71,7 +88,22 @@ export default async function ExpertPage({
             </div>
           ))}
         </section>
-      </ExpertBooking>
+      </ScreenBody>
+
+      <BottomBar>
+        <div className="mb-2 flex items-baseline justify-between">
+          <span className="text-[12.5px] text-neutral-600">컨설팅비</span>
+          <span className="cond text-[19px] font-bold">
+            ₩{expert.price.toLocaleString("ko-KR")}
+          </span>
+        </div>
+        <PrimaryButton href={`/booking/${expert.id}`}>
+          컨설팅 신청하기
+        </PrimaryButton>
+        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+          {CONSULTING_SLA_HOURS}시간 안에 답변 · 불만족 시 100% 환불
+        </p>
+      </BottomBar>
     </AppShell>
   );
 }
