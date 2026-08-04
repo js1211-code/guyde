@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PostTypeBadge } from "@/components/badge";
-import { ThumbsUpIcon } from "@/components/icons";
+import { ThumbsUpIcon, VoteIcon } from "@/components/icons";
 import { AppShell, ScreenBody, TopBar } from "@/components/shell";
 import { timeAgo } from "@/lib/format";
 import {
@@ -96,7 +96,10 @@ function PostList({ items }: { items: FeedItem[] | null }) {
           <p className="text-[14.5px] leading-snug font-medium">{p.title}</p>
           <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-600">
             {p.post_type === "선택지투표" && (
-              <span className="cond tracking-wide">VOTES {p.reaction_count}</span>
+              <span className="flex items-center gap-1">
+                <VoteIcon size={12} />
+                {p.reaction_count}
+              </span>
             )}
             <span>댓글 {p.comment_count}</span>
           </div>

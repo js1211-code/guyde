@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
-import { MessageIcon } from "@/components/icons";
+import { HeartIcon, MessageIcon, VoteIcon } from "@/components/icons";
 import { NoticeBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
@@ -131,11 +131,19 @@ function FeedCard({ item }: { item: FeedItem }) {
 
   const meta = (
     <div className="mt-2 flex items-center gap-3 text-[11.5px] text-neutral-600">
+      {/* 영문 라벨 대신 모양으로 보여준다. 하트=좋아요, 투표함=투표.
+          숫자 옆에 뭐가 붙었는지 읽지 않고도 구분돼야 한다. */}
       {item.post_type === "선택지투표" && (
-        <span className="cond tracking-wide">VOTES {item.reaction_count}</span>
+        <span className="flex items-center gap-1">
+          <VoteIcon size={12} />
+          {item.reaction_count}
+        </span>
       )}
       {item.post_type === "정보공유" && item.reaction_count > 0 && (
-        <span className="cond tracking-wide">LIKES {item.reaction_count}</span>
+        <span className="flex items-center gap-1">
+          <HeartIcon size={12} />
+          {item.reaction_count}
+        </span>
       )}
       {item.comment_count > 0 && (
         <span className="flex items-center gap-1">

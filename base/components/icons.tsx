@@ -32,6 +32,19 @@ export const HeartIcon = (p: P) => (
   </S>
 );
 
+/**
+ * 투표 — 투표함에 용지를 넣는 모양.
+ * 체크·막대그래프도 후보였지만, 체크는 완료(CheckIcon)와 겹치고
+ * 막대그래프는 통계로 읽힌다. "표를 던졌다"가 바로 읽히는 쪽을 골랐다.
+ */
+export const VoteIcon = (p: P) => (
+  <S {...p}>
+    <path d="M4 14h16v6H4z" />
+    <path d="M9 14V4h6v10" />
+    <path d="M12 7v4" />
+  </S>
+);
+
 export const HomeIcon = (p: P) => (
   <S {...p}>
     <path d="m3 11 9-8 9 8" />
