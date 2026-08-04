@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
-import { BudgetBadge } from "@/components/consulting";
+import { BudgetBadge, SlotLabel } from "@/components/consulting";
 import { CheckIcon } from "@/components/icons";
 import {
   AppShell,
@@ -208,10 +208,11 @@ export default function AnswerWritePage({
               value={avoidInput}
               onChange={(e) => setAvoidInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addAvoid();
-                }
+                // 한글 조합 중의 Enter는 확정이지 추가가 아니다.
+                // 안 거르면 칩이 두 개씩 생긴다(댓글에서 겪은 것과 같은 문제).
+                if (e.key !== "Enter" || e.nativeEvent.isComposing) return;
+                e.preventDefault();
+                addAvoid();
               }}
               placeholder="예) 오버핏 후드"
               className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-[13px]"
@@ -250,15 +251,13 @@ export default function AnswerWritePage({
           {OUTFIT_SLOTS.map((slot) => (
             <div key={slot} className="card mb-3 rounded-3xl p-4">
               <div className="mb-3 flex items-center gap-1.5">
-                <span className="text-[15px] font-bold">{slot}</span>
+                <SlotLabel slot={slot} />
                 {slotDone(slot) ? (
                   <span className="flex items-center gap-1 text-[11px] font-bold text-ok">
                     <CheckIcon size={12} /> 완료
                   </span>
                 ) : (
-                  <span className="rounded-full bg-brand px-2 py-0.5 text-[10.5px] font-bold text-white">
-                    필수
-                  </span>
+                  <Required />
                 )}
               </div>
 
@@ -306,12 +305,13 @@ export default function AnswerWritePage({
                 placeholder="무신사 스탠다드"
               />
 
-              <div className="mt-3 mb-1 flex items-center gap-1.5">
+              <div className="mt-3 mb-1 flex items-center gap-1">
                 <p className="text-[12px] font-semibold text-neutral-600">
                   왜 이 아이템인가요?
                 </p>
-                <span className="rounded-full bg-brand px-1.5 py-0.5 text-[9.5px] font-bold text-white">
-                  필수 · 최소 {OUTFIT_REASON_MIN}자
+                <Required />
+                <span className="text-[11px] text-neutral-500">
+                  최소 {OUTFIT_REASON_MIN}자
                 </span>
               </div>
               <textarea
@@ -396,10 +396,24 @@ function Label({
   optional?: boolean;
 }) {
   return (
-    <p className="mt-3 mb-1.5 text-[11.5px] font-semibold text-neutral-500 first:mt-0">
+    <p className="mt-3 mb-1.5 flex items-center gap-1 text-[11.5px] font-semibold text-neutral-500 first:mt-0">
       {children}
-      {optional && " · 선택"}
+      {optional ? <span className="font-normal">· 선택</span> : <Required />}
     </p>
+  );
+}
+
+/**
+ * 필수 표시. 뱃지 대신 별표 하나 —
+ * 이 화면은 필수 항목이 열 개가 넘어서 뱃지를 붙이면 그것만 눈에 들어온다.
+ * 색은 사전 설문의 별표와 같은 토큰을 쓴다. 같은 기호가 화면마다 다른 색이면
+ * 다른 뜻으로 읽힌다. (빨강은 오류를 뜻해서 피했다)
+ */
+function Required() {
+  return (
+    <span className="text-required text-[13px] leading-none" aria-label="필수">
+      *
+    </span>
   );
 }
 

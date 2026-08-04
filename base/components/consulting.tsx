@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { CheckIcon } from "@/components/icons";
+import {
+  CheckIcon,
+  PantsIcon,
+  ShirtIcon,
+  ShoeIcon,
+} from "@/components/icons";
 import { BOOKING_STATUSES, type BookingStatus } from "@/lib/constants";
 import type {
   BookingListItem,
@@ -112,6 +117,33 @@ export function BudgetBadge({
   );
 }
 
+/**
+ * 착장 슬롯 이름 + 모양.
+ * 글자만 있으면 세 칸이 같은 덩어리로 보여서 어디가 어디인지 훑기 어렵다.
+ * 답변 작성 화면과 열람 화면이 같은 걸 써야 두 쪽이 어긋나지 않는다.
+ */
+const SLOT_ICON = {
+  상의: ShirtIcon,
+  하의: PantsIcon,
+  신발: ShoeIcon,
+} as const;
+
+export function SlotLabel({
+  slot,
+  size = 17,
+}: {
+  slot: string;
+  size?: number;
+}) {
+  const Icon = SLOT_ICON[slot as keyof typeof SLOT_ICON];
+  return (
+    <span className="flex items-center gap-1.5">
+      {Icon && <Icon size={size} />}
+      <span className="text-[15px] font-bold">{slot}</span>
+    </span>
+  );
+}
+
 /** ㉗·㉙ 고수 답변 한 회차를 통째로 그린다. 읽기 전용. */
 export function AnswerView({
   answer,
@@ -145,7 +177,7 @@ export function AnswerView({
           {answer.items.map((item) => (
             <div key={item.slot} className="card mb-3 rounded-3xl p-4">
               <div className="mb-2.5 flex items-center gap-1.5">
-                <span className="text-[15px] font-bold">{item.slot}</span>
+                <SlotLabel slot={item.slot} />
                 <span className="cond ml-auto text-[14px] font-bold">
                   {item.price.toLocaleString("ko-KR")}원
                 </span>
