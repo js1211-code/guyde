@@ -27,7 +27,7 @@ export function TabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-end justify-around border-t border-neutral-400 bg-paper px-2 pt-2 pb-1">
+    <nav className="flex shrink-0 items-end justify-around border-t border-neutral-400 bg-paper px-2 pt-2 pb-1">
       {TABS.map(({ href, label, Icon }) => {
         const active = isActive(pathname, href);
         return (
@@ -56,7 +56,11 @@ export function TabBar() {
 
 /**
  * 글쓰기 FAB — 커뮤니티 탭에서만 보인다(F-17).
- * 탭바 위에 떠 있어야 해서 셸 기준 absolute로 띄운다.
+ *
+ * 셸이 h-dvh로 고정돼 있어서 이 absolute는 화면 높이 기준이 된다.
+ * (셸이 min-h-dvh였을 땐 문서 높이 기준이라, 글이 많으면 끝까지 스크롤해야
+ *  버튼이 보였다. 셸 높이를 고정한 게 이 문제의 진짜 해결이다.)
+ * bottom 값은 탭바 높이 + 여백. 탭바 위에 떠 있어야 한다.
  */
 export function WriteFab() {
   return (

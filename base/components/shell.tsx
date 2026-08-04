@@ -4,15 +4,26 @@ import { ChevronLeftIcon } from "@/components/icons";
 /**
  * 모바일 퍼스트 셸(390px 기준). 데스크톱에서는 가운데 컬럼으로만 두고
  * 기기 프레임은 그리지 않는다 — 디자인 파일의 아이폰 프레임은 에디터 장식이다.
+ *
+ * ⚠️ 높이는 h-dvh 고정이어야 한다. min-h-dvh로 두면 셸이 내용만큼 늘어나고,
+ * 그러면 ScreenBody의 overflow-y:auto가 발동할 일이 없어서 문서 전체가
+ * 스크롤된다. 결과적으로 탭바와 글쓰기 FAB이 화면이 아니라 문서 맨 아래에
+ * 붙어서, 글이 많으면 끝까지 내려야 보인다.
+ * 스크롤은 오직 ScreenBody 안에서만 일어나야 한다.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-paper text-ink">
+    <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-paper text-ink">
       {children}
     </div>
   );
 }
 
+/**
+ * 화면의 유일한 스크롤 영역.
+ * min-h-0이 없으면 flex 자식의 기본 min-height:auto 때문에 내용만큼 늘어나서
+ * overflow가 안 잡힌다 — flex + overflow 조합에서 매번 걸리는 지점이다.
+ */
 export function ScreenBody({
   children,
   className = "",
@@ -20,7 +31,9 @@ export function ScreenBody({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <main className={`scroll-area flex-1 ${className}`}>{children}</main>;
+  return (
+    <main className={`scroll-area min-h-0 flex-1 ${className}`}>{children}</main>
+  );
 }
 
 /** 뒤로가기 + 가운데 제목. 제목은 응축 서체가 기본. */
