@@ -16,13 +16,18 @@ import { CATEGORIES, POST_TYPES, type Category, type PostType } from "@/lib/cons
  * F-11·12·13 피드 조회
  * - ?category=옷        → 카테고리 탭
  * - ?post_type=무난함판정 → 무난무난 탭 (카테고리를 가로지른다)
- * 정렬은 최신순 고정(F-13). 집계는 posts_feed 뷰가 한 번에 준다(N+1 방지).
+ * - ?sort=reactions     → 반응 많은 순 (도서관의 정보공유 서가)
+ *
+ * 피드의 정렬은 최신순 고정이다(F-13). sort는 도서관용으로 열어둔 것 —
+ * 도서관은 흐름을 보는 곳이 아니라 쓸 만한 걸 찾는 곳이라 최신순이 맞지 않는다.
+ * 집계는 posts_feed 뷰가 한 번에 준다(N+1 방지).
  */
 export async function GET(req: Request) {
   const viewer = getDeviceId(req); // 없어도 된다 — 읽기는 열려 있다
   const url = new URL(req.url);
   const category = url.searchParams.get("category");
   const postType = url.searchParams.get("post_type");
+  const sort = url.searchParams.get("sort");
   const limit = Math.min(Number(url.searchParams.get("limit") ?? 30), 100);
   const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
@@ -33,10 +38,19 @@ export async function GET(req: Request) {
     return fail("INVALID_POST_TYPE", 400);
   }
 
+  if (sort && sort !== "latest" && sort !== "reactions") {
+    return fail("INVALID_SORT", 400);
+  }
+
   const db = createAdminClient();
-  let query = db
-    .from("posts_feed")
-    .select("*")
+  let query = db.from("posts_feed").select("*");
+
+  // reaction_count는 뷰가 계산해 주는 컬럼이라 그대로 정렬에 쓸 수 있다.
+  // 같은 수면 최신 글이 위로 — 안 그러면 순서가 매 요청마다 흔들린다.
+  if (sort === "reactions") {
+    query = query.order("reaction_count", { ascending: false });
+  }
+  query = query
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 

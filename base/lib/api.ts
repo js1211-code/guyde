@@ -83,10 +83,15 @@ export class ApiError extends Error {
 export async function fetchFeed(params: {
   category?: Category;
   post_type?: PostType;
+  /** 도서관 전용. 피드는 최신순 고정이다(F-13). */
+  sort?: "latest" | "reactions";
+  limit?: number;
 }): Promise<FeedItem[]> {
   const q = new URLSearchParams();
   if (params.category) q.set("category", params.category);
   if (params.post_type) q.set("post_type", params.post_type);
+  if (params.sort) q.set("sort", params.sort);
+  if (params.limit) q.set("limit", String(params.limit));
   const res = await apiFetch(`/api/posts?${q}`);
   const { items } = await json<{ items: FeedItem[] }>(res);
   return items;
