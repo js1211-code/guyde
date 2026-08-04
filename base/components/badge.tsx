@@ -15,6 +15,7 @@ export function CategoryBadge({ children }: { children: React.ReactNode }) {
  * 글 유형 뱃지 (F-16) — 카드와 상세 헤더가 같은 문구를 쓴다.
  *   선택지투표  → [투표]           브랜드 채움
  *   무난함판정  → [무난함 82%]     틴트. 0표면 % 없이 [무난함]
+ *   정보공유    → [정보]           테두리만. 질문이 아니라는 표시
  *   일반질문    → 뱃지 없음 (없는 것 자체가 "그냥 질문글" 신호)
  */
 export function PostTypeBadge({
@@ -28,6 +29,15 @@ export function PostTypeBadge({
     return (
       <span className="rounded-xs bg-brand px-1.5 py-px text-[10.5px] font-bold text-white">
         투표
+      </span>
+    );
+  }
+  if (postType === "정보공유") {
+    // 질문글 사이에서 "이건 답이 있는 글"이라고 알리는 게 목적이라
+    // 채움 없이 테두리만 준다 — 투표 뱃지보다 조용해야 한다.
+    return (
+      <span className="rounded-xs border border-brand px-1.5 py-px text-[10.5px] font-bold text-brand">
+        정보
       </span>
     );
   }

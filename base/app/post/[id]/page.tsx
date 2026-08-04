@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { CategoryBadge, MineBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
-import { CheckIcon, MoreIcon, ThumbsUpIcon } from "@/components/icons";
+import { CheckIcon, HeartIcon, MoreIcon, ThumbsUpIcon } from "@/components/icons";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { timeAgo } from "@/lib/format";
@@ -11,6 +11,7 @@ import {
   castNanhanVote,
   castPollVote,
   fetchPost,
+  togglePostLike,
   toggleCommentLike,
   type PostDetail,
 } from "@/lib/api";
@@ -115,11 +116,79 @@ export default function PostPage({
           {data.nanhan && (
             <Nanhan postId={post.id} nanhan={data.nanhan} onDone={reload} />
           )}
+          {data.likes && (
+            <Likes
+              postId={post.id}
+              likes={data.likes}
+              isMine={post.is_mine}
+              onDone={reload}
+            />
+          )}
         </article>
 
         <Comments postId={post.id} data={data} onDone={reload} />
       </ScreenBody>
     </AppShell>
+  );
+}
+
+/**
+ * 정보 공유 글의 좋아요 (F-80).
+ *
+ * 투표·판정과 달리 결과를 감추지 않는다. 물어보는 글이 아니라 알려주는 글이라
+ * "몇 명이 도움받았나"가 본문의 일부처럼 읽혀야 한다.
+ *
+ * 자기 글에는 누를 수 없다. DB 트리거가 막지만, 눌리는 것처럼 보였다가
+ * 실패하면 고장으로 보이므로 버튼부터 잠근다.
+ */
+function Likes({
+  postId,
+  likes,
+  isMine,
+  onDone,
+}: {
+  postId: string;
+  likes: NonNullable<PostDetail["likes"]>;
+  isMine: boolean;
+  onDone: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  async function toggle() {
+    setBusy(true);
+    await togglePostLike(postId, likes.liked_by_me).catch(() => {});
+    await onDone();
+    setBusy(false);
+  }
+
+  return (
+    <div className="mt-4 flex flex-col items-center gap-2">
+      <button
+        type="button"
+        onClick={toggle}
+        disabled={busy || isMine}
+        aria-pressed={likes.liked_by_me}
+        className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-[14px] font-bold transition-colors ${
+          likes.liked_by_me
+            ? "border-brand bg-brand/15 text-brand-dark"
+            : "border-neutral-400 text-neutral-700"
+        } ${isMine ? "opacity-45" : ""}`}
+      >
+        <HeartIcon
+          size={16}
+          className={likes.liked_by_me ? "text-brand" : "text-neutral-500"}
+        />
+        도움돼요
+        {likes.count > 0 && (
+          <span className="cond text-[15px]">{likes.count}</span>
+        )}
+      </button>
+      <p className="text-[11.5px] text-neutral-500">
+        {isMine
+          ? "내 글에는 누를 수 없어요"
+          : "받은 좋아요는 글쓴이 온도에 쌓여요"}
+      </p>
+    </div>
   );
 }
 

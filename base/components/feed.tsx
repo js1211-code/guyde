@@ -8,11 +8,21 @@ import { NoticeBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
-import { CATEGORIES, type Category } from "@/lib/constants";
+import { CATEGORIES, type Category, type PostType } from "@/lib/constants";
 
-/** 탭 6개 — '무난무난'만 카테고리가 아니라 글 유형 필터다(F-10·F-12). */
-const TABS = ["전체", "무난무난", ...CATEGORIES] as const;
+/**
+ * 탭 — '무난무난'과 '정보공유'는 카테고리가 아니라 글 유형 필터다(F-10·F-12).
+ * 나머지는 전부 카테고리. 두 축이 한 줄에 섞여 있으니 아래 분기에서 헷갈리지 말 것.
+ */
+const TYPE_TABS = {
+  무난무난: "무난함판정",
+  정보공유: "정보공유",
+} as const satisfies Record<string, PostType>;
+
+const TABS = ["전체", ...Object.keys(TYPE_TABS), ...CATEGORIES] as const;
 type Tab = (typeof TABS)[number];
+
+const isTypeTab = (t: Tab): t is keyof typeof TYPE_TABS => t in TYPE_TABS;
 
 type Sort = "최신순" | "인기순";
 
@@ -28,8 +38,8 @@ export function Feed() {
     fetchFeed(
       tab === "전체"
         ? {}
-        : tab === "무난무난"
-          ? { post_type: "무난함판정" }
+        : isTypeTab(tab)
+          ? { post_type: TYPE_TABS[tab] }
           : { category: tab as Category },
     )
       .then((rows) => alive && setLoaded({ tab, rows }))
@@ -70,8 +80,12 @@ export function Feed() {
         ))}
       </div>
 
-      {tab === "무난무난" ? (
-        <NoticeBar>대중이 무난하다고 판정한 글만 모았어요</NoticeBar>
+      {isTypeTab(tab) ? (
+        <NoticeBar>
+          {tab === "무난무난"
+            ? "대중이 무난하다고 판정한 글만 모았어요"
+            : "묻는 글이 아니라 알려주는 글만 모았어요"}
+        </NoticeBar>
       ) : (
         <div className="flex items-center gap-3 px-4 py-2">
           {(["최신순", "인기순"] as Sort[]).map((s) => (
@@ -119,6 +133,9 @@ function FeedCard({ item }: { item: FeedItem }) {
     <div className="mt-2 flex items-center gap-3 text-[11.5px] text-neutral-600">
       {item.post_type === "선택지투표" && (
         <span className="cond tracking-wide">VOTES {item.reaction_count}</span>
+      )}
+      {item.post_type === "정보공유" && item.reaction_count > 0 && (
+        <span className="cond tracking-wide">LIKES {item.reaction_count}</span>
       )}
       {item.comment_count > 0 && (
         <span className="flex items-center gap-1">

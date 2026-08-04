@@ -11,9 +11,8 @@
 -- 진짜 유저(다른 UUID)는 건드리지 않는다.
 --
 -- 담지 않은 것
---  - 정보공유 글: 유형을 쓸지 미정이고, 지금 UI에 좋아요 위젯이 없어
---    시드해두면 상호작용이 없는 글로 보인다.
---  - 매거진·고수: 화면이 아직 lib/mock.ts를 봐서 DB에 넣어도 안 뜬다.
+--  - 매거진: 화면이 아직 lib/mock.ts를 봐서 DB에 넣어도 안 뜬다.
+--  - 고수: db/seed_consulting.sql이 담당한다 (이 파일 다음에 실행).
 -- ============================================================
 
 -- ---------- 0) 이전 시드 정리 ----------
@@ -103,7 +102,21 @@ insert into posts (id, device_id, category, post_type, title, body, created_at) 
    '한 달째 하고 있는데 눈에 띄는 변화가 없어서 좀 지칩니다. 다들 언제부터 체감하셨어요?', now() - interval '7 hours'),
   ('aaaa0005-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000002','자유','무난함판정',
    '주말에 이 정도 차림으로 나가도 무난한가요',
-   '동네 카페 가는 정도인데 너무 대충인가 싶어서요.', now() - interval '9 hours');
+   '동네 카페 가는 정도인데 너무 대충인가 싶어서요.', now() - interval '9 hours'),
+
+  -- 정보공유 3 (묻는 글이 아니라 알려주는 글. 하트를 쓰지 않고 좋아요를 받는다)
+  ('aaaa0006-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000005','옷','정보공유',
+   '무신사 사이즈표에서 어깨너비 읽는 법',
+   '어깨너비는 봉제선 기준이라 실제 어깨보다 1~2cm 크게 표기됩니다. 지금 잘 맞는 옷을 바닥에 펴놓고 재서 그 숫자에 맞추는 게 제일 정확해요. 총장은 뒷목 중앙부터라 앞에서 재면 계속 짧게 나옵니다.',
+   now() - interval '33 minutes'),
+  ('aaaa0006-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000006','헤어','정보공유',
+   '미용실에서 통하는 말 세 가지',
+   '"짧게"는 사람마다 기준이 달라서 안 통합니다. 옆은 몇 mm, 앞머리는 눈썹 위/아래, 전체 느낌은 사진 한 장. 이 셋만 정해가면 실패가 확 줍니다. 사진은 원하는 것 하나, 피하고 싶은 것 하나를 같이 보여주는 게 제일 정확해요.',
+   now() - interval '2 hours 5 minutes'),
+  ('aaaa0006-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000005','스킨케어','정보공유',
+   '선크림 백탁 줄이는 순서',
+   '무기자차는 바르고 바로 문지르면 하얗게 뜹니다. 점 찍듯 올린 뒤 30초 두고 두드려 펴면 훨씬 덜해요. 톤업 기능이 들어간 제품은 백탁이 기능이라 아무리 발라도 안 없어집니다 — 성분표에서 티타늄디옥사이드 함량을 먼저 보세요.',
+   now() - interval '4 hours 15 minutes');
 
 -- ---------- 3) 선택지 ----------
 insert into poll_options (post_id, text, sort_order) values
@@ -226,6 +239,27 @@ insert into comments (id, post_id, device_id, body, created_at) values
    '사진 찍어두고 비교하세요. 그게 제일 확실해요', now() - interval '5 hours 30 minutes'),
   ('cccc0005-0000-4000-8000-000000000005','aaaa0005-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000019',
    '동네 카페면 이 정도로 충분하죠', now() - interval '8 hours');
+
+-- ---------- 6-1) 정보공유 글 좋아요 ----------
+-- post_likes는 정보공유 글에만 걸 수 있다(block_invalid_post_like 트리거).
+-- 좋아요 1개가 글쓴이 온도에 +0.2다. 여기 개수는 아래 댓글 추천과 합쳐
+-- 아무도 42.0을 넘지 않도록 잡아둔 값이다.
+with likers as (
+  select device_id, row_number() over (order by device_id) as n
+  from users
+  where device_id::text like '00000000-0000-4000-8000-%'
+)
+insert into post_likes (post_id, device_id)
+select post_id, device_id from (
+  select 'aaaa0006-0000-4000-8000-000000000001'::uuid as post_id, device_id from likers where n between 1 and 9
+  union all select 'aaaa0006-0000-4000-8000-000000000002', device_id from likers where n between 1 and 6
+  union all select 'aaaa0006-0000-4000-8000-000000000003', device_id from likers where n between 1 and 4
+) t
+-- 자기 글 좋아요는 트리거가 막으므로 미리 걸러낸다
+where not exists (
+  select 1 from posts p
+  where p.id = t.post_id and p.device_id = t.device_id
+);
 
 -- ---------- 7) 댓글 추천 ----------
 -- comments.likes는 트리거가 세므로 직접 넣지 않는다.

@@ -26,6 +26,7 @@ import {
   POST_TYPES,
   POST_TYPE_HINT,
   POST_TYPE_LABEL,
+  isFreePost,
   type Category,
   type PostType,
 } from "@/lib/constants";
@@ -123,9 +124,12 @@ function Composer({
   const { me } = useMe();
   const [hearts, setHearts] = useState<number | null>(null);
   const balance = hearts ?? me?.hearts ?? null;
+  // 정보 공유는 하트를 쓰지 않는다(F-80). DB의 create_post()도 같은 규칙이라
+  // 여기서 막으면 올릴 수 있는 글을 막아버린다.
+  const free = isFreePost(postType);
   // 하트가 없으면 아예 올릴 수 없다. DB도 INSUFFICIENT_HEARTS로 막지만,
   // 다 써놓고 마지막에 막히면 헛수고라 여기서 먼저 알린다.
-  const noHearts = balance !== null && balance < POST_COST_HEARTS;
+  const noHearts = !free && balance !== null && balance < POST_COST_HEARTS;
 
   const filledOptions = options.map((o) => o.trim()).filter(Boolean);
   const ready =
@@ -181,13 +185,17 @@ function Composer({
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목을 적어주세요"
+          placeholder={free ? "무엇에 대한 정보인가요?" : "제목을 적어주세요"}
           className="w-full border-b border-neutral-400 pb-2 text-[15px] font-medium"
         />
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="어떤 점이 궁금한지 적어주세요"
+          placeholder={
+            free
+              ? "알게 된 것을 정리해서 적어주세요"
+              : "어떤 점이 궁금한지 적어주세요"
+          }
           className="mt-2 h-[92px] w-full resize-none text-[13px] leading-relaxed"
         />
 
@@ -246,6 +254,17 @@ function Composer({
           </>
         )}
 
+        {free && (
+          <div className="mt-5 rounded-lg border border-brand-tint-b bg-brand-tint p-3">
+            <p className="text-[12px] font-semibold text-brand-dark">
+              정보 공유 글은 하트를 쓰지 않아요
+            </p>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-700">
+              투표 대신 좋아요를 받고, 받은 좋아요는 내 온도에 쌓여요.
+            </p>
+          </div>
+        )}
+
         {postType === "무난함판정" && (
           <div className="mt-5 rounded-lg border border-brand-tint-b bg-brand-tint p-3">
             <p className="mb-2 text-[12px] font-semibold text-brand-dark">
@@ -296,13 +315,19 @@ function Composer({
         ) : (
           <>
             <PrimaryButton disabled={!ready || saving} onClick={submit}>
-              {saving ? "올리는 중…" : `하트 ${POST_COST_HEARTS}개로 올리기`}
+              {saving
+                ? "올리는 중…"
+                : free
+                  ? "올리기"
+                  : `하트 ${POST_COST_HEARTS}개로 올리기`}
             </PrimaryButton>
-            {balance !== null && (
-              <p className="mt-2 text-center text-[11.5px] text-neutral-600">
-                내 하트 {balance}개
-              </p>
-            )}
+            <p className="mt-2 text-center text-[11.5px] text-neutral-600">
+              {free
+                ? "하트를 쓰지 않아요"
+                : balance !== null
+                  ? `내 하트 ${balance}개`
+                  : ""}
+            </p>
           </>
         )}
       </BottomBar>

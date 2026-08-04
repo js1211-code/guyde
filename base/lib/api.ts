@@ -181,6 +181,18 @@ export async function addComment(postId: string, body: string) {
   );
 }
 
+/**
+ * 정보 공유 글 좋아요 (F-80).
+ * 이 좋아요는 글쓴이 온도에 ×0.2로 쌓인다 — 서버 트리거가 자가 좋아요를 막는다.
+ */
+export async function togglePostLike(postId: string, liked: boolean) {
+  return json(
+    await apiFetch(`/api/posts/${postId}/like`, {
+      method: liked ? "DELETE" : "POST",
+    }),
+  );
+}
+
 export async function toggleCommentLike(commentId: string, liked: boolean) {
   return json(
     await apiFetch(`/api/comments/${commentId}/like`, {

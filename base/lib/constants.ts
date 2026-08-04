@@ -14,21 +14,40 @@ export type Category = (typeof CATEGORIES)[number];
 /** 온도가 쌓이는 카테고리. '자유'는 잡담방이라 제외된다(F-06). */
 export const TEMP_CATEGORIES = CATEGORIES.filter((c) => c !== "자유");
 
-/** 물어보는 방식 — category와 완전히 다른 축이다. */
-export const POST_TYPES = ["일반질문", "선택지투표", "무난함판정"] as const;
+/**
+ * 물어보는 방식 — category와 완전히 다른 축이다.
+ *
+ * '정보공유'만 성격이 다르다. 나머지 셋은 "봐주세요"고 이건 "알려드릴게요"다.
+ * 그래서 이 유형만 하트를 안 쓰고(POST_COST_HEARTS 면제), 투표 대신 좋아요를
+ * 받고, 받은 좋아요가 온도에 ×0.2로 반영된다.
+ * 질문해서 온도가 오르는 경로는 없지만 알려줘서 오르는 경로는 있다 —
+ * 온도는 고수 판별 장치라서 방향이 이래야 한다.
+ */
+export const POST_TYPES = [
+  "일반질문",
+  "선택지투표",
+  "무난함판정",
+  "정보공유",
+] as const;
 export type PostType = (typeof POST_TYPES)[number];
 
 export const POST_TYPE_LABEL: Record<PostType, string> = {
   일반질문: "일반 글",
   선택지투표: "선택지 투표",
   무난함판정: "무난함 판정",
+  정보공유: "정보 공유",
 };
 
 export const POST_TYPE_HINT: Record<PostType, string> = {
   일반질문: "그냥 이야기하거나 물어보기",
   선택지투표: "2~5개 중 골라달라기",
   무난함판정: "무난한지 애매한지 판정받기",
+  정보공유: "아는 걸 알려주기 · 하트를 쓰지 않아요",
 };
+
+/** 하트를 쓰지 않는 유형. DB의 create_post()도 같은 규칙으로 면제한다. */
+export const FREE_POST_TYPES: readonly PostType[] = ["정보공유"];
+export const isFreePost = (t: PostType) => FREE_POST_TYPES.includes(t);
 
 export const TEMP_START = 36.5;
 /**
