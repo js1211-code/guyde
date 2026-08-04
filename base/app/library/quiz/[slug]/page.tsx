@@ -20,7 +20,7 @@ export default async function QuizResultPage({
 
   return (
     <AppShell>
-      <TopBar backHref="/magazine" title="TEST RESULT" />
+      <TopBar backHref="/library" title="TEST RESULT" />
 
       <ScreenBody className="px-4 pt-6 text-center">
         <Kicker>{result.quiz_title}</Kicker>

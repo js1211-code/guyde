@@ -139,7 +139,7 @@ create table articles (
   category     text not null check (category in ('옷','스킨케어','바디&향수','자유')),
   cover_url    text,
   read_minutes int not null default 3,
-  is_hero      boolean not null default false,           -- 매거진 상단 히어로
+  is_hero      boolean not null default false,           -- 도서관 상단 대표 글
   published_at timestamptz not null default now()
 );
 create index idx_articles_recent on articles (published_at desc);

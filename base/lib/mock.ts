@@ -3,7 +3,7 @@
  *
  *   커뮤니티(피드·글쓰기·상세·댓글) → 실제 API (lib/api.ts)
  *   컨설팅(고수·신청·답변·피드백)   → 실제 API (lib/api/consulting.ts)
- *   매거진 · 퀴즈                   → 여기 (백엔드 미구현)
+ *   도서관 · 퀴즈                   → 여기 (백엔드 미구현)
  *
  * 필드명은 db/schema_v2.sql의 컬럼명을 그대로 따른다. 백엔드가 붙으면
  * 화면은 그대로 두고 아래 get*() 본문만 fetch로 바꾸면 된다.
@@ -12,7 +12,7 @@
 import type { Category } from "@/lib/constants";
 
 // ─────────────────────────────────────────────────────────────
-// 매거진 — articles / quizzes / quiz_results
+// 도서관 — articles / quizzes / quiz_results
 // ─────────────────────────────────────────────────────────────
 
 export type Article = {

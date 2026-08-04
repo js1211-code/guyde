@@ -13,7 +13,7 @@ import { Reg } from "@/components/reg";
 
 const TABS = [
   { href: "/", label: "커뮤니티", Icon: HomeIcon },
-  { href: "/magazine", label: "매거진", Icon: BookIcon },
+  { href: "/library", label: "도서관", Icon: BookIcon },
   { href: "/experts", label: "컨설팅", Icon: BriefcaseIcon },
   { href: "/me", label: "내정보", Icon: UserIcon },
 ] as const;

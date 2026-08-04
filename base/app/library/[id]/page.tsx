@@ -24,7 +24,7 @@ export default async function ArticlePage({
       <div className="relative flex h-[240px] shrink-0 items-center justify-center border-b border-neutral-400 bg-brand-tint">
         <PhotoBox className="absolute inset-0 border-0" iconSize={28} marks={false} />
         <Link
-          href="/magazine"
+          href="/library"
           aria-label="뒤로"
           className="absolute top-4 left-4 z-10 text-white drop-shadow"
         >

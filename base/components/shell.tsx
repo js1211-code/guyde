@@ -68,7 +68,7 @@ export function TopBar({
   );
 }
 
-/** 탭 화면의 큰 제목 (매거진 / 고수 / 내정보) */
+/** 탭 화면의 큰 제목 (도서관 / 컨설팅 / 내정보) */
 export function PageTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="px-4 pt-3 pb-2.5">

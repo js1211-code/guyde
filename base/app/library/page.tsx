@@ -5,16 +5,22 @@ import { AppShell, Kicker, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { getHeroArticle, getLatestArticles, getQuizzes } from "@/lib/mock";
 
-/** ⑪ 매거진 홈 — 히어로 1개 + 최신 목록 + 테스트 카드 */
-export default function MagazinePage() {
+/**
+ * ⑪ 도서관 홈 — 대표 글 1개 + 목록 + 테스트 카드.
+ *
+ * 매거진에서 이름이 바뀌었다. 매거진은 "이번 호"라 지나가면 끝인 인상인데,
+ * 여기 글은 한 번 쓰면 계속 찾아보는 참고 자료에 가깝다.
+ * 그래서 LATEST(최신)가 아니라 그냥 모아둔 서가로 보이게 한다.
+ */
+export default function LibraryPage() {
   const hero = getHeroArticle();
 
   return (
     <AppShell>
-      <PageTitle>매거진</PageTitle>
+      <PageTitle>도서관</PageTitle>
 
       <ScreenBody>
-        <Link href={`/magazine/${hero.id}`} className="block px-4">
+        <Link href={`/library/${hero.id}`} className="block px-4">
           <PhotoBox className="h-[150px]" iconSize={24} />
           <span className="mt-2.5 inline-block">
             <CategoryBadge>{hero.category}</CategoryBadge>
@@ -25,11 +31,11 @@ export default function MagazinePage() {
           </p>
         </Link>
 
-        <Kicker className="px-4 pt-5 pb-2">LATEST</Kicker>
+        <Kicker className="px-4 pt-5 pb-2">ALL</Kicker>
         {getLatestArticles().map((a) => (
           <Link
             key={a.id}
-            href={`/magazine/${a.id}`}
+            href={`/library/${a.id}`}
             className="flex items-center gap-3 border-t border-dashed border-neutral-400 px-4 py-2.5"
           >
             <PhotoBox
@@ -52,7 +58,7 @@ export default function MagazinePage() {
           {getQuizzes().map((q) => (
             <Link
               key={q.id}
-              href={`/magazine/quiz/${q.slug}`}
+              href={`/library/quiz/${q.slug}`}
               className="relative min-w-[128px] flex-1 rounded-xl border border-neutral-400 p-3"
             >
               <Reg corners="tl br" size="sm" />
