@@ -90,6 +90,15 @@ export const CONSULT_PURPOSES = [
 export type ConsultPurpose = (typeof CONSULT_PURPOSES)[number];
 
 /**
+ * '기타'는 저장되는 값이 아니라 자유 입력칸을 여는 스위치다.
+ * 고수가 보는 건 "기타"가 아니라 실제로 어떤 자리인지라서,
+ * 기타를 고르면 사용자가 쓴 문장이 그대로 purpose로 저장된다.
+ */
+export const CONSULT_OTHER = "기타";
+/** 자유 입력 purpose의 길이 상한. 목록 밖 값을 받는 대신 길이는 막는다. */
+export const CONSULT_PURPOSE_MAX = 40;
+
+/**
  * 예산 — 구간이 아니라 단일 금액이다(bookings.budget).
  * 15만원 미만은 상의·하의·신발을 새로 갖추기엔 빠듯해서 열지 않고,
  * 30만원 초과는 아직 준비가 안 됐다. 둘 다 왜 없는지 화면에 적어준다 —
@@ -102,10 +111,15 @@ export const CONSULT_BUDGET_MIN = CONSULT_BUDGETS[0];
 export const CONSULT_BUDGET_MAX = CONSULT_BUDGETS[CONSULT_BUDGETS.length - 1];
 
 export const CONSULT_BUDGET_NOTES = [
-  `${CONSULT_BUDGET_MIN / 10000}만원 미만 — 상의/하의/신발을 새로 갖추기엔 예산이 빠듯해 만족스러운 제안이 어려워요.`,
+  `${CONSULT_BUDGET_MIN / 10000}만원 미만 — 예산이 빠듯해 만족스러운 제안이 어려워요.`,
   `${CONSULT_BUDGET_MAX / 10000}만원 초과 — 더 큰 예산의 컨설팅은 준비 중이에요.`,
 ] as const;
 
+/**
+ * 신경 쓰이는 부위. 여기에 '기타'는 넣지 않는다 —
+ * 목록에 없는 고민은 '기타'라는 단어가 아니라 자유 서술(body_note)이
+ * 실제 정보를 담는다. 화면에서는 CONSULT_OTHER 칩을 뒤에 덧붙여 그린다.
+ */
 export const CONSULT_CONCERNS = [
   "어깨·상체",
   "배·허리",

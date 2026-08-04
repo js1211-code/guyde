@@ -15,6 +15,8 @@ import {
   CONSULT_BUDGET_NOTES,
   CONSULT_BUDGETS,
   CONSULT_CONCERNS,
+  CONSULT_OTHER,
+  CONSULT_PURPOSE_MAX,
   CONSULT_PURPOSES,
   CONSULTING_SLA_HOURS,
 } from "@/lib/constants";
@@ -47,10 +49,13 @@ export default function BookingSurveyPage({
 
   const [expert, setExpert] = useState<ExpertDetail | null>(null);
   const [purpose, setPurpose] = useState<string | null>(null);
+  // '기타'를 골랐을 때만 쓰는 자유 입력. 저장될 때는 이 문장이 purpose가 된다.
+  const [purposeOther, setPurposeOther] = useState("");
   const [budget, setBudget] = useState<number | null>(null);
   const [bodyPhotos, setBodyPhotos] = useState<string[]>([]);
   const [outfitPhotos, setOutfitPhotos] = useState<string[]>([]);
   const [concerns, setConcerns] = useState<string[]>([]);
+  const [concernOther, setConcernOther] = useState(false);
   const [bodyNote, setBodyNote] = useState("");
   const [styleNote, setStyleNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -81,21 +86,29 @@ export default function BookingSurveyPage({
   // 사진 두 종류가 다 있어야 답이 나온다.
   // 전신은 체형을, 자주 입는 옷은 이미 가진 것을 알려준다 —
   // 후자가 없으면 이미 옷장에 있는 걸 다시 사라고 할 위험이 있다.
+  // 기타를 골랐으면 무엇인지 적어야 한다. "기타"만 보내면 고수가 알 수 없다.
+  const purposeReady =
+    purpose !== null &&
+    (purpose !== CONSULT_OTHER || purposeOther.trim().length > 0);
+
   const canSubmit =
-    Boolean(purpose) &&
+    purposeReady &&
     budget !== null &&
     bodyPhotos.length > 0 &&
     outfitPhotos.length > 0 &&
     !busy;
 
   async function submit() {
-    if (!expert || !purpose || budget === null) return;
+    if (!expert || !purposeReady || budget === null) return;
+    // 기타면 사용자가 쓴 문장 자체가 purpose다.
+    const finalPurpose =
+      purpose === CONSULT_OTHER ? purposeOther.trim() : purpose!;
     setBusy(true);
     setError(null);
     try {
       const { id } = await createBooking({
         expert_id: expert.id,
-        purpose,
+        purpose: finalPurpose,
         budget,
         concerns,
         body_note: bodyNote,
@@ -120,12 +133,23 @@ export default function BookingSurveyPage({
       <ScreenBody className="px-4 pt-4 pb-2">
         <Field label="어떤 자리인가요?" required>
           <div className="flex flex-wrap gap-2">
-            {CONSULT_PURPOSES.map((p) => (
+            {[...CONSULT_PURPOSES, CONSULT_OTHER].map((p) => (
               <Chip key={p} selected={purpose === p} onClick={() => setPurpose(p)}>
                 {p}
               </Chip>
             ))}
           </div>
+          {purpose === CONSULT_OTHER && (
+            <input
+              value={purposeOther}
+              onChange={(e) =>
+                setPurposeOther(e.target.value.slice(0, CONSULT_PURPOSE_MAX))
+              }
+              autoFocus
+              placeholder="어떤 자리인지 적어주세요 (예: 사촌 결혼식 사회)"
+              className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px]"
+            />
+          )}
         </Field>
 
         <Field label="예산" required>
@@ -192,14 +216,31 @@ export default function BookingSurveyPage({
                 {c}
               </Chip>
             ))}
+            {/* '기타'는 목록 항목이 아니라 입력칸을 여는 스위치다.
+                끄면 써둔 내용도 같이 지운다 — 안 보이는 값이 조용히
+                제출되면 사용자가 지웠다고 생각한 게 남는다. */}
+            <Chip
+              selected={concernOther}
+              onClick={() => {
+                setConcernOther((prev) => {
+                  if (prev) setBodyNote("");
+                  return !prev;
+                });
+              }}
+            >
+              {CONSULT_OTHER}
+            </Chip>
           </div>
-          <textarea
-            value={bodyNote}
-            onChange={(e) => setBodyNote(e.target.value)}
-            rows={2}
-            placeholder="어떤 부분이 신경 쓰이는지 적어주세요"
-            className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
-          />
+          {concernOther && (
+            <textarea
+              value={bodyNote}
+              onChange={(e) => setBodyNote(e.target.value)}
+              rows={2}
+              autoFocus
+              placeholder="어떤 부분이 신경 쓰이는지 적어주세요"
+              className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+            />
+          )}
         </Field>
 
         <Field label="원하는 스타일">

@@ -7,6 +7,7 @@ import {
   BOOKING_PHOTO_MAX,
   CONSULT_BUDGETS,
   CONSULT_CONCERNS,
+  CONSULT_PURPOSE_MAX,
   CONSULT_PURPOSES,
   CONSULTING_SLA_HOURS,
   type ConsultBudget,
@@ -97,8 +98,23 @@ export async function POST(req: Request) {
   }
 
   if (!body.expert_id) return fail("EXPERT_REQUIRED", 400, "고수를 선택해주세요");
-  if (!CONSULT_PURPOSES.includes(body.purpose as ConsultPurpose)) {
+
+  // 목록에 있는 값이거나, '기타'로 직접 쓴 문장이거나 둘 중 하나다.
+  // 자유 입력을 받는 이상 화이트리스트로는 막을 수 없으니 길이로 막는다 —
+  // purpose는 고수 화면에 그대로 나오는 값이라 길면 레이아웃이 무너진다.
+  const purpose = (body.purpose ?? "").trim();
+  if (!purpose) {
     return fail("INVALID_PURPOSE", 400, "어떤 자리인지 골라주세요");
+  }
+  if (
+    !CONSULT_PURPOSES.includes(purpose as ConsultPurpose) &&
+    purpose.length > CONSULT_PURPOSE_MAX
+  ) {
+    return fail(
+      "PURPOSE_TOO_LONG",
+      400,
+      `어떤 자리인지 ${CONSULT_PURPOSE_MAX}자 이내로 적어주세요`,
+    );
   }
   if (!CONSULT_BUDGETS.includes(body.budget as ConsultBudget)) {
     return fail("INVALID_BUDGET", 400, "지원하는 예산 범위를 골라주세요");
@@ -140,7 +156,7 @@ export async function POST(req: Request) {
     .insert({
       device_id: deviceId,
       expert_id: expert.id,
-      purpose: body.purpose,
+      purpose,
       budget: body.budget,
       concerns,
       body_note: body.body_note?.trim() || null,
