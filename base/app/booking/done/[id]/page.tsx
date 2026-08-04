@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
-import { AnswerView, ConsultStepper, StatusPill } from "@/components/consulting";
+import {
+  AnswerView,
+  ConsultStepper,
+  SubmittedMark,
+} from "@/components/consulting";
 import { CheckIcon } from "@/components/icons";
 import {
   AppShell,
@@ -11,7 +15,6 @@ import {
   ScreenBody,
   TopBar,
 } from "@/components/shell";
-import { Temperature } from "@/components/temperature";
 import { CONSULTING_SLA_HOURS } from "@/lib/constants";
 import {
   fetchBooking,
@@ -99,24 +102,26 @@ export default function BookingDetailPage({
       />
 
       <ScreenBody className="pb-2">
-        <section className="px-4 pt-3 pb-4">
+        {booking.status === "신청 접수" && (
+          <section className="flex flex-col items-center px-4 pt-6 pb-1 text-center">
+            <SubmittedMark />
+            <p className="mt-4 text-[17px] font-bold">
+              {booking.is_expert ? "답변을 기다리고 있어요" : "신청이 접수됐어요"}
+            </p>
+            <p className="mt-1.5 text-[13px] text-neutral-600">
+              {CONSULTING_SLA_HOURS}시간 안에 1회차 답변이 도착해요
+            </p>
+            <p className="cond mt-1 text-[13px] font-bold text-brand">
+              {booking.due_label}
+            </p>
+          </section>
+        )}
+
+        <section className="px-4 pt-5 pb-4">
           <ConsultStepper status={booking.status} />
         </section>
 
         <SurveySummary booking={booking} />
-
-        {booking.status === "신청 접수" && (
-          <section className="px-4 pt-5 text-center">
-            <p className="text-[16px] font-bold">
-              {booking.is_expert ? "답변을 기다리고 있어요" : "신청이 접수됐어요"}
-            </p>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-neutral-600">
-              {CONSULTING_SLA_HOURS}시간 안에 1회차 답변이 도착해요
-              <br />
-              <span className="cond font-bold text-brand">{booking.due_label}</span>
-            </p>
-          </section>
-        )}
 
         {booking.status === "수정 요청됨" && (
           <section className="mx-4 mt-4 rounded-2xl bg-danger-tint p-4">
@@ -225,6 +230,7 @@ export default function BookingDetailPage({
 /** 고수 + 설문 요약. 어느 상태에서든 위에 붙는다. */
 function SurveySummary({ booking }: { booking: BookingDetail }) {
   const rows: [string, string][] = [
+    ["고수", booking.expert.nickname],
     ["목적", booking.purpose],
     ["예산", `${(booking.budget / 10000).toFixed(0)}만원`],
     ["신경 쓰이는 부위", booking.concerns.join(" · ") || "—"],
@@ -233,34 +239,50 @@ function SurveySummary({ booking }: { booking: BookingDetail }) {
   if (booking.style_note) rows.push(["원하는 스타일", booking.style_note]);
 
   return (
-    <section className="mx-4 rounded-2xl bg-neutral-100 p-4">
-      <div className="mb-3 flex items-center gap-1.5">
-        <span className="text-[10.5px] font-semibold text-neutral-500">고수</span>
-        <span className="text-[13.5px] font-bold">{booking.expert.nickname}</span>
-        <Temperature value={booking.expert.temperature} size={12} />
-        <span className="ml-auto">
-          <StatusPill status={booking.status} />
-        </span>
-      </div>
-      {rows.map(([k, v]) => (
-        <div key={k} className="flex gap-3 py-1 text-[12.5px]">
-          <span className="w-[90px] shrink-0 text-neutral-500">{k}</span>
-          <span className="flex-1 leading-relaxed">{v}</span>
+    <section className="mx-4 rounded-2xl border border-neutral-300 px-4 py-1">
+      {rows.map(([k, v], i) => (
+        <div
+          key={k}
+          className={`flex items-start gap-4 py-3 ${
+            i > 0 ? "border-t border-dashed border-neutral-300" : ""
+          }`}
+        >
+          <span className="shrink-0 text-[12.5px] text-neutral-500">{k}</span>
+          {/* 값은 오른쪽 끝에 붙인다 — 라벨 폭이 제각각이라
+              왼쪽 정렬하면 값이 들쭉날쭉해서 훑기 어렵다. */}
+          <span className="flex-1 text-right text-[13px] leading-relaxed font-semibold">
+            {v}
+          </span>
         </div>
       ))}
-      {booking.images.length > 0 && (
-        <div className="mt-3 flex gap-2">
-          {booking.images.slice(0, 5).map((img) => (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              key={img.url}
-              src={img.url}
-              alt={img.kind}
-              className="h-[52px] w-[52px] rounded-lg border border-neutral-300 object-cover"
-            />
-          ))}
-        </div>
-      )}
+
+      {/* 전신과 착장은 고수에게 다른 정보라 섞지 않고 나눠서 보여준다.
+          전신은 체형, 착장은 이미 가진 옷이다. */}
+      {(["전신", "착장"] as const).map((kind) => {
+        const shots = booking.images.filter((i) => i.kind === kind);
+        if (shots.length === 0) return null;
+        return (
+          <div
+            key={kind}
+            className="border-t border-dashed border-neutral-300 py-3"
+          >
+            <p className="mb-2 text-[12.5px] text-neutral-500">
+              {kind === "전신" ? "전신 사진" : "자주 입는 옷"}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {shots.map((img) => (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  key={img.url}
+                  src={img.url}
+                  alt={kind}
+                  className="h-[62px] w-[62px] rounded-lg border border-neutral-300 object-cover"
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </section>
   );
 }

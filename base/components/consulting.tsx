@@ -21,34 +21,57 @@ export function ConsultStepper({ status }: { status: BookingStatus }) {
   const current = CONSULT_STEPS.indexOf(status);
 
   return (
-    <ol className="flex items-center gap-1.5">
+    <ol className="flex items-start">
       {CONSULT_STEPS.map((step, i) => {
-        const done = i < current;
-        const active = i === current;
+        // 지나온 단계와 지금 단계 모두 체크로 채운다.
+        // 지금 단계를 빈 원으로 두면 "아직 안 됐다"로 읽혀서,
+        // 접수가 끝났는데도 뭔가 덜 된 것처럼 보인다.
+        const reached = i <= current;
         return (
-          <li key={step} className="flex flex-1 flex-col items-center gap-1.5">
-            <span
-              className={`flex h-[22px] w-[22px] items-center justify-center rounded-full text-[11px] font-bold ${
-                done
-                  ? "bg-ok text-white"
-                  : active
-                    ? "bg-brand text-white"
-                    : "bg-neutral-200 text-neutral-500"
-              }`}
-            >
-              {done ? <CheckIcon size={13} /> : i + 1}
-            </span>
-            <span
-              className={`text-center text-[10.5px] leading-tight ${
-                active ? "font-bold text-brand" : "text-neutral-500"
-              }`}
-            >
-              {step}
+          <li key={step} className="contents">
+            {i > 0 && (
+              <span
+                aria-hidden="true"
+                className={`mt-[13px] h-px flex-1 ${
+                  i <= current ? "bg-brand" : "bg-neutral-300"
+                }`}
+              />
+            )}
+            <span className="flex w-[62px] shrink-0 flex-col items-center gap-1.5">
+              <span
+                className={`flex h-[27px] w-[27px] items-center justify-center rounded-full border ${
+                  reached
+                    ? "border-brand bg-brand text-white"
+                    : "border-neutral-300 text-transparent"
+                }`}
+              >
+                {reached && <CheckIcon size={14} strokeWidth={2.4} />}
+              </span>
+              <span
+                className={`text-center text-[10.5px] leading-tight ${
+                  i === current ? "font-bold text-ink" : "text-neutral-500"
+                }`}
+              >
+                {step}
+              </span>
             </span>
           </li>
         );
       })}
     </ol>
+  );
+}
+
+/**
+ * 접수 완료 표시 — 큰 체크 원.
+ * 상태 배지만으로는 "냈다"는 안도감이 안 생겨서, 제출 직후에는
+ * 스테퍼보다 먼저 이 표시가 눈에 들어와야 한다.
+ */
+export function SubmittedMark() {
+  return (
+    <span className="flex h-[62px] w-[62px] items-center justify-center rounded-full border-2 border-brand text-brand">
+      <CheckIcon size={28} strokeWidth={2.2} />
+    </span>
   );
 }
 

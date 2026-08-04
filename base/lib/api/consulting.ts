@@ -120,6 +120,9 @@ export async function loadBooking(
         .from("booking_images")
         .select("kind, url, sort_order")
         .eq("booking_id", bookingId)
+        // 전신과 착장은 각각 0부터 매겨져서 sort_order만으로 정렬하면 섞인다.
+        // 종류를 먼저 세우고 그 안에서 순서를 지킨다.
+        .order("kind", { ascending: true })
         .order("sort_order", { ascending: true }),
     ]);
 
@@ -144,7 +147,14 @@ export async function loadBooking(
         temperature: expertDevice ? (temps.get(expertDevice) ?? 36.5) : 36.5,
         intro: expert?.intro ?? "",
       },
-      images: (images ?? []).map((i) => ({ kind: i.kind, url: i.url })),
+      images: (images ?? [])
+        .slice()
+        .sort(
+          (a, b) =>
+            IMAGE_KIND_ORDER.indexOf(a.kind) - IMAGE_KIND_ORDER.indexOf(b.kind) ||
+            a.sort_order - b.sort_order,
+        )
+        .map((i) => ({ kind: i.kind, url: i.url })),
       answers: (answers ?? []).map((a) => {
         const items = ((a.outfit_items ?? []) as OutfitItemRow[]).slice().sort(
           (x, y) => SLOT_ORDER.indexOf(x.slot) - SLOT_ORDER.indexOf(y.slot),
@@ -174,3 +184,6 @@ type OutfitItemRow = {
 
 // 상의 → 하의 → 신발. DB는 순서를 보장하지 않아서 화면 직전에 정렬한다.
 const SLOT_ORDER = ["상의", "하의", "신발"];
+
+// 전신이 먼저다 — 체형이 보여야 나머지가 읽힌다.
+const IMAGE_KIND_ORDER = ["전신", "착장"];
