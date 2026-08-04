@@ -59,9 +59,16 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 | `patch_v2_1.sql` | 글 유형 4택 · `post_likes` · `calc_temperature` · 뷰 재정의 |
 | `patch_v2_3.sql` | 카테고리에 '헤어' 추가 |
 | `patch_v3.sql` | **컨설팅 재설계** — `expert_slots` 폐기, `bookings` 재정의, 신규 5테이블 |
+| `patch_v3_1.sql` | 예산을 구간(`budget_min`/`budget_max`) → 단일값(`budget`)으로 |
 | `seed.sql` | 데모용 커뮤니티 데이터 (사용자 20 · 글 16 · 댓글 28) |
+| `seed_consulting.sql` | 고수 4명 (**반드시 `seed.sql` 다음에**) |
 | `test_v2_1.sql` | 검증 23종 (검증 전용 DB에서만 실행) |
 | `test_v3.sql` | 컨설팅 제약 검증 17종 (검증 전용 DB에서만 실행) |
+
+> ⚠️ `seed_consulting.sql`은 반드시 `seed.sql` **다음에** 돌린다.
+> `seed.sql`이 일반 유저를 지우고 다시 넣는데, 그 유저들이 고수 댓글에
+> 눌러둔 추천도 FK로 같이 날아간다. 순서가 뒤바뀌면 고수 온도가 36.5로 떨어져
+> 고수 목록이 통째로 빈다(42.0 미만은 목록에서 걸러진다).
 
 테이블: `users` `posts` `post_images` `poll_options` `poll_votes` `nanhan_votes` `post_likes` `comments` `comment_likes` `articles` `quizzes` `quiz_results` `experts` `reviews` `bookings` `booking_images` `consulting_answers` `outfit_items` `feedbacks` `refunds` `heart_transactions` `reports`
 뷰: `posts_feed`(피드 카드 집계) · `comments_view`(댓글 + 작성자 온도) · `outfit_totals`(착장 합계 + 예산 대비 %)
@@ -94,6 +101,8 @@ Storage: **`post-images`** 버킷(공개 읽기, 5MB, 이미지 타입만). 업�
 - 무난함 판정글은 작성자가 선택지를 만들 수 없다 — `무난해요`/`애매해요` 고정 2종. 0표면 % 없이 `[무난함]`만.
 - 고수는 시드 고정(유저가 고수가 되는 경로 없음). 고수도 랜덤 닉네임 체계를 쓴다.
 - **컨설팅은 '옷' 하나만 연다.** 고수 전원 같은 전문분야, 같은 단가라서 목록에 필터를 두지 않는다 — 선택지가 하나인 필터는 오히려 헷갈린다.
+- **고수 온도는 절대 `users.temperature`(캐시)를 읽지 않는다.** `calc_temperature()`로 매번 계산한다. 캐시를 읽으면 방금 받은 추천이 빠져서 프로필과 목록의 온도가 어긋난다.
+- **42.0도 미만인 고수는 목록에서 뺀다.** `experts` 행이 남아 있어도 자격을 잃었으면 고수로 보여선 안 된다 — 42도가 기준이라고 화면에 써놓고 41도짜리를 같이 보여주면 그 문구가 거짓이 된다.
 
 ### 온도 (확정)
 ```
@@ -126,6 +135,7 @@ v3는 **"무엇을 살지"를 문서로 받는** 서비스다. 달력·슬롯·�
 | 단계 | 내용 |
 |---|---|
 | 사전 설문 | 목적 · 예산 · **전신 사진(필수)** · 자주 입는 옷 · 신경 쓰이는 부위 · 원하는 스타일 |
+| 예산 | **15 / 20 / 25 / 30만원 단일 선택**(`bookings.budget`). 범위 밖은 왜 안 받는지도 화면에 적는다 |
 | 가격 | **₩14,900 단일가.** 고수마다 다르지 않다 |
 | SLA | 48시간 안에 1회차 답변 |
 | 고수 답변 | ① 진단 ② 피해야 할 것(칩) ③ **착장 1세트**(상의·하의·신발 전부 필수) |
@@ -138,7 +148,7 @@ v3는 **"무엇을 살지"를 문서로 받는** 서비스다. 달력·슬롯·�
   화면에서 이 문자열을 다시 나열하지 말고 `components/consulting.tsx`의 `CONSULT_STEPS`를 쓴다.
 - **전신 사진이 없으면 제출을 막는다.** 고수가 판단할 근거 자체가 없기 때문이다.
   "얼굴은 가려도 괜찮아요"를 사진 영역에 반드시 붙인다 — 사진 요구가 이 흐름의 최대 관문이라, 이 문구가 없으면 대부분 여기서 그만둔다.
-- 예산은 지금 **15~30만원만** 지원한다. 나머지 구간은 목록에서 빼지 말고 "준비 중"으로 잠근다.
+- 예산 범위 밖(15만원 미만 / 30만원 초과)은 **왜 안 받는지 이유를 같이 적는다**. 이유 없이 선택지만 좁히면 "내 예산은 취급 안 하는구나"로만 읽힌다.
 - `outfit_items.reason`의 20자 최소와 `feedbacks`의 사유 필수는 **DB 제약**으로도 막혀 있다.
   화면에서만 막으면 API로 우회된다.
 
@@ -150,7 +160,9 @@ v3는 **"무엇을 살지"를 문서로 받는** 서비스다. 달력·슬롯·�
   - `/` `/post/[id]` `/write`
   - `/magazine` `/magazine/[id]` `/magazine/quiz/[slug]`
   - `/experts` `/experts/[id]` `/booking/[expertId]`(사전 설문) `/booking/done/[id]`(상세) `/booking/done/[id]/revise`(수정 요청)
+  - `/consulting`(고수 인박스) `/consulting/[id]/answer`(㉘ 답변 작성)
   - `/me` `/me/activity` `/me/bookings`
+  - `/test/device` — **데모 전용 기기 전환.** 로그인이 없어 고수 입장을 보려면 localStorage UUID를 바꾸는 수밖에 없다. API에는 우회로가 없다. 실서비스에선 `app/test` 폴더째 삭제.
   - `/hearts` (충전 샵 — 커뮤니티 헤더의 하트에서 진입)
 
 ## API (구현됨)
@@ -170,6 +182,15 @@ POST|DELETE /api/comments/[id]/like   댓글 추천
 POST   /api/uploads                   사진 업로드
 POST   /api/hearts/purchase           하트 충전
 GET|POST /api/hearts/ad-reward        광고 보상 (GET = 남은 횟수)
+
+GET    /api/experts                   고수 목록 (42도 미만 제외)
+GET    /api/experts/[id]              프로필 + 대표 답변(실제 댓글) + 후기
+GET    /api/experts/me/bookings       고수 인박스 — 고수가 아니면 403
+GET    /api/bookings                  내 컨설팅
+POST   /api/bookings                  사전 설문 제출 (금액은 서버가 정한다)
+GET    /api/bookings/[id]             상세 — 신청자·담당 고수만
+POST   /api/bookings/[id]/answer      고수 답변 (회차는 서버가 정한다)
+POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수정 요청됨
 ```
 규칙: 1기기 1표·자기 추천 차단·하트 차감은 **전부 DB(제약·트리거·함수)에 두고 API는 번역만 한다.** 규칙이 두 군데로 갈리면 반드시 어긋난다.
 
@@ -202,16 +223,16 @@ GET|POST /api/hearts/ad-reward        광고 보상 (GET = 남은 횟수)
 1. ~~공통 기반~~ ✅ 기기 UUID · 유저 등록 · 랜덤 닉네임 · X-Device-Id · 4탭+FAB
 2. ~~커뮤니티 핵심~~ ✅ 피드 · 글쓰기 3택 · 상세(투표/판정/일반) · 댓글·추천 · 사진 업로드
 3. **시드 데이터** ← 지금 여기. 6개 탭 어디를 눌러도 비지 않게. 무난함 판정글은 투표가 쌓인 상태로. (콜드스타트 방어 = 데모 생명줄)
-4. 매거진 — 화면은 있으나 `lib/mock.ts` 목데이터. 백엔드 미구현
-5. 컨설팅 — v3 재설계 완료(화면). **아직 `lib/mock.ts` 기반이고 API 미연결.** 대표 답변 3개는 나중에 실제 comments 레코드를 참조해야 한다
-6. 내정보 — 프로필·닉네임 변경·온도 바·내 활동 ✅ / 내 컨설팅은 목데이터
+4. 매거진 — 화면은 있으나 `lib/mock.ts` 목데이터. 백엔드 미구현 (mock에 남은 유일한 영역)
+5. ~~컨설팅~~ ✅ v3 재설계 + API 연결 완료. 대표 답변 3개는 실제 comments를 추천순으로 인용한다
+6. 내정보 — 프로필·닉네임 변경·온도 바·내 활동·내 컨설팅 ✅
 7. ~~하트~~ ✅ 배지·차감·충전 샵·광고 보상
 
 ## 하지 말 것 (스코프 밖)
 - 로그인·회원가입·소셜 로그인·세션/JWT/쿠키, Supabase Auth
 - 대댓글, 글 수정·삭제, 검색, 알림, 팔로우, 무한스크롤
 - 결제·PG 연동·카드 입력 UI (₩14,900은 화면 표시만, 누르면 통과)
-- 유저가 고수가 되는 경로, 고수 답변 작성 화면(㉘), 리뷰 작성 UI, 환불 처리
+- 유저가 고수가 되는 경로(고수는 시드 고정), 리뷰 작성 UI, 환불 처리
 - 신고 클릭 동작(버튼 자리만), 사진 편집·필터
 - 스택 임의 교체, 불필요한 라이브러리 추가
 
