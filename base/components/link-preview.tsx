@@ -91,9 +91,15 @@ export function toProductName(title: string): string {
 export function LinkPreviewCard({
   url,
   onUseTitle,
+  clickable = false,
 }: {
   url: string;
   onUseTitle?: (title: string) => void;
+  /**
+   * 받는 쪽(컨설팅 열람)에서는 카드 자체가 링크다. 사진을 보고 마음이
+   * 정해지는데 그때 다시 위의 주소 줄을 찾아 누르게 하면 한 단계가 더 는다.
+   */
+  clickable?: boolean;
 }) {
   const { data, loading } = useLinkPreview(url);
 
@@ -107,8 +113,8 @@ export function LinkPreviewCard({
 
   if (!data?.found || !data.title) return null;
 
-  return (
-    <div className="mt-1.5 flex items-center gap-2.5 rounded-lg border border-brand-tint-b bg-brand-tint p-2">
+  const inner = (
+    <>
       <span className="relative flex h-[46px] w-[46px] shrink-0 items-center justify-center overflow-hidden rounded-md border border-brand-tint-b bg-bg">
         {data.image ? (
           // next/image를 쓰지 않는다. 어느 도메인이 올지 미리 알 수 없어서
@@ -148,6 +154,27 @@ export function LinkPreviewCard({
           상품명에 넣기
         </button>
       )}
-    </div>
+    </>
+  );
+
+  if (!clickable) {
+    return (
+      <div className="mt-1.5 flex items-center gap-2.5 rounded-lg border border-brand-tint-b bg-brand-tint p-2">
+        {inner}
+      </div>
+    );
+  }
+
+  // 프로토콜이 없으면 상대 경로로 잡혀 앱 안에서 404가 난다(ShopLink와 같은 규칙).
+  const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-1.5 flex items-center gap-2.5 rounded-lg border border-brand-tint-b bg-bg p-2"
+    >
+      {inner}
+    </a>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LinkPreviewCard } from "@/components/link-preview";
 import {
   ArrowUpRightIcon,
   CheckIcon,
@@ -187,8 +188,16 @@ export function AnswerView({
               <p className="text-[13px] font-bold">{item.name}</p>
               <p className="mt-0.5 text-[11px] text-neutral-500">{item.brand}</p>
 
+              {/* 링크 밑에 미리보기. 읽히는 사이트에서만 뜨고, 29cm·쿠팡처럼
+                  상품을 자바스크립트로 그리는 곳은 아무것도 안 그린다. */}
               <ShopLink url={item.url} />
-              {item.alt_url && <ShopLink url={item.alt_url} alt />}
+              <LinkPreviewCard url={item.url} clickable />
+              {item.alt_url && (
+                <>
+                  <ShopLink url={item.alt_url} alt />
+                  <LinkPreviewCard url={item.alt_url} clickable />
+                </>
+              )}
 
               <p className="mt-3 mb-1 text-[12px] font-semibold text-neutral-600">
                 왜 이 아이템인가요?
