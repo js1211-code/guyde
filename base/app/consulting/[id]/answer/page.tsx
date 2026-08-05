@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
 import { BudgetBadge, SlotLabel } from "@/components/consulting";
+import { LinkPreviewCard } from "@/components/link-preview";
 import { CheckIcon } from "@/components/icons";
 import {
   AppShell,
@@ -319,6 +320,12 @@ export default function AnswerWritePage({
                 placeholder="상품 링크를 붙여넣어 주세요"
                 invalid={!looksLikeUrl(items[slot].url)}
               />
+              {/* 읽히는 사이트에서만 뜬다. 29cm·쿠팡처럼 상품을
+                  자바스크립트로 그리는 곳은 아무것도 안 그린다. */}
+              <LinkPreviewCard
+                url={items[slot].url}
+                onUseTitle={(t) => patch(slot, "name", t)}
+              />
 
               <Label optional>대체 링크 (품절 대비)</Label>
               <Input
@@ -327,6 +334,7 @@ export default function AnswerWritePage({
                 placeholder="선택"
                 invalid={!looksLikeUrl(items[slot].alt_url)}
               />
+              <LinkPreviewCard url={items[slot].alt_url} />
 
               <div className="mt-3 flex gap-2">
                 <div className="flex-1">

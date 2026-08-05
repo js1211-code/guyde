@@ -1,0 +1,159 @@
+- generic [ref=f62e1]:
+  - generic [ref=f62e2]:
+    - banner [ref=f62e3]:
+      - link "뒤로" [ref=f62e5] [cursor=pointer]:
+        - /url: /booking/done/c3f2d113-4e92-4e0f-a580-c3119dd1d46c
+      - generic [ref=f62e8]: 답변 작성
+    - main [ref=f62e9]:
+      - generic [ref=f62e21]:
+        - paragraph [ref=f62e22]: 신청 내용
+        - generic [ref=f62e23]:
+          - generic [ref=f62e24]: 목적
+          - generic [ref=f62e25]: 일상
+        - generic [ref=f62e26]:
+          - generic [ref=f62e27]: 예산
+          - generic [ref=f62e28]: 20만원
+        - generic [ref=f62e29]:
+          - generic [ref=f62e30]: 신경 쓰이는 부위
+          - generic [ref=f62e31]: 마른 체형 · 다리 길이 · 배·허리
+        - generic [ref=f62e32]:
+          - img "전신" [ref=f62e33]
+          - img "착장" [ref=f62e34]
+      - generic [ref=f62e35]:
+        - paragraph [ref=f62e36]:
+          - generic [ref=f62e37]: ①
+          - text: 진단
+          - generic "필수" [ref=f62e38]: "*"
+          - generic [ref=f62e39]: 최소 20자
+        - textbox "체형과 사진을 보고 무엇이 문제인지, 어떤 방향으로 가야 하는지 적어주세요" [ref=f62e40]
+        - paragraph [ref=f62e41]: 0 / 최소 20자
+      - generic [ref=f62e42]:
+        - paragraph [ref=f62e43]:
+          - generic [ref=f62e44]: ②
+          - text: 피해야 할 것
+          - generic "필수" [ref=f62e45]: "*"
+          - generic [ref=f62e46]: 최소 1개
+        - generic [ref=f62e47]:
+          - textbox "예) 오버핏 후드" [ref=f62e48]
+          - button "추가" [ref=f62e49]
+      - generic [ref=f62e50]:
+        - paragraph [ref=f62e51]:
+          - generic [ref=f62e52]: ③
+          - text: 착장 1세트
+          - generic "필수" [ref=f62e53]: "*"
+          - generic [ref=f62e54]: 세 칸 모두
+        - generic [ref=f62e55]:
+          - generic [ref=f62e56]:
+            - paragraph [ref=f62e57]: 합계
+            - paragraph [ref=f62e58]: 0원
+          - generic [ref=f62e59]: 예산 200,000원의 0%
+        - paragraph [ref=f62e60]: 합계가 예산의 80~100%면 초록 배지가 돼요. 벗어나면 주황·빨강으로 바뀝니다.
+        - generic [ref=f62e61]:
+          - generic [ref=f62e62]:
+            - generic [ref=f62e63]: 상의
+            - generic "필수" [ref=f62e67]: "*"
+          - paragraph [ref=f62e68]:
+            - text: 구매 링크
+            - generic "필수" [ref=f62e69]: "*"
+          - textbox "상품 링크를 붙여넣어 주세요" [active] [ref=f62e70]: https://www.musinsa.com/products/3948573
+          - generic [ref=f62e159]:
+            - generic [ref=f62e161]:
+              - generic [ref=f62e162]: 숲(SOUP) 브이넥 벌룬 슬리브 니트(OY4SKT1) - 사이즈 & 후기 | 무신사
+              - generic [ref=f62e163]: 무신사
+            - button "상품명에 넣기" [ref=f62e164]
+          - paragraph [ref=f62e71]:
+            - text: 대체 링크 (품절 대비)
+            - generic [ref=f62e72]: · 선택
+          - textbox "선택" [ref=f62e73]
+          - generic [ref=f62e74]:
+            - generic [ref=f62e75]:
+              - paragraph [ref=f62e76]:
+                - text: 상품명
+                - generic "필수" [ref=f62e77]: "*"
+              - textbox "세미오버핏 코튼 셔츠 · 네이비" [ref=f62e78]
+            - generic [ref=f62e79]:
+              - paragraph [ref=f62e80]:
+                - text: 가격
+                - generic "필수" [ref=f62e81]: "*"
+              - textbox "59000" [ref=f62e82]
+          - paragraph [ref=f62e83]:
+            - text: 브랜드
+            - generic [ref=f62e84]: · 선택
+          - textbox "무신사 스탠다드" [ref=f62e85]
+          - generic [ref=f62e86]:
+            - paragraph [ref=f62e87]: 왜 이 아이템인가요?
+            - generic "필수" [ref=f62e88]: "*"
+            - generic [ref=f62e89]: 최소 20자
+          - textbox "이 사람의 체형·목적과 이 아이템이 어떻게 맞는지 적어주세요" [ref=f62e90]
+          - paragraph [ref=f62e91]: 0 / 최소 20자
+        - generic [ref=f62e92]:
+          - generic [ref=f62e93]:
+            - generic [ref=f62e94]: 하의
+            - generic "필수" [ref=f62e98]: "*"
+          - paragraph [ref=f62e99]:
+            - text: 구매 링크
+            - generic "필수" [ref=f62e100]: "*"
+          - textbox "상품 링크를 붙여넣어 주세요" [ref=f62e101]
+          - paragraph [ref=f62e102]:
+            - text: 대체 링크 (품절 대비)
+            - generic [ref=f62e103]: · 선택
+          - textbox "선택" [ref=f62e104]
+          - generic [ref=f62e105]:
+            - generic [ref=f62e106]:
+              - paragraph [ref=f62e107]:
+                - text: 상품명
+                - generic "필수" [ref=f62e108]: "*"
+              - textbox "세미오버핏 코튼 셔츠 · 네이비" [ref=f62e109]
+            - generic [ref=f62e110]:
+              - paragraph [ref=f62e111]:
+                - text: 가격
+                - generic "필수" [ref=f62e112]: "*"
+              - textbox "59000" [ref=f62e113]
+          - paragraph [ref=f62e114]:
+            - text: 브랜드
+            - generic [ref=f62e115]: · 선택
+          - textbox "무신사 스탠다드" [ref=f62e116]
+          - generic [ref=f62e117]:
+            - paragraph [ref=f62e118]: 왜 이 아이템인가요?
+            - generic "필수" [ref=f62e119]: "*"
+            - generic [ref=f62e120]: 최소 20자
+          - textbox "이 사람의 체형·목적과 이 아이템이 어떻게 맞는지 적어주세요" [ref=f62e121]
+          - paragraph [ref=f62e122]: 0 / 최소 20자
+        - generic [ref=f62e123]:
+          - generic [ref=f62e124]:
+            - generic [ref=f62e125]: 신발
+            - generic "필수" [ref=f62e130]: "*"
+          - paragraph [ref=f62e131]:
+            - text: 구매 링크
+            - generic "필수" [ref=f62e132]: "*"
+          - textbox "상품 링크를 붙여넣어 주세요" [ref=f62e133]
+          - paragraph [ref=f62e134]:
+            - text: 대체 링크 (품절 대비)
+            - generic [ref=f62e135]: · 선택
+          - textbox "선택" [ref=f62e136]
+          - generic [ref=f62e137]:
+            - generic [ref=f62e138]:
+              - paragraph [ref=f62e139]:
+                - text: 상품명
+                - generic "필수" [ref=f62e140]: "*"
+              - textbox "세미오버핏 코튼 셔츠 · 네이비" [ref=f62e141]
+            - generic [ref=f62e142]:
+              - paragraph [ref=f62e143]:
+                - text: 가격
+                - generic "필수" [ref=f62e144]: "*"
+              - textbox "59000" [ref=f62e145]
+          - paragraph [ref=f62e146]:
+            - text: 브랜드
+            - generic [ref=f62e147]: · 선택
+          - textbox "무신사 스탠다드" [ref=f62e148]
+          - generic [ref=f62e149]:
+            - paragraph [ref=f62e150]: 왜 이 아이템인가요?
+            - generic "필수" [ref=f62e151]: "*"
+            - generic [ref=f62e152]: 최소 20자
+          - textbox "이 사람의 체형·목적과 이 아이템이 어떻게 맞는지 적어주세요" [ref=f62e153]
+          - paragraph [ref=f62e154]: 0 / 최소 20자
+    - generic [ref=f62e155]:
+      - button "답변 보내기" [disabled] [ref=f62e156]
+      - paragraph [ref=f62e157]: 진단 · 피해야 할 것 · 착장 세 칸을 모두 채워주세요
+  - button "Open Next.js Dev Tools" [ref=f62e16] [cursor=pointer]
+  - alert [ref=f62e20]
