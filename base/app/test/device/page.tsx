@@ -14,10 +14,10 @@ import {
  * 이 앱에는 로그인이 없다. 신원은 localStorage의 UUID 하나뿐이라,
  * "고수 입장에서 보기"를 하려면 그 UUID를 바꾸는 수밖에 없다.
  *
- * 두 가지 방식이 있다.
- *   이 탭에서만  → sessionStorage. 탭마다 따로라 **일반과 고수를 동시에** 띄울 수 있다.
- *   브라우저 전체 → localStorage. 모든 탭이 같이 바뀐다.
- * 데모에서 두 화면을 나란히 보여줘야 하면 앞의 것을 쓴다.
+ * 고수 신원은 **sessionStorage(탭 단위)에만** 둔다. localStorage에 박으면
+ * localhost:3000을 그냥 열어도 고수로 떠서, 왜 그런지 알 수 없는 상태가 된다.
+ * 실제로 그 함정을 밟아서 브라우저 전체를 바꾸는 경로를 없앴다.
+ * 덕분에 일반 사용자와 고수를 두 탭에 동시에 띄울 수 있다.
  *
  * ⚠️ 제품 기능이 아니다. API에는 어떤 우회로도 만들지 않았다 —
  * 답변 작성은 여전히 담당 고수의 device_id로만 통과한다.
@@ -70,29 +70,28 @@ function DeviceSwitch() {
     window.location.href = "/consulting";
   }
 
-  /** 브라우저 전체를 고수로. 모든 탭이 같이 바뀐다. */
-  function switchAll(id: string) {
-    const now = localStorage.getItem(DEVICE_KEY);
-    // 고수→고수로 옮길 때 원래 기기를 덮어쓰면 돌아갈 곳이 사라진다.
-    if (now && !SEED_EXPERTS.some((e) => e.id === now)) {
-      localStorage.setItem(PREV_KEY, now);
-    }
-    localStorage.setItem(DEVICE_KEY, id);
+  /**
+   * 일반 사용자로 복귀.
+   *
+   * 고수 신원은 이제 sessionStorage(탭)에만 둔다. localStorage에 고수가 박히면
+   * localhost:3000을 그냥 열어도 고수로 떠서, 왜 그런지 알 수 없는 상태가 된다.
+   * 예전 방식으로 박아둔 값이 남아 있을 수 있으니 여기서 걷어낸다.
+   */
+  function restore() {
     sessionStorage.removeItem(DEVICE_TAB_KEY);
-    window.location.href = "/consulting";
+    if (prev) {
+      localStorage.setItem(DEVICE_KEY, prev);
+      localStorage.removeItem(PREV_KEY);
+    } else {
+      // 돌아갈 기기가 없으면 새로 발급받는 수밖에 없다.
+      localStorage.removeItem(DEVICE_KEY);
+    }
+    window.location.href = prev ? "/me/bookings" : "/";
   }
 
   function clearTab() {
     sessionStorage.removeItem(DEVICE_TAB_KEY);
     window.location.href = "/";
-  }
-
-  function restore() {
-    if (!prev) return;
-    localStorage.setItem(DEVICE_KEY, prev);
-    localStorage.removeItem(PREV_KEY);
-    sessionStorage.removeItem(DEVICE_TAB_KEY);
-    window.location.href = "/me/bookings";
   }
 
   function reset() {
@@ -103,6 +102,8 @@ function DeviceSwitch() {
   }
 
   const isExpert = SEED_EXPERTS.some((e) => e.id === current);
+  // localStorage 자체가 고수인 상태 — 새 탭을 열어도 고수로 뜬다.
+  const stuckAsExpert = isExpert && !tabMode;
 
   return (
     <main className="mx-auto max-w-md space-y-6 p-8">
@@ -130,9 +131,10 @@ function DeviceSwitch() {
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-semibold">이 탭에서만 고수로 (권장)</p>
-        <p className="text-xs text-neutral-500">
-          다른 탭은 계속 일반 사용자예요. 데모에서 두 화면을 나란히 놓을 때 쓰세요.
+        <p className="text-sm font-semibold">이 탭에서만 고수로</p>
+        <p className="text-xs leading-relaxed text-neutral-500">
+          다른 탭은 계속 일반 사용자예요. 고수 신원은 이 탭에만 남으므로
+          <code>localhost:3000</code>은 언제나 일반 사용자로 열립니다.
         </p>
         {SEED_EXPERTS.map((e, i) => (
           <button
@@ -156,43 +158,40 @@ function DeviceSwitch() {
         )}
       </div>
 
-      <details className="rounded-lg border border-neutral-200 p-4">
-        <summary className="cursor-pointer text-sm font-semibold">
-          브라우저 전체를 바꾸기
-        </summary>
-        <p className="mt-2 text-xs text-neutral-500">
-          모든 탭이 같이 바뀝니다. 한 화면만 보여줄 때 쓰세요.
-        </p>
-        <div className="mt-3 space-y-2">
-          {SEED_EXPERTS.map((e) => (
-            <button
-              key={e.id}
-              type="button"
-              onClick={() => switchAll(e.id)}
-              disabled={e.id === current && !tabMode}
-              className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-left text-sm disabled:bg-neutral-100 disabled:text-neutral-400"
-            >
-              {e.label}
-            </button>
-          ))}
-        </div>
-
-        {prev && (
+      {stuckAsExpert && (
+        <div className="rounded-lg border-2 border-amber-700 bg-amber-50 p-4">
+          <p className="text-sm font-bold text-amber-900">
+            브라우저 전체가 고수로 고정돼 있어요
+          </p>
+          <p className="mt-1.5 text-xs leading-relaxed text-amber-900">
+            이 상태면 <code>localhost:3000</code>을 그냥 열어도 고수로 뜹니다.
+            아래를 눌러 일반 사용자로 되돌리세요.
+          </p>
           <button
             type="button"
             onClick={restore}
             className="mt-3 w-full rounded-lg bg-amber-700 px-4 py-3 text-sm font-bold text-white"
           >
-            원래 기기로 돌아가기 · 신청한 컨설팅 그대로
+            일반 사용자로 되돌리기
+            {prev && " · 신청한 컨설팅 그대로"}
           </button>
-        )}
+        </div>
+      )}
 
+      <details className="rounded-lg border border-neutral-200 p-4">
+        <summary className="cursor-pointer text-sm font-semibold">
+          기기 초기화
+        </summary>
+        <p className="mt-2 text-xs leading-relaxed text-neutral-500">
+          새 UUID를 발급합니다. 그 전에 쓴 글·댓글과 신청한 컨설팅이 더 이상
+          보이지 않아요.
+        </p>
         <button
           type="button"
           onClick={reset}
-          className="mt-2 w-full rounded-lg bg-neutral-800 px-4 py-2.5 text-sm font-bold text-white"
+          className="mt-3 w-full rounded-lg bg-neutral-800 px-4 py-2.5 text-sm font-bold text-white"
         >
-          완전 초기화 (새 UUID 발급)
+          완전 초기화
         </button>
       </details>
 
