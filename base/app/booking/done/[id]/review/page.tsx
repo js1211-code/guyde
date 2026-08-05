@@ -26,8 +26,9 @@ const RATINGS = [1, 2, 3, 4, 5];
  * 다시 찾아 들어와야 해서 대부분 안 쓴다 — 고수 평점이 쌓이는 유일한 경로라
  * 흐름 안에서 받아야 한다.
  *
- * 별점만 필수고 글은 선택이다. 한 줄도 안 쓰면 안 남기느니만 못하다는 생각에
- * 글까지 필수로 하면 별점조차 안 남는다.
+ * 후기는 건너뛸 수 없다. '나중에'를 열어두면 대부분 안 남기는데,
+ * 고수 평점이 쌓이는 유일한 경로라 여기서 받아야 한다.
+ * 다만 별점만 필수고 글은 선택이다 — 글까지 강제하면 별점조차 안 남는다.
  */
 export default function ReviewPage({
   params,
@@ -56,7 +57,9 @@ export default function ReviewPage({
     setError(null);
     try {
       await submitReview(id, rating, body.trim());
-      router.push(`/booking/done/${id}`);
+      // 컨설팅이 여기서 끝난다. 상세로 되돌리면 다 끝난 화면을 다시 보게 되므로
+      // 앱의 출발점인 커뮤니티로 보낸다.
+      router.replace("/");
     } catch (e) {
       setError((e as { detail?: string }).detail ?? "후기를 남기지 못했어요");
       setBusy(false);
@@ -109,7 +112,12 @@ export default function ReviewPage({
 
   return (
     <AppShell>
-      <TopBar backHref={`/booking/done/${id}`} title="후기" />
+      {/*
+        뒤로가기를 두지 않는다. '나중에'를 없앤 마당에 위쪽으로 빠져나갈 길을
+        남겨두면 결국 같은 것이 된다. 브라우저 뒤로가기까지는 막을 수 없지만,
+        그 경우에도 완료된 컨설팅 화면이 계속 '후기 남기기'를 띄운다.
+      */}
+      <TopBar title="후기" />
 
       <ScreenBody className="px-4 pt-6">
         <div className="text-center">
@@ -167,13 +175,11 @@ export default function ReviewPage({
         <PrimaryButton disabled={rating === 0 || busy} onClick={submit}>
           {busy ? "남기는 중…" : "후기 남기기"}
         </PrimaryButton>
-        <button
-          type="button"
-          onClick={() => router.push(`/booking/done/${id}`)}
-          className="mt-2 w-full text-center text-[12.5px] text-neutral-500"
-        >
-          나중에 할게요
-        </button>
+        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+          {rating === 0
+            ? "별점을 골라야 남길 수 있어요"
+            : "후기는 다음 사람이 고수를 고르는 유일한 단서예요"}
+        </p>
       </BottomBar>
     </AppShell>
   );
