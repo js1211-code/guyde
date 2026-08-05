@@ -1,3 +1,7 @@
 # Playwright MCP가 화면 확인할 때마다 떨구는 스냅샷·콘솔 로그.
 # 저장소에 남을 이유가 없는데 git add -A에 딸려 들어간다.
 .playwright-mcp/
+
+# 화면 확인용으로 찍은 스크린샷. Playwright가 저장소 루트에 떨구는데
+# git add -A 에 딸려 들어간다. 코드가 아니라 확인 과정의 흔적이다.
+/*.png
