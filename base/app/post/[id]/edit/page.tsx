@@ -6,7 +6,6 @@ import { CategoryBadge, PostTypeBadge } from "@/components/badge";
 import {
   AppShell,
   BottomBar,
-  NoticeBar,
   PrimaryButton,
   ScreenBody,
   TopBar,
@@ -86,10 +85,6 @@ export default function EditPostPage({
         </ScreenBody>
       ) : (
         <>
-          <NoticeBar>
-            제목과 내용만 고칠 수 있어요. 고치면 글에 수정됨이 표시돼요.
-          </NoticeBar>
-
           <ScreenBody className="px-4 pt-3">
             {/* 못 고치는 항목. 눌리지 않는다는 게 보이도록 배지 그대로 둔다. */}
             <div className="mb-3 flex items-center gap-1.5">

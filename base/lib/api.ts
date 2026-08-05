@@ -16,7 +16,7 @@ export type FeedItem = {
   title: string;
   body: string;
   created_at: string;
-  /** 한 번도 안 고쳤으면 null. 있으면 화면에 '수정됨'을 붙인다. */
+  /** 마지막으로 고친 시각. 기록만 하고 화면에는 안 띄운다. */
   edited_at: string | null;
   nickname: string;
   temperature: number;

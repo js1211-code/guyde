@@ -92,8 +92,9 @@ export async function GET(
  * 그 표가 통째로 갈 곳을 잃는다. 카테고리도 막는다 — '자유' 글은 온도에서
  * 빠지므로, 옮기는 것만으로 온도를 올리거나 내릴 수 있다.
  *
- * 고친 사실은 edited_at에 남긴다. 무난함 판정은 "이 글"에 대한 투표라서,
- * 표가 쌓인 뒤 내용이 바뀐 걸 감추면 82%가 무엇에 대한 숫자인지 알 수 없다.
+ * edited_at은 기록만 하고 **화면에는 안 띄운다.** "수정됨" 딱지가 붙으면
+ * 오타 하나 고친 글에도 남아서 계속 눈에 걸린다. 컬럼은 남겨둔다 —
+ * 나중에 필요해지면 화면만 붙이면 되고, 안 남기면 그때 근거가 없다.
  *
  * 남의 글은 403이 아니라 404다 — 403이면 "그 글이 있긴 하다"가 새어 나간다.
  */
@@ -128,8 +129,8 @@ export async function PATCH(
   if (error) return fail("DB_ERROR", 500, error.message);
   if (!post || post.device_id !== deviceId) return fail("POST_NOT_FOUND", 404);
 
-  // 아무것도 안 바뀌었으면 edited_at을 찍지 않는다.
-  // 들어왔다 그냥 나간 글에 "수정됨"이 붙으면 거짓 표시다.
+  // 아무것도 안 바뀌었으면 굳이 쓰지 않는다. 들어왔다 그냥 나간 글까지
+  // 고친 것으로 기록되면 그 시각이 아무 뜻도 없어진다.
   if (post.title === title && post.body === body) {
     return ok({ id, edited: false });
   }

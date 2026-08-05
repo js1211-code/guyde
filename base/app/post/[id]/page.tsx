@@ -105,9 +105,6 @@ export default function PostPage({
             )}
             <span className="ml-auto text-[11px] text-neutral-600">
               {timeAgo(post.created_at)}
-              {/* 판정·투표는 "이 글"에 대한 표라서, 표가 쌓인 뒤 내용이
-                  바뀐 걸 감추면 % 가 무엇에 대한 숫자인지 알 수 없다. */}
-              {post.edited_at && " · 수정됨"}
             </span>
           </div>
 
