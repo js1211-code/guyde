@@ -10,10 +10,15 @@ import { ChevronLeftIcon } from "@/components/icons";
  * 스크롤된다. 결과적으로 탭바와 글쓰기 FAB이 화면이 아니라 문서 맨 아래에
  * 붙어서, 글이 많으면 끝까지 내려야 보인다.
  * 스크롤은 오직 ScreenBody 안에서만 일어나야 한다.
+ *
+ * ⚠️ 상단 pt-[var(--safe-top)]을 빼지 말 것. 설치형에서 화면이 상태바 밑까지
+ * 올라가기 때문에, 없으면 노치·다이내믹 아일랜드가 상단바를 덮어 뒤로가기
+ * 버튼이 안 눌린다. box-sizing이 border-box라 h-dvh는 그대로 유지된다 —
+ * 여백만큼 내용 영역이 줄어들 뿐 화면 밖으로 넘치지 않는다.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-paper text-ink">
+    <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-paper pt-[var(--safe-top)] text-ink">
       <DemoRibbon />
       {children}
     </div>
@@ -35,7 +40,8 @@ function DemoRibbon() {
   if (!label) return null;
 
   return (
-    <div className="pointer-events-none absolute top-0 right-0 z-50">
+    // 절대 배치는 padding box 기준이라 그냥 두면 노치 밑으로 들어간다.
+    <div className="pointer-events-none absolute top-[var(--safe-top)] right-0 z-50">
       <span className="block rounded-bl-lg bg-temp-hot px-2.5 py-1 text-[10px] font-bold text-brand-dark">
         {label}
       </span>
@@ -127,7 +133,7 @@ export function BottomBar({
   return (
     <div
       // 설치형(standalone)에서는 홈 인디케이터가 이 자리에 겹친다.
-      className={`px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] ${
+      className={`px-4 pt-2 pb-[max(0.75rem,var(--safe-bottom))] ${
         bordered ? "border-t border-neutral-400" : ""
       }`}
     >

@@ -28,7 +28,9 @@
   - 아이콘은 SVG가 아니라 PNG다 — 안드로이드 런처와 iOS가 SVG를 제대로 못 다룬다. `maskable`을 따로 넣어야 안드로이드가 원형으로 잘라낼 때 타일 모서리가 안 잘린다. iOS는 매니페스트를 안 읽으므로 `apple-touch-icon`이 따로 필요하다.
   - 🚨 **서비스 워커를 cache-first로 바꾸지 말 것.** 글·댓글·온도가 계속 바뀌는 앱이라 캐시를 먼저 주면 몇 시간 전 화면이 남아 고장으로 보인다. 지금은 network-first이고 실패할 때만 캐시로 떨어진다. `/api/*`는 아예 캐시하지 않는다 — 남의 기기 응답이 남으면 신원이 섞여 보인다.
   - 개발 중에는 워커를 등록하지 않는다(`NODE_ENV !== production`). 등록하면 HMR로 고친 파일 대신 캐시가 나가서 "고쳤는데 화면이 안 바뀐다"가 반복된다.
-  - `viewportFit: "cover"` + `env(safe-area-inset-bottom)` — 이게 없으면 standalone에서 아이폰 홈 인디케이터가 하단 탭바와 결제 바를 덮는다.
+  - **안전 영역은 `globals.css`의 `--safe-top` / `--safe-bottom` 변수로만 쓴다.** `env(safe-area-inset-*)`를 컴포넌트에서 직접 부르지 말 것 — 데스크톱 브라우저에서는 항상 0이라 눈으로 확인할 수가 없다. 변수로 두면 검사할 때 값만 덮어써서 실제 기기와 같은 상태를 만들 수 있다(아이폰 15 Pro = 상단 59px · 하단 34px).
+  - 🚨 **`AppShell`의 `pt-[var(--safe-top)]`을 빼지 말 것.** `statusBarStyle: "black-translucent"` + `viewportFit: "cover"` 조합이라 화면이 상태바 **밑까지** 올라간다. 여백이 없으면 노치·다이내믹 아일랜드가 상단바를 덮어서 **뒤로가기 버튼이 안 눌린다.** `box-sizing: border-box`라 `h-dvh`는 그대로 유지된다 — 내용 영역만 줄어들 뿐 화면 밖으로 넘치지 않는다.
+  - 하단도 마찬가지다. 탭바·결제 바는 `pb-[max(…,var(--safe-bottom))]`, 글쓰기 FAB은 `bottom-[calc(82px+var(--safe-bottom))]`. **FAB의 82px을 고정값으로 두면 안 된다** — 홈 인디케이터가 있는 기기는 탭바가 그만큼 두꺼워져서 FAB이 탭바에 깔린다.
 - 배포: Vercel + Supabase Cloud
   - **배포본이 둘이다. 같은 코드, 환경변수만 다르다.**
 

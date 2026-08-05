@@ -728,7 +728,8 @@ function PostMenu({ postId, isMine }: { postId: string; isMine: boolean }) {
           />
           <div
             role="menu"
-            className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] rounded-t-2xl bg-bg p-3 pb-5"
+            // 홈 인디케이터가 닫기 버튼을 덮지 않게 아래 여백을 안전 영역만큼 준다.
+            className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] rounded-t-2xl bg-bg p-3 pb-[max(1.25rem,var(--safe-bottom))]"
           >
             {done ? (
               <p className="py-4 text-center text-[14px] font-bold text-brand">

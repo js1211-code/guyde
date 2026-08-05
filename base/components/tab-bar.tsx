@@ -80,7 +80,7 @@ export function TabBar() {
   }, [activeIndex, slideTo]);
 
   return (
-    <nav className="shrink-0 border-t border-neutral-400 bg-paper px-2 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+    <nav className="shrink-0 border-t border-neutral-400 bg-paper px-2 pt-2 pb-[max(0.25rem,var(--safe-bottom))]">
       {/*
         4등분 그리드여야 인디케이터를 index × 100%로 옮길 수 있다.
         justify-around은 간격이 균등하지 않아서 위치를 계산할 수 없다.
@@ -145,13 +145,15 @@ export function TabBar() {
  * (셸이 min-h-dvh였을 땐 문서 높이 기준이라, 글이 많으면 끝까지 스크롤해야
  *  버튼이 보였다. 셸 높이를 고정한 게 이 문제의 진짜 해결이다.)
  * bottom 값은 탭바 높이 + 여백. 탭바 위에 떠 있어야 한다.
+ * ⚠️ 안전 영역을 더해야 한다 — 홈 인디케이터가 있는 기기는 탭바가 그만큼
+ * 두꺼워지는데, 82px로 고정해두면 그 차이만큼 FAB이 탭바에 깔린다.
  */
 export function WriteFab() {
   return (
     <Link
       href="/write"
       aria-label="글쓰기"
-      className="absolute right-4 bottom-[82px] flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-brand text-white transition-transform duration-100 active:scale-90"
+      className="absolute right-4 bottom-[calc(82px+var(--safe-bottom))] flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-brand text-white transition-transform duration-100 active:scale-90"
     >      <PlusIcon size={22} strokeWidth={1.8} />
     </Link>
   );
