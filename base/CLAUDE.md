@@ -24,7 +24,17 @@
 - Supabase (PostgreSQL, Storage) — **Auth는 쓰지 않는다**
 - 서버 로직: Next.js Route Handlers (`app/api/...`)
 - 배포: Vercel + Supabase Cloud
-  - 프로덕션: **https://guyde.vercel.app** (Vercel 프로젝트 `guyde`, 루트 디렉터리 `base/`)
+  - **배포본이 둘이다. 같은 코드, 환경변수만 다르다.**
+
+    | | URL | Vercel 프로젝트 | 특징 |
+    |---|---|---|---|
+    | 일반 ver. | https://guyde.vercel.app | `guyde` | 방문자마다 새 UUID |
+    | 고수 ver. | https://guyde-expert.vercel.app | `guyde-expert` | 정갈한 여우 #4192로 고정 |
+
+    도메인이 다르면 `localStorage`도 따로라 두 창을 나란히 띄워도 신원이 섞이지 않는다. 데모 중에 기기를 전환할 필요가 없다.
+  - 고수 ver.만 갖는 변수: `NEXT_PUBLIC_DEMO_DEVICE_ID`(고정할 계정) · `NEXT_PUBLIC_DEMO_LABEL`(우상단 표시). **`NEXT_PUBLIC_`은 빌드 시점에 박히므로 배포마다 다시 빌드된다.**
+  - 🚨 **실서비스에서는 `NEXT_PUBLIC_DEMO_DEVICE_ID`를 절대 설정하지 않는다.** 설정하면 모든 방문자가 한 사람으로 취급된다.
+  - 두 프로젝트가 한 디렉터리를 공유하므로 `.vercel/`이 링크를 들고 있다. 다른 쪽에 배포하려면 `vercel link --project <이름>`으로 갈아끼운 뒤 되돌린다.
   - 환경변수 3개는 Vercel Production에 등록돼 있다. **이름을 바꾸면 Vercel 쪽도 같이 바꿔야 한다** — 로컬만 고치면 배포본이 조용히 죽는다.
   - 배포: `cd base && npx vercel --prod`
   - ⚠️ **`/test`·`/test/device`가 공개 URL에 그대로 열려 있다.** 누구나 시드 고수로 전환해 답변을 쓸 수 있다. 데모용으로 일부러 남긴 것이고, 실서비스 전에는 `app/test` 폴더째 지운다.

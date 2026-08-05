@@ -21,6 +21,22 @@ export const DEVICE_KEY = "base.device_id";
  */
 export const DEVICE_TAB_KEY = "base.device_id.tab";
 
+/**
+ * 배포본 자체를 특정 계정으로 고정한다 (데모 전용).
+ *
+ * 같은 코드를 두 번 배포하되 이 값만 다르게 준다.
+ *   guyde.vercel.app         → 비워둠. 평범한 사용자가 새 UUID를 받는다.
+ *   guyde-expert.vercel.app  → 시드 고수의 UUID. 열면 곧바로 고수다.
+ *
+ * 도메인이 다르면 localStorage도 따로라, 두 창을 나란히 띄워도 신원이 섞이지
+ * 않는다. 데모 중에 기기를 전환할 필요가 없어진다.
+ *
+ * NEXT_PUBLIC_ 은 빌드 시점에 박히므로 배포마다 다시 빌드된다.
+ * ⚠️ 실서비스에서는 이 변수를 절대 설정하지 않는다. 설정하면 모든 방문자가
+ *    한 사람으로 취급된다.
+ */
+const FIXED_ID = process.env.NEXT_PUBLIC_DEMO_DEVICE_ID?.trim() || null;
+
 function tabOverride(): string | null {
   try {
     return sessionStorage.getItem(DEVICE_TAB_KEY);
@@ -31,11 +47,16 @@ function tabOverride(): string | null {
 
 /** 최초 실행인지 판별한다 — 닉네임 발급 화면을 한 번만 보여주기 위해. */
 export function hasDeviceId(): boolean {
-  // 탭 덮어쓰기로 들어온 사람에게 "새 닉네임을 발급했어요"를 보여주면 안 된다.
+  // 고정 계정이나 탭 덮어쓰기로 들어온 사람에게
+  // "새 닉네임을 발급했어요"를 보여주면 안 된다.
+  if (FIXED_ID) return true;
   return tabOverride() !== null || localStorage.getItem(DEVICE_KEY) !== null;
 }
 
 export function getOrCreateDeviceId(): string {
+  // 배포본이 계정을 고정했으면 그게 최우선이다.
+  if (FIXED_ID) return FIXED_ID;
+
   const override = tabOverride();
   if (override) return override;
 

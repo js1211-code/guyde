@@ -14,7 +14,31 @@ import { ChevronLeftIcon } from "@/components/icons";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-paper text-ink">
+      <DemoRibbon />
       {children}
+    </div>
+  );
+}
+
+/**
+ * 데모 배포본 표시.
+ *
+ * 고수 버전과 일반 버전을 두 창에 나란히 띄우고 시연하는데, 겉모습이 거의
+ * 같아서 어느 쪽을 조작 중인지 헷갈린다. 발표 중에 반대쪽을 눌러버리면
+ * 되돌리기가 어렵다. 그래서 고정 계정으로 배포한 쪽에만 띠를 붙인다.
+ *
+ * NEXT_PUBLIC_DEMO_LABEL이 없으면 아무것도 그리지 않는다 —
+ * 실서비스 빌드에는 흔적이 남지 않는다.
+ */
+function DemoRibbon() {
+  const label = process.env.NEXT_PUBLIC_DEMO_LABEL?.trim();
+  if (!label) return null;
+
+  return (
+    <div className="pointer-events-none absolute top-0 right-0 z-50">
+      <span className="block rounded-bl-lg bg-temp-hot px-2.5 py-1 text-[10px] font-bold text-brand-dark">
+        {label}
+      </span>
     </div>
   );
 }
