@@ -135,12 +135,13 @@ function Composer({
 
   // 정보 공유 글은 여전히 성격이 다르다(투표 대신 좋아요). 하트만 사라졌다.
   const free = isFreePost(postType);
+  const isPoll = postType === "선택지투표";
 
   const filledOptions = options.map((o) => o.trim()).filter(Boolean);
   const ready =
     title.trim().length > 0 &&
     body.trim().length > 0 &&
-    (postType !== "선택지투표" || filledOptions.length >= POLL_OPTION_MIN);
+    (!isPoll || filledOptions.length >= POLL_OPTION_MIN);
 
   async function submit() {
     setSaving(true);
@@ -153,9 +154,11 @@ function Composer({
         body: body.trim(),
         // 빈 칸을 여기서 걸러내면 사진 배열의 자리가 어긋난다.
         // 원본 그대로 보내고, 서버가 짝을 유지한 채 거른다.
-        options: postType === "선택지투표" ? options : undefined,
-        option_images: postType === "선택지투표" ? optionImages : undefined,
-        image_urls: images,
+        options: isPoll ? options : undefined,
+        option_images: isPoll ? optionImages : undefined,
+        // 투표글은 본문 사진칸을 안 보여준다. 유형을 바꿔가며 고를 수 있어서
+        // 다른 유형에서 올려둔 사진이 상태에 남아 있을 수 있으므로 여기서도 끊는다.
+        image_urls: isPoll ? [] : images,
       });
       router.push(`/post/${id}`);
     } catch (e) {
@@ -206,6 +209,12 @@ function Composer({
           className="mt-2 h-[92px] w-full resize-none text-[13px] leading-relaxed"
         />
 
+        {/*
+          투표글에는 본문 사진칸을 두지 않는다. 선택지마다 사진을 붙일 수 있게
+          되면서 "이 사진은 어느 선택지 것인가"가 다시 모호해지기 때문이다 —
+          두 자리 다 열어두면 올리는 쪽도 헷갈리고 고르는 쪽은 더 헷갈린다.
+        */}
+        {!isPoll && (
         <div className="mt-3 flex items-center gap-2">
           {images.map((url, i) => (
             <span key={url} className="relative">
@@ -227,8 +236,9 @@ function Composer({
             <span className="text-[12px] text-neutral-500">올리는 중…</span>
           )}
         </div>
+        )}
 
-        {postType === "선택지투표" && (
+        {isPoll && (
           <>
             <Kicker className="mt-4 mb-2">OPTIONS</Kicker>
             <p className="mb-2 text-[11.5px] text-neutral-500">
