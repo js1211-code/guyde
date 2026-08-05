@@ -174,7 +174,7 @@ v3는 **"무엇을 살지"를 문서로 받는** 서비스다. 달력·슬롯·�
   - `/experts` `/experts/[id]` `/booking/[expertId]`(사전 설문) `/booking/done/[id]`(상세) `/booking/done/[id]/revise`(수정 요청)
   - `/consulting`(고수 인박스) `/consulting/[id]/answer`(㉘ 답변 작성)
   - `/me` `/me/activity` `/me/bookings`
-  - `/test/device` — **데모 전용 기기 전환.** 로그인이 없어 고수 입장을 보려면 localStorage UUID를 바꾸는 수밖에 없다. API에는 우회로가 없다. 실서비스에선 `app/test` 폴더째 삭제.
+  - `/test/device` — **데모 전용 기기 전환.** `?as=1~4`로 열면 **그 탭만** 고수가 된다(sessionStorage). 일반 사용자 탭과 고수 탭을 동시에 띄워둘 수 있다. 로그인이 없어 고수 입장을 보려면 localStorage UUID를 바꾸는 수밖에 없다. API에는 우회로가 없다. 실서비스에선 `app/test` 폴더째 삭제.
   - `/hearts` (충전 샵 — 커뮤니티 헤더의 하트에서 진입)
 
 ## API (구현됨)
