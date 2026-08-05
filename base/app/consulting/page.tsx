@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { StatusPill } from "@/components/consulting";
 import { AppShell, NoticeBar, PageTitle, ScreenBody } from "@/components/shell";
+import { TabBar } from "@/components/tab-bar";
 import {
   fetchExpertInbox,
   type ExpertInboxItem,
@@ -50,6 +51,7 @@ export default function ExpertConsolePage() {
             컨설팅 둘러보기
           </Link>
         </ScreenBody>
+        <TabBar />
       </AppShell>
     );
   }
@@ -98,6 +100,10 @@ export default function ExpertConsolePage() {
           </>
         )}
       </ScreenBody>
+
+      {/* 고수도 커뮤니티·도서관·내정보를 그대로 쓴다. 탭바가 없으면
+          받은 신청함에 들어온 순간 다른 화면으로 나갈 길이 없다. */}
+      <TabBar />
     </AppShell>
   );
 }

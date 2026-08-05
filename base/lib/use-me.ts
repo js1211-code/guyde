@@ -8,6 +8,11 @@ export type Me = {
   nickname: string;
   temperature: number;
   hearts: number;
+  /**
+   * 고수 계정인지. 고수도 커뮤니티·도서관·내정보를 똑같이 쓴다 —
+   * 다른 건 컨설팅 탭이 신청 화면 대신 받은 신청함으로 간다는 것뿐이다.
+   */
+  is_expert: boolean;
 };
 
 /**

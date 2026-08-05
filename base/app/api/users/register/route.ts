@@ -13,6 +13,19 @@ export async function POST(req: Request) {
 
   const db = createAdminClient();
 
+  /**
+   * 고수인지 여부.
+   * 탭바가 매 화면에서 판단해야 하는 값이라 진입 시 한 번에 같이 준다 —
+   * 화면마다 따로 물으면 요청이 화면 수만큼 늘어난다.
+   * ⚠️ 온도로 판별하지 않는다. 고수는 experts에 행이 있는 사람이다.
+   */
+  const expertRow = await db
+    .from("experts")
+    .select("id")
+    .eq("device_id", deviceId)
+    .maybeSingle();
+  const isExpert = Boolean(expertRow.data);
+
   const existing = await db
     .from("users")
     .select("device_id, nickname, hearts")
@@ -26,7 +39,7 @@ export async function POST(req: Request) {
     // 온도는 고수 판별 장치라, 계산이 실패했는데 36.5로 떨어뜨리면
     // 모두가 신규처럼 보이는 조용한 오류가 된다. 그래서 그냥 실패시킨다.
     if (temp.error) return fail("TEMPERATURE_FAILED", 500, temp.error.message);
-    return ok({ ...existing.data, temperature: Number(temp.data) });
+    return ok({ ...existing.data, temperature: Number(temp.data), is_expert: isExpert });
   }
 
   // 신규 — 닉네임이 unique라 충돌하면 숫자만 다시 뽑아 재시도한다.
@@ -39,7 +52,7 @@ export async function POST(req: Request) {
       .single();
 
     if (!created.error) {
-      return ok({ ...created.data, temperature: 36.5 }, 201);
+      return ok({ ...created.data, temperature: 36.5, is_expert: isExpert }, 201);
     }
     // 23505 = unique_violation
     if (created.error.code !== "23505") {
