@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   BookIcon,
   BriefcaseIcon,
@@ -39,51 +40,100 @@ function isActive(pathname: string, key: string) {
   return pathname.startsWith("/me");
 }
 
+/**
+ * 마지막으로 표시된 탭 위치.
+ *
+ * 화면마다 <TabBar/>를 따로 그리기 때문에 라우팅할 때마다 탭바가 통째로
+ * 새로 만들어진다. 그러면 인디케이터가 새 위치에 그냥 나타나고 전환이
+ * 일어나지 않는다 — 실제로 transitionstart가 한 번도 발생하지 않았다.
+ *
+ * 모듈 스코프 변수는 리마운트를 넘어 살아남으므로, 새로 그릴 때 직전 위치에서
+ * 출발시켜 목적지로 옮긴다. 라우팅 구조를 바꾸지 않고 슬라이드를 살리는 방법이다.
+ * (새로고침하면 초기화되는데, 그때는 애니메이션 없이 제자리에서 시작하면 된다)
+ */
+let lastIndex = -1;
+
 export function TabBar() {
   const pathname = usePathname();
   const { me } = useMe();
 
+  const activeIndex = TABS.findIndex(({ key }) => isActive(pathname, key));
+  // 처음 그릴 때는 직전 위치. 그 다음 프레임에 목적지로 옮기면 CSS가 미끄러뜨린다.
+  const [slideTo, setSlideTo] = useState(lastIndex >= 0 ? lastIndex : activeIndex);
+
+  useEffect(() => {
+    lastIndex = slideTo;
+  }, [slideTo]);
+
+  useEffect(() => {
+    if (slideTo === activeIndex) return;
+    // rAF 두 번 — 한 번만 하면 출발 위치가 그려지기 전에 값이 바뀌어
+    // 브라우저가 전환할 구간을 못 잡고 그냥 순간이동한다.
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setSlideTo(activeIndex));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [activeIndex, slideTo]);
+
   return (
-    <nav className="flex shrink-0 items-end justify-around border-t border-neutral-400 bg-paper px-2 pt-2 pb-1">
-      {TABS.map(({ key, label, Icon, href }) => {
-        const active = isActive(pathname, key);
-        // 고수는 컨설팅 탭에서 받은 신청함으로 간다.
-        const to = key === "consulting" && me?.is_expert ? "/consulting" : href;
-        return (
-          <Link
-            key={key}
-            href={to}
-            aria-current={active ? "page" : undefined}
-            // 누르는 순간 눌린 티가 나야 한다. 화면 전환은 네트워크를 타서
-            // 몇백 ms 걸릴 수 있는데, 그동안 아무 반응이 없으면 안 눌린 줄 안다.
-            className={`flex w-14 flex-col items-center gap-0.5 transition-transform duration-100 active:scale-90 ${
-              active ? "text-brand" : "text-neutral-600"
-            }`}
+    <nav className="shrink-0 border-t border-neutral-400 bg-paper px-2 pt-2 pb-1">
+      {/*
+        4등분 그리드여야 인디케이터를 index × 100%로 옮길 수 있다.
+        justify-around은 간격이 균등하지 않아서 위치를 계산할 수 없다.
+      */}
+      <div className="relative grid grid-cols-4">
+        {/*
+          선택 표시가 탭 사이를 미끄러진다.
+          left/width가 아니라 transform으로 옮긴다 — 레이아웃을 다시 계산하지
+          않아서 저사양 기기에서도 끊기지 않는다.
+        */}
+        {slideTo >= 0 && (
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 left-0 w-1/4 px-1.5 transition-transform duration-300 ease-out"
+            style={{ transform: `translateX(${slideTo * 100}%)` }}
           >
-            {/*
-              key에 활성 여부를 넣어 탭이 켜질 때마다 애니메이션이 다시 돈다.
-              key가 없으면 React가 같은 노드로 보고 애니메이션을 한 번만 재생한다.
-            */}
-            <span
-              key={active ? "on" : "off"}
-              className={active ? "tab-pop" : "transition-transform"}
+            <span className="block h-full rounded-xl bg-brand/10" />
+          </span>
+        )}
+
+        {TABS.map(({ key, label, Icon, href }) => {
+          const active = isActive(pathname, key);
+          // 고수는 컨설팅 탭에서 받은 신청함으로 간다.
+          const to = key === "consulting" && me?.is_expert ? "/consulting" : href;
+          return (
+            <Link
+              key={key}
+              href={to}
+              aria-current={active ? "page" : undefined}
+              // 누르면 즉시 눌린 티가 나야 한다. 화면 전환은 네트워크를 타서
+              // 몇백 ms 걸리는데 그동안 반응이 없으면 안 눌린 줄 안다.
+              className={`relative flex flex-col items-center gap-0.5 py-1 transition-transform duration-100 active:scale-90 ${
+                active ? "text-brand" : "text-neutral-600"
+              }`}
             >
               <Icon
                 size={21}
                 strokeWidth={active ? 1.8 : 1.5}
-                className={active ? "text-brand" : "text-neutral-500"}
+                className={`transition-colors duration-200 ${
+                  active ? "text-brand" : "text-neutral-500"
+                }`}
               />
-            </span>
-            <span
-              className={`text-[10px] transition-all duration-150 ${
-                active ? "font-bold" : "opacity-80"
-              }`}
-            >
-              {label}
-            </span>
-          </Link>
-        );
-      })}
+              <span
+                className={`text-[10px] transition-all duration-200 ${
+                  active ? "font-bold" : "opacity-80"
+                }`}
+              >
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
