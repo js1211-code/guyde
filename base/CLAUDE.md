@@ -35,7 +35,7 @@
     - 클라이언트 라우팅에서는 레이아웃이 다시 만들어지지 않아 다시 뜨지 않는다. 라우트마다 두지 말 것.
   - **안전 영역은 `globals.css`의 `--safe-top` / `--safe-bottom` 변수로만 쓴다.** `env(safe-area-inset-*)`를 컴포넌트에서 직접 부르지 말 것 — 데스크톱 브라우저에서는 항상 0이라 눈으로 확인할 수가 없다. 변수로 두면 검사할 때 값만 덮어써서 실제 기기와 같은 상태를 만들 수 있다(아이폰 15 Pro = 상단 59px · 하단 34px).
   - 🚨 **`AppShell`의 `pt-[var(--safe-top)]`을 빼지 말 것.** `statusBarStyle: "black-translucent"` + `viewportFit: "cover"` 조합이라 화면이 상태바 **밑까지** 올라간다. 여백이 없으면 노치·다이내믹 아일랜드가 상단바를 덮어서 **뒤로가기 버튼이 안 눌린다.** `box-sizing: border-box`라 `h-dvh`는 그대로 유지된다 — 내용 영역만 줄어들 뿐 화면 밖으로 넘치지 않는다.
-  - 하단도 마찬가지다. 탭바·결제 바는 `pb-[max(…,var(--safe-bottom))]`, 글쓰기 FAB은 `bottom-[calc(82px+var(--safe-bottom))]`. **FAB의 82px을 고정값으로 두면 안 된다** — 홈 인디케이터가 있는 기기는 탭바가 그만큼 두꺼워져서 FAB이 탭바에 깔린다.
+  - 하단도 마찬가지다. 탭바·결제 바는 `pb-` 유틸에 `max(기본값, var(--safe-bottom))`, 글쓰기 FAB은 `bottom-[calc(82px+var(--safe-bottom))]`. **FAB의 82px을 고정값으로 두면 안 된다** — 홈 인디케이터가 있는 기기는 탭바가 그만큼 두꺼워져서 FAB이 탭바에 깔린다.
 - 배포: Vercel + Supabase Cloud
   - **배포본이 둘이다. 같은 코드, 환경변수만 다르다.**
 
