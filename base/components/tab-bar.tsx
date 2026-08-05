@@ -54,16 +54,31 @@ export function TabBar() {
             key={key}
             href={to}
             aria-current={active ? "page" : undefined}
-            className={`flex w-14 flex-col items-center gap-0.5 ${
+            // 누르는 순간 눌린 티가 나야 한다. 화면 전환은 네트워크를 타서
+            // 몇백 ms 걸릴 수 있는데, 그동안 아무 반응이 없으면 안 눌린 줄 안다.
+            className={`flex w-14 flex-col items-center gap-0.5 transition-transform duration-100 active:scale-90 ${
               active ? "text-brand" : "text-neutral-600"
             }`}
           >
-            <Icon
-              size={21}
-              strokeWidth={active ? 1.8 : 1.5}
-              className={active ? "text-brand" : "text-neutral-500"}
-            />
-            <span className={`text-[10px] ${active ? "font-bold" : ""}`}>
+            {/*
+              key에 활성 여부를 넣어 탭이 켜질 때마다 애니메이션이 다시 돈다.
+              key가 없으면 React가 같은 노드로 보고 애니메이션을 한 번만 재생한다.
+            */}
+            <span
+              key={active ? "on" : "off"}
+              className={active ? "tab-pop" : "transition-transform"}
+            >
+              <Icon
+                size={21}
+                strokeWidth={active ? 1.8 : 1.5}
+                className={active ? "text-brand" : "text-neutral-500"}
+              />
+            </span>
+            <span
+              className={`text-[10px] transition-all duration-150 ${
+                active ? "font-bold" : "opacity-80"
+              }`}
+            >
               {label}
             </span>
           </Link>
@@ -86,7 +101,7 @@ export function WriteFab() {
     <Link
       href="/write"
       aria-label="글쓰기"
-      className="absolute right-4 bottom-[82px] flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-brand text-white"
+      className="absolute right-4 bottom-[82px] flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-brand text-white transition-transform duration-100 active:scale-90"
     >      <PlusIcon size={22} strokeWidth={1.8} />
     </Link>
   );
