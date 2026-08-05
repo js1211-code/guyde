@@ -136,6 +136,15 @@ export default function MePage() {
             </Link>
           ))}
         </nav>
+
+        {/* ⚠️ 진단 전용 — 탭바 밑 공백 원인을 잡으면 이 블록과 app/diag를 지운다.
+            설치형 앱에서는 주소를 칠 수 없어서 앱 안에 입구가 있어야 한다. */}
+        <Link
+          href="/diag"
+          className="mt-6 mb-2 block text-center text-[12px] text-neutral-500 underline underline-offset-2"
+        >
+          화면 진단 (임시)
+        </Link>
       </ScreenBody>
 
       <TabBar />

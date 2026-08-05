@@ -39,6 +39,13 @@ export default function DiagPage() {
           window.matchMedia("(display-mode: standalone)").matches,
         ),
         "문서 넘침": document.documentElement.scrollHeight - window.innerHeight,
+        // 어느 값이 '진짜 화면 높이'인지 갈라준다. 셸을 무엇에 맞춰야 하는지가
+        // 여기서 정해진다 — innerHeight가 짧으면 fixed inset-0으로는 못 채운다.
+        "▶ screen−inner": window.screen.height - window.innerHeight,
+        "▶ 판정":
+          window.innerHeight >= window.screen.height - 2
+            ? "innerHeight = 전체화면 (fixed로 충분)"
+            : `innerHeight가 ${window.screen.height - window.innerHeight}px 짧음 (다른 기준 필요)`,
       });
     };
 
@@ -90,7 +97,7 @@ export default function DiagPage() {
               <p
                 key={k}
                 className={`flex justify-between border-b border-neutral-300 py-1 text-[12px] ${
-                  k.startsWith("★") ? "font-bold text-danger" : ""
+                  k.startsWith("★") || k.startsWith("▶") ? "font-bold text-danger" : ""
                 }`}
               >
                 <span>{k}</span>
