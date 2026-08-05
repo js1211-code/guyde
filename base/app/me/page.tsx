@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronRightIcon, HeartIcon, LockIcon, PencilIcon } from "@/components/icons";
 import { AppShell, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature, TemperatureProgress } from "@/components/temperature";
 import { TEMP_EXPERT_GATE } from "@/lib/constants";
 import { useMe } from "@/lib/use-me";
-import { fetchExpertInbox } from "@/lib/api/consulting-client";
 
 const MENU = [
   { label: "내 글", href: "/me/activity" },
@@ -16,28 +15,14 @@ const MENU = [
   { label: "내 컨설팅", href: "/me/bookings" },
 ];
 
-/**
- * 고수에게만 보이는 메뉴. 온도 42도를 넘겼다고 자동으로 고수가 되는 건
- * 아니라서(experts 행이 있어야 한다) 자격이 아니라 실제 등록 여부로 가른다.
- */
-const EXPERT_MENU = { label: "고수 콘솔 · 받은 신청", href: "/consulting" };
-
 /** ⑱ 내정보 */
 export default function MePage() {
   const { me, renameNickname } = useMe();
-  const [isExpert, setIsExpert] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const qualified = (me?.temperature ?? 0) >= TEMP_EXPERT_GATE;
-
-  // 고수로 등록된 기기인지 확인한다. 아니면 403이 오고 메뉴는 숨긴 채로 둔다.
-  useEffect(() => {
-    fetchExpertInbox()
-      .then(() => setIsExpert(true))
-      .catch(() => setIsExpert(false));
-  }, []);
 
   async function save() {
     try {
@@ -101,22 +86,38 @@ export default function MePage() {
         <TemperatureProgress value={me?.temperature ?? 36.5} />
 
         {/* 자격이 희소하다는 신호가 목적이라 잠긴 상태로도 노출한다 (F-72) */}
-        <div
-          className={`mt-4 flex items-center justify-center gap-2 border py-3 ${
-            qualified
-              ? "border-brand bg-brand-tint"
-              : "border-neutral-300 bg-neutral-200 opacity-55"
-          }`}
-        >
-          {!qualified && <LockIcon size={16} className="text-neutral-600" />}
-          <span
-            className={`text-[14px] font-bold ${
-              qualified ? "text-brand-dark" : "text-neutral-600"
+        {/*
+          세 갈래다.
+            이미 고수      → 개설하기를 보여주면 안 된다. 이미 됐다.
+            42도 넘음      → 자격은 갖췄지만 임명은 별개라 아직 잠겨 있다.
+            42도 못 넘음   → 잠김 + 남은 온도 안내
+          예전엔 온도만 보고 갈라서, 고수 계정에도 '고수 개설하기'가 떴다 —
+          온도로 고수를 판별하면 안 된다는 규칙을 이 화면이 어기고 있었다.
+        */}
+        {me?.is_expert ? (
+          <div className="mt-4 flex items-center justify-center gap-2 rounded-md border border-temp-hot bg-temp-hot/15 py-3">
+            <span className="text-[14px] font-bold text-brand-dark">
+              고수로 활동 중이에요
+            </span>
+          </div>
+        ) : (
+          <div
+            className={`mt-4 flex items-center justify-center gap-2 rounded-md border py-3 ${
+              qualified
+                ? "border-brand bg-brand-tint"
+                : "border-neutral-300 bg-neutral-200 opacity-55"
             }`}
           >
-            고수 개설하기
-          </span>
-        </div>
+            {!qualified && <LockIcon size={16} className="text-neutral-600" />}
+            <span
+              className={`text-[14px] font-bold ${
+                qualified ? "text-brand-dark" : "text-neutral-600"
+              }`}
+            >
+              고수 개설하기
+            </span>
+          </div>
+        )}
 
         <div className="mt-4 flex items-center justify-between rounded-xl border border-neutral-400 p-3.5">
           <span className="flex items-center gap-1.5">
@@ -130,7 +131,7 @@ export default function MePage() {
         </div>
 
         <nav className="mt-5">
-          {[...MENU, ...(isExpert ? [EXPERT_MENU] : [])].map((item, i) => (
+          {MENU.map((item, i) => (
             <Link
               key={item.label}
               href={item.href}
