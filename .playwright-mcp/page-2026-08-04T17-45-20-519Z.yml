@@ -1,8 +1,0 @@
-- generic [active] [ref=f13e1]:
-  - main [ref=f13e2]:
-    - paragraph [ref=f13e4]: 160px · 홈 화면
-    - paragraph [ref=f13e6]: 64px · 탭 아이콘
-    - paragraph [ref=f13e8]: 32px · 브라우저 탭
-    - paragraph [ref=f13e10]: 16px · 파비콘 최소
-  - button "Open Next.js Dev Tools" [ref=f13e16] [cursor=pointer]
-  - alert [ref=f13e20]

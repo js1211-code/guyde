@@ -1,6 +1,0 @@
-- generic [ref=f43e2]:
-  - banner [ref=f43e3]:
-    - link "뒤로" [ref=f43e5] [cursor=pointer]:
-      - /url: /
-    - generic [ref=f43e8]: GUYDE
-  - paragraph [ref=f43e9]: 불러오는 중…
