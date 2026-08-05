@@ -41,7 +41,7 @@ export default function ExpertConsolePage() {
             이 기기는 고수로 등록되어 있지 않아요.
             <br />
             <span className="text-[12.5px] text-neutral-500">
-              고수는 온도 42.0도를 넘긴 사람 중에서만 정해져요.
+              고수는 온도 42.0℃ 이상인 사람 중에서만 정해져요.
             </span>
           </p>
           <Link

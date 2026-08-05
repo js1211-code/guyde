@@ -10,7 +10,7 @@ import { Temperature } from "@/components/temperature";
 import {
   CONSULTING_PRICE,
   CONSULTING_SLA_HOURS,
-  EXPERT_TOP_PERCENT,
+  TEMP_EXPERT_GATE,
 } from "@/lib/constants";
 import { fetchExperts, type ExpertListItem } from "@/lib/api/consulting-client";
 import { useMe } from "@/lib/use-me";
@@ -48,7 +48,7 @@ export default function ExpertsPage() {
     <AppShell>
       <PageTitle>컨설팅</PageTitle>
       <NoticeBar>
-        온도 상위 {EXPERT_TOP_PERCENT}%만 고수가 될 수 있어요
+        온도 {TEMP_EXPERT_GATE.toFixed(1)}℃ 이상만 고수가 될 수 있어요
       </NoticeBar>
 
       <ScreenBody className="px-4 pt-3">

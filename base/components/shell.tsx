@@ -5,20 +5,27 @@ import { ChevronLeftIcon } from "@/components/icons";
  * 모바일 퍼스트 셸(390px 기준). 데스크톱에서는 가운데 컬럼으로만 두고
  * 기기 프레임은 그리지 않는다 — 디자인 파일의 아이폰 프레임은 에디터 장식이다.
  *
- * ⚠️ 높이는 h-dvh 고정이어야 한다. min-h-dvh로 두면 셸이 내용만큼 늘어나고,
- * 그러면 ScreenBody의 overflow-y:auto가 발동할 일이 없어서 문서 전체가
- * 스크롤된다. 결과적으로 탭바와 글쓰기 FAB이 화면이 아니라 문서 맨 아래에
- * 붙어서, 글이 많으면 끝까지 내려야 보인다.
+ * ⚠️ 높이를 h-dvh로 주지 말 것. 설치형 iOS에서 첫 페인트 때 dvh가 안전 영역을
+ * 뺀 높이(화면 − 노치 − 홈 인디케이터)를 돌려준다. 그러면 셸이 화면보다
+ * 90pt쯤 짧아져서 탭바 밑이 텅 빈 채로 뜨고, 한 번 스크롤해서 다시 계산될 때
+ * 비로소 화면 끝까지 늘어난다 — 실제 기기에서 그랬다.
+ *
+ * position:fixed + inset-0 은 dvh를 거치지 않고 화면(정확히는 visual viewport)에
+ * 직접 맞춘다. 가로 가운데 정렬은 left/right:0 + margin-inline:auto 로 여전히 된다.
+ *
+ * 높이를 고정하는 목적은 그대로다: 셸이 내용만큼 늘어나면 ScreenBody의
+ * overflow-y:auto가 발동할 일이 없어서 문서 전체가 스크롤되고, 탭바와 글쓰기
+ * FAB이 화면이 아니라 문서 맨 아래에 붙는다(글이 많으면 끝까지 내려야 보인다).
  * 스크롤은 오직 ScreenBody 안에서만 일어나야 한다.
  *
  * ⚠️ 상단 pt-[var(--safe-top)]을 빼지 말 것. 설치형에서 화면이 상태바 밑까지
  * 올라가기 때문에, 없으면 노치·다이내믹 아일랜드가 상단바를 덮어 뒤로가기
- * 버튼이 안 눌린다. box-sizing이 border-box라 h-dvh는 그대로 유지된다 —
+ * 버튼이 안 눌린다. box-sizing이 border-box라 셸 높이는 그대로 유지된다 —
  * 여백만큼 내용 영역이 줄어들 뿐 화면 밖으로 넘치지 않는다.
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-paper pt-[var(--safe-top)] text-ink">
+    <div className="fixed inset-0 mx-auto flex w-full max-w-[430px] flex-col overflow-hidden bg-paper pt-[var(--safe-top)] text-ink">
       <DemoRibbon />
       {children}
     </div>

@@ -54,7 +54,8 @@ export const TEMP_START = 36.5;
  * (디자인 파일 ⑱의 "0.7도 남았어요"는 목업 문구라 여기 기준을 따른다)
  */
 export const TEMP_EXPERT_GATE = 42.0;
-export const EXPERT_TOP_PERCENT = 10;
+// EXPERT_TOP_PERCENT(상위 10%)는 없앴다. 실제 기준은 백분위가 아니라
+// 42.0℃라는 절대값이라, 두 표현이 같이 있으면 화면마다 말이 달라진다.
 
 
 /**
