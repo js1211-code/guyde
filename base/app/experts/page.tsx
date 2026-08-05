@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { StarIcon } from "@/components/icons";
 import { AppShell, NoticeBar, PageTitle, ScreenBody } from "@/components/shell";
@@ -12,6 +13,7 @@ import {
   EXPERT_TOP_PERCENT,
 } from "@/lib/constants";
 import { fetchExperts, type ExpertListItem } from "@/lib/api/consulting-client";
+import { useMe } from "@/lib/use-me";
 
 /**
  * ⑭ 고수 목록.
@@ -19,8 +21,15 @@ import { fetchExperts, type ExpertListItem } from "@/lib/api/consulting-client";
  * v3에서 전문분야 필터가 사라졌다. 지금 여는 컨설팅은 '옷' 하나뿐이고
  * 가격도 전원 동일해서, 고를 축이 "누구에게 맡길까" 밖에 없다.
  * 선택지가 하나뿐인 필터를 두면 오히려 헷갈린다.
+ *
+ * 고수가 여기 들어오면 받은 신청함으로 되돌린다. 자기 자신에게 신청하는
+ * 화면이기 때문이다. 탭바에서도 갈라놓지만 그것만으로는 모자란다 —
+ * 탭은 내 정보를 받아야 목적지를 정할 수 있어서, 앱을 켜자마자 누르면
+ * 아직 모르는 상태라 신청 화면으로 보내버린다. 실제로 배포본에서 그랬다.
  */
 export default function ExpertsPage() {
+  const router = useRouter();
+  const { me } = useMe();
   const [experts, setExperts] = useState<ExpertListItem[] | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -29,6 +38,11 @@ export default function ExpertsPage() {
       .then(setExperts)
       .catch(() => setFailed(true));
   }, []);
+
+  useEffect(() => {
+    // replace로 보낸다 — push면 뒤로가기가 다시 이 화면으로 돌아온다.
+    if (me?.is_expert) router.replace("/consulting");
+  }, [me?.is_expert, router]);
 
   return (
     <AppShell>
