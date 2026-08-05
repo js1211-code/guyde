@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Chip, PhotoBox, PhotoSlot } from "@/components/badge";
-import { PlusIcon } from "@/components/icons";
+import { ImageIcon, PlusIcon } from "@/components/icons";
 import {
   AppShell,
   BottomBar,
@@ -95,6 +95,10 @@ function Composer({
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [options, setOptions] = useState(["", ""]);
+  // 선택지와 나란한 배열. 사진을 안 고른 자리는 null.
+  // 배열 두 개를 각각 들면 추가·삭제 때 어긋나므로 항상 같이 손댄다.
+  const [optionImages, setOptionImages] = useState<(string | null)[]>([null, null]);
+  const [optionUploading, setOptionUploading] = useState<number | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,6 +116,21 @@ function Composer({
       );
     }
     setUploading(false);
+  }
+
+  /** 선택지 사진. 본문 사진과 달리 한 자리에 한 장이라 교체다. */
+  async function pickOptionImage(index: number, file: File) {
+    setOptionUploading(index);
+    setError(null);
+    try {
+      const url = await uploadImage(file);
+      setOptionImages((prev) => prev.map((v, i) => (i === index ? url : v)));
+    } catch (e) {
+      setError(
+        e instanceof ApiError && e.detail ? e.detail : "사진을 올리지 못했어요",
+      );
+    }
+    setOptionUploading(null);
   }
 
   // 정보 공유 글은 여전히 성격이 다르다(투표 대신 좋아요). 하트만 사라졌다.
@@ -132,7 +151,10 @@ function Composer({
         post_type: postType,
         title: title.trim(),
         body: body.trim(),
-        options: postType === "선택지투표" ? filledOptions : undefined,
+        // 빈 칸을 여기서 걸러내면 사진 배열의 자리가 어긋난다.
+        // 원본 그대로 보내고, 서버가 짝을 유지한 채 거른다.
+        options: postType === "선택지투표" ? options : undefined,
+        option_images: postType === "선택지투표" ? optionImages : undefined,
         image_urls: images,
       });
       router.push(`/post/${id}`);
@@ -209,11 +231,60 @@ function Composer({
         {postType === "선택지투표" && (
           <>
             <Kicker className="mt-4 mb-2">OPTIONS</Kicker>
+            <p className="mb-2 text-[11.5px] text-neutral-500">
+              사진은 선택이에요. 실물을 보여주면 고르는 쪽이 훨씬 편해요.
+            </p>
             {options.map((value, i) => (
               <div key={i} className="mb-2 flex items-center gap-2">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center bg-ink text-[12px] font-bold text-white">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-xs bg-ink text-[12px] font-bold text-white">
                   {LETTERS[i]}
                 </span>
+
+                {/* 사진은 선택지 **왼쪽**에 붙는다. 본문에 몰아 올리면
+                    몇 번째 사진이 어느 선택지인지 따로 적어야 한다. */}
+                {optionImages[i] ? (
+                  <span className="relative shrink-0">
+                    <PhotoBox
+                      src={optionImages[i]}
+                      alt=""
+                      className="h-[44px] w-[44px]"
+                    />
+                    <button
+                      type="button"
+                      aria-label={`선택지 ${LETTERS[i]} 사진 빼기`}
+                      onClick={() =>
+                        setOptionImages((prev) =>
+                          prev.map((v, idx) => (idx === i ? null : v)),
+                        )
+                      }
+                      className="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-ink text-[10px] leading-none text-white"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ) : (
+                  <label
+                    aria-label={`선택지 ${LETTERS[i]} 사진 넣기`}
+                    className={`flex h-[44px] w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-lg border border-dashed border-neutral-400 text-neutral-500 ${
+                      optionUploading === i ? "opacity-50" : ""
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={optionUploading !== null}
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) pickOptionImage(i, f);
+                        // 같은 파일을 다시 고를 수 있게 비운다.
+                        e.target.value = "";
+                      }}
+                    />
+                    <ImageIcon size={16} />
+                  </label>
+                )}
+
                 <input
                   value={value}
                   onChange={(e) =>
@@ -222,14 +293,17 @@ function Composer({
                     )
                   }
                   placeholder={`선택지 ${LETTERS[i]}`}
-                  className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[14px]"
+                  className="min-w-0 flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[14px]"
                 />
               </div>
             ))}
             {options.length < POLL_OPTION_MAX && (
               <button
                 type="button"
-                onClick={() => setOptions((prev) => [...prev, ""])}
+                onClick={() => {
+                  setOptions((prev) => [...prev, ""]);
+                  setOptionImages((prev) => [...prev, null]);
+                }}
                 className="mt-1 flex w-full items-center justify-center gap-1 rounded-md border border-dashed border-neutral-400 py-2 text-[13px] font-semibold text-brand"
               >
                 <PlusIcon size={13} />

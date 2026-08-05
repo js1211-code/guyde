@@ -16,6 +16,8 @@ export type FeedItem = {
   title: string;
   body: string;
   created_at: string;
+  /** 한 번도 안 고쳤으면 null. 있으면 화면에 '수정됨'을 붙인다. */
+  edited_at: string | null;
   nickname: string;
   temperature: number;
   /** experts에 등록된 사람인지. 온도 42도를 넘겼다고 고수인 게 아니다. */
@@ -31,6 +33,8 @@ export type PollOption = {
   id: string;
   text: string;
   sort_order: number;
+  /** 선택지 사진. 없으면 null — 사진 없는 투표도 올릴 수 있다. */
+  image_url: string | null;
   /** 투표 전에는 null — 결과를 서버에서부터 감춘다(F-32) */
   vote_count: number | null;
   percent: number | null;
@@ -157,6 +161,8 @@ export async function createPost(input: {
   title: string;
   body: string;
   options?: string[];
+  /** 선택지와 나란한 배열. 사진을 안 고른 자리는 null. */
+  option_images?: (string | null)[];
   image_urls?: string[];
 }): Promise<{ id: string }> {
   return json<{ id: string }>(
@@ -202,9 +208,21 @@ export async function addComment(
 }
 
 /**
- * 정보 공유 글 좋아요 (F-80).
- * 이 좋아요는 글쓴이 온도에 ×0.2로 쌓인다 — 서버 트리거가 자가 좋아요를 막는다.
+ * 내 글 수정 — 제목과 본문만.
+ * 유형·선택지·카테고리는 서버가 거부한다(쌓인 표가 갈 곳을 잃는다).
  */
+export async function updatePost(
+  postId: string,
+  patch: { title: string; body: string },
+) {
+  return json<{ id: string; edited: boolean }>(
+    await apiFetch(`/api/posts/${postId}`, {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+    }),
+  );
+}
+
 /** 내 글 삭제. 사진·투표·댓글은 DB가 연쇄로 지운다. */
 export async function deletePost(postId: string) {
   return json(await apiFetch(`/api/posts/${postId}`, { method: "DELETE" }));
@@ -220,6 +238,10 @@ export async function reportPost(postId: string, reason?: string) {
   );
 }
 
+/**
+ * 정보 공유 글 좋아요 (F-80).
+ * 이 좋아요는 글쓴이 온도에 ×0.2로 쌓인다 — 서버 트리거가 자가 좋아요를 막는다.
+ */
 export async function togglePostLike(postId: string, liked: boolean) {
   return json(
     await apiFetch(`/api/posts/${postId}/like`, {

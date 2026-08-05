@@ -83,6 +83,8 @@ export async function POST(req: Request) {
     title?: string;
     body?: string;
     options?: string[];
+    /** 선택지와 나란한 배열. 사진을 안 고른 자리는 null. */
+    option_images?: (string | null)[];
     image_urls?: string[];
   };
   try {
@@ -100,7 +102,17 @@ export async function POST(req: Request) {
   if (!body.title?.trim()) return fail("TITLE_REQUIRED", 400);
   if (!body.body?.trim()) return fail("BODY_REQUIRED", 400);
 
-  const options = body.options?.map((o) => o.trim()).filter(Boolean) ?? null;
+  // filter(Boolean)로 빈 칸을 걷어내므로, 사진 배열도 **같은 자리**를 걷어내야
+  // 짝이 어긋나지 않는다. 인덱스를 살려둔 채 함께 거른다.
+  const kept = (body.options ?? [])
+    .map((o, i) => ({ text: o.trim(), image: body.option_images?.[i] ?? null }))
+    .filter((o) => o.text.length > 0);
+
+  const options = kept.length ? kept.map((o) => o.text) : null;
+  // 아무 선택지에도 사진이 없으면 배열을 통째로 보내지 않는다 —
+  // null만 든 배열을 넘기면 DB가 길이 검사만 한 번 더 할 뿐이다.
+  const optionImages =
+    options && kept.some((o) => o.image) ? kept.map((o) => o.image) : null;
 
   const db = createAdminClient();
   const { data: postId, error } = await db.rpc("create_post", {
@@ -109,7 +121,8 @@ export async function POST(req: Request) {
     p_type: body.post_type,
     p_title: body.title.trim(),
     p_body: body.body.trim(),
-    p_options: options?.length ? options : null,
+    p_options: options,
+    p_option_images: optionImages,
   });
 
   if (error) return fromDbError(error.message);

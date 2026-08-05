@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ZoomablePhoto } from "@/components/lightbox";
 import { use, useEffect, useRef, useState } from "react";
@@ -7,12 +8,14 @@ import {
   CategoryBadge,
   ExpertBadge,
   MineBadge,
+  PhotoBox,
   PostTypeBadge,
 } from "@/components/badge";
 import {
   CheckIcon,
   HeartIcon,
   MoreIcon,
+  PencilIcon,
   SirenIcon,
   TrashIcon,
 } from "@/components/icons";
@@ -102,6 +105,9 @@ export default function PostPage({
             )}
             <span className="ml-auto text-[11px] text-neutral-600">
               {timeAgo(post.created_at)}
+              {/* 판정·투표는 "이 글"에 대한 표라서, 표가 쌓인 뒤 내용이
+                  바뀐 걸 감추면 % 가 무엇에 대한 숫자인지 알 수 없다. */}
+              {post.edited_at && " · 수정됨"}
             </span>
           </div>
 
@@ -240,6 +246,10 @@ function Poll({
     setBusy(false);
   }
 
+  // 사진이 하나라도 붙어 있으면 줄 높이를 키운다. 사진 있는 줄만 키우면
+  // 선택지끼리 높이가 들쭉날쭉해서 어느 쪽이 더 중요해 보인다.
+  const withPhotos = poll.options.some((o) => o.image_url);
+
   if (!poll.revealed) {
     return (
       <>
@@ -250,8 +260,18 @@ function Poll({
               type="button"
               disabled={busy}
               onClick={() => vote(o.id)}
-              className="border border-neutral-500 px-3.5 py-3 text-left text-[14.5px] font-semibold"
+              className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3 text-left text-[14.5px] font-semibold"
             >
+              {withPhotos && (
+                // 사진을 눌러도 확대가 아니라 투표다 — 고르는 화면이라
+                // 여기서 사진을 열면 투표가 한 단계 멀어진다.
+                <PhotoBox
+                  src={o.image_url}
+                  alt=""
+                  className="h-[52px] w-[52px] shrink-0"
+                  iconSize={16}
+                />
+              )}
               {o.text}
             </button>
           ))}
@@ -279,7 +299,9 @@ function Poll({
               type="button"
               disabled={busy}
               onClick={() => !mine && vote(o.id)}
-              className={`relative flex h-[38px] items-center overflow-hidden border text-left ${
+              className={`relative flex items-center overflow-hidden rounded-lg border text-left ${
+                withPhotos ? "h-[60px]" : "h-[38px]"
+              } ${
                 mine
                   ? "border-2 border-brand"
                   : leading
@@ -298,9 +320,19 @@ function Poll({
                 }`}
                 style={{ width: `${pct}%` }}
               />
-              <span className="relative flex w-full items-center justify-between px-3 text-[13px]">
-                <span className={leading ? "font-bold" : "text-neutral-700"}>
-                  {o.text}
+              <span className="relative flex w-full items-center justify-between gap-2 px-3 text-[13px]">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  {withPhotos && (
+                    <PhotoBox
+                      src={o.image_url}
+                      alt=""
+                      className="h-[44px] w-[44px] shrink-0"
+                      iconSize={14}
+                    />
+                  )}
+                  <span className={leading ? "font-bold" : "text-neutral-700"}>
+                    {o.text}
+                  </span>
                 </span>
                 <span
                   className={`flex items-center gap-1 ${
@@ -706,16 +738,26 @@ function PostMenu({ postId, isMine }: { postId: string; isMine: boolean }) {
                 신고가 접수됐어요
               </p>
             ) : isMine ? (
-              <button
-                type="button"
-                role="menuitem"
-                disabled={busy}
-                onClick={remove}
-                className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold text-danger disabled:opacity-50"
-              >
-                <TrashIcon size={19} />
-                글 삭제하기
-              </button>
+              <>
+                <Link
+                  href={`/post/${postId}/edit`}
+                  role="menuitem"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold"
+                >
+                  <PencilIcon size={19} />
+                  글 수정하기
+                </Link>
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={busy}
+                  onClick={remove}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold text-danger disabled:opacity-50"
+                >
+                  <TrashIcon size={19} />
+                  글 삭제하기
+                </button>
+              </>
             ) : (
               <button
                 type="button"

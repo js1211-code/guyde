@@ -85,6 +85,65 @@ export async function GET(
 }
 
 /**
+ * 글 수정 — 글쓴이만, 제목과 본문만.
+ *
+ * 유형(post_type)과 선택지는 바꿀 수 없다. 투표가 이미 쌓인 글의 선택지를
+ * 갈아끼우면 사람들이 고른 표가 엉뚱한 항목에 붙는다. 유형을 바꾸면
+ * 그 표가 통째로 갈 곳을 잃는다. 카테고리도 막는다 — '자유' 글은 온도에서
+ * 빠지므로, 옮기는 것만으로 온도를 올리거나 내릴 수 있다.
+ *
+ * 고친 사실은 edited_at에 남긴다. 무난함 판정은 "이 글"에 대한 투표라서,
+ * 표가 쌓인 뒤 내용이 바뀐 걸 감추면 82%가 무엇에 대한 숫자인지 알 수 없다.
+ *
+ * 남의 글은 403이 아니라 404다 — 403이면 "그 글이 있긴 하다"가 새어 나간다.
+ */
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const deviceId = getDeviceId(req);
+  if (!deviceId) return deviceRequired();
+
+  const { id } = await params;
+
+  let payload: { title?: string; body?: string };
+  try {
+    payload = await req.json();
+  } catch {
+    return fail("INVALID_JSON", 400);
+  }
+
+  const title = payload.title?.trim();
+  const body = payload.body?.trim();
+  if (!title) return fail("TITLE_REQUIRED", 400);
+  if (!body) return fail("BODY_REQUIRED", 400);
+
+  const db = createAdminClient();
+
+  const { data: post, error } = await db
+    .from("posts")
+    .select("id, device_id, title, body")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) return fail("DB_ERROR", 500, error.message);
+  if (!post || post.device_id !== deviceId) return fail("POST_NOT_FOUND", 404);
+
+  // 아무것도 안 바뀌었으면 edited_at을 찍지 않는다.
+  // 들어왔다 그냥 나간 글에 "수정됨"이 붙으면 거짓 표시다.
+  if (post.title === title && post.body === body) {
+    return ok({ id, edited: false });
+  }
+
+  const { error: updateError } = await db
+    .from("posts")
+    .update({ title, body, edited_at: new Date().toISOString() })
+    .eq("id", id);
+  if (updateError) return fail("DB_ERROR", 500, updateError.message);
+
+  return ok({ id, edited: true });
+}
+
+/**
  * 글 삭제 — 글쓴이만.
  *
  * 사진·선택지·투표·판정·좋아요·댓글은 FK가 연쇄로 지운다.
@@ -122,7 +181,7 @@ async function loadPoll(db: Db, postId: string, deviceId: string | null) {
   const [options, votes, mine] = await Promise.all([
     db
       .from("poll_options")
-      .select("id, text, sort_order")
+      .select("id, text, sort_order, image_url")
       .eq("post_id", postId)
       .order("sort_order"),
     db.from("poll_votes").select("option_id").eq("post_id", postId),
