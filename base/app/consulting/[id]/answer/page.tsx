@@ -155,6 +155,7 @@ export default function AnswerWritePage({
   }
 
   const round = booking.status === "수정 요청됨" ? 2 : 1;
+  const lastAnswer = booking.answers.at(-1) ?? null;
 
   return (
     <AppShell>
@@ -164,6 +165,44 @@ export default function AnswerWritePage({
       />
 
       <ScreenBody className="px-4 pt-3 pb-2">
+        {/*
+          수정 요청 사유. 확정안을 쓸 때 이게 이 화면에서 제일 중요한 정보라
+          신청 내용보다 위에 둔다 — 무엇을 고쳐야 하는지가 먼저다.
+          다음이 마지막 기회라는 것도 같이 말해준다.
+        */}
+        {round === 2 && (
+          <section className="mb-5 rounded-2xl border-2 border-danger-line bg-danger-tint p-4">
+            <p className="text-[13px] font-bold text-danger">
+              이 점을 고쳐달라고 했어요
+            </p>
+            <p className="mt-2 text-[14px] leading-relaxed">
+              {booking.revision_reason ?? "사유가 기록되지 않았어요"}
+            </p>
+            <p className="mt-2.5 text-[11.5px] text-neutral-600">
+              수정은 1회뿐이라 이번이 확정안이에요.
+            </p>
+          </section>
+        )}
+
+        {/* 지난 회차에서 무엇을 냈는지 — 같은 걸 또 내지 않으려면 필요하다 */}
+        {round === 2 && lastAnswer && (
+          <details className="mb-5 rounded-2xl bg-neutral-100 p-4">
+            <summary className="cursor-pointer text-[12.5px] font-semibold text-neutral-600">
+              1회차에 보낸 답변 다시 보기
+            </summary>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-700">
+              {lastAnswer.diagnosis}
+            </p>
+            <ul className="mt-3 space-y-1">
+              {lastAnswer.items.map((i) => (
+                <li key={i.slot} className="text-[12.5px] text-neutral-700">
+                  · {i.slot} — {i.name} ({i.price.toLocaleString("ko-KR")}원)
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+
         {/* 신청 내용 — 답을 쓰는 내내 보여야 한다 */}
         <section className="mb-5 rounded-2xl bg-neutral-100 p-4">
           <p className="mb-2 text-[12px] font-semibold text-neutral-500">

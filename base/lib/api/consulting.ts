@@ -105,8 +105,13 @@ export async function loadBooking(
     .maybeSingle();
 
   const expertDevice = expert?.device_id ?? null;
-  const [{ data: expertUser }, temps, { data: answers }, { data: images }] =
-    await Promise.all([
+  const [
+    { data: expertUser },
+    temps,
+    { data: answers },
+    { data: feedbacks },
+    { data: images },
+  ] = await Promise.all([
       expertDevice
         ? db.from("users").select("nickname").eq("device_id", expertDevice).maybeSingle()
         : Promise.resolve({ data: null }),
@@ -116,6 +121,11 @@ export async function loadBooking(
         .select("id, round, diagnosis, avoid, created_at, outfit_items(*)")
         .eq("booking_id", bookingId)
         .order("round", { ascending: true }),
+      db
+        .from("feedbacks")
+        .select("answer_id, kind, reason, created_at")
+        .eq("booking_id", bookingId)
+        .order("created_at", { ascending: true }),
       db
         .from("booking_images")
         .select("kind, url, sort_order")
@@ -139,6 +149,15 @@ export async function loadBooking(
       style_note: booking.style_note ?? "",
       price: booking.price,
       revision_count: booking.revision_count ?? 0,
+      /**
+       * 가장 최근 수정 요청 사유.
+       * 고수가 확정안을 쓸 때 이게 없으면 무엇을 고쳐야 하는지 알 수가 없다 —
+       * 이 흐름에서 제일 중요한 한 줄이라 상세와 작성 화면 양쪽에 내려준다.
+       */
+      revision_reason:
+        (feedbacks ?? [])
+          .filter((f) => f.kind === "수정요청")
+          .at(-1)?.reason ?? null,
       created_label: dayLabel(booking.created_at),
       due_label: dueLabel(booking.due_at, booking.status),
       expert: {
@@ -159,6 +178,8 @@ export async function loadBooking(
         const items = ((a.outfit_items ?? []) as OutfitItemRow[]).slice().sort(
           (x, y) => SLOT_ORDER.indexOf(x.slot) - SLOT_ORDER.indexOf(y.slot),
         );
+        // 이 회차에 달린 피드백. 어떤 답변이 왜 반려됐는지 짝지어 보여준다.
+        const fb = (feedbacks ?? []).find((f) => f.answer_id === a.id) ?? null;
         return {
           id: a.id,
           round: a.round,
@@ -166,6 +187,7 @@ export async function loadBooking(
           avoid: a.avoid ?? [],
           items,
           total: items.reduce((sum, i) => sum + i.price, 0),
+          feedback: fb ? { kind: fb.kind, reason: fb.reason } : null,
         };
       }),
     },

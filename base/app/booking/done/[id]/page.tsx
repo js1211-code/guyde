@@ -125,9 +125,18 @@ export default function BookingDetailPage({
 
         {booking.status === "수정 요청됨" && (
           <section className="mx-4 mt-4 rounded-2xl bg-danger-tint p-4">
-            <p className="text-[13px] font-bold text-danger">수정을 요청했어요</p>
-            <p className="mt-2 text-[11.5px] text-neutral-600">
-              고수가 확정안을 다시 만드는 중이에요 · 수정 요청은 1회 가능해요
+            <p className="text-[13px] font-bold text-danger">
+              {booking.is_expert ? "수정 요청이 왔어요" : "수정을 요청했어요"}
+            </p>
+            {booking.revision_reason && (
+              <p className="mt-2 border-l-[3px] border-danger-line pl-2.5 text-[13px] leading-relaxed">
+                {booking.revision_reason}
+              </p>
+            )}
+            <p className="mt-2.5 text-[11.5px] text-neutral-600">
+              {booking.is_expert
+                ? "이 내용을 반영해 확정안을 만들어주세요 · 수정은 1회뿐이라 다음이 마지막이에요"
+                : "고수가 확정안을 다시 만드는 중이에요 · 수정 요청은 1회 가능해요"}
             </p>
           </section>
         )}
@@ -144,6 +153,16 @@ export default function BookingDetailPage({
                 </span>
               )}
             </div>
+            {answer.feedback?.kind === "수정요청" && answer.feedback.reason && (
+              <div className="mb-3 rounded-lg bg-danger-tint px-3 py-2.5">
+                <p className="text-[11.5px] font-bold text-danger">
+                  이 답변에 요청된 수정
+                </p>
+                <p className="mt-1 text-[12.5px] leading-relaxed">
+                  {answer.feedback.reason}
+                </p>
+              </div>
+            )}
             <AnswerView answer={answer} budget={booking.budget} />
           </section>
         )}

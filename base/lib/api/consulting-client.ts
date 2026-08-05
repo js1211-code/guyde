@@ -52,6 +52,8 @@ export type ConsultingAnswer = {
   avoid: string[];
   items: OutfitItem[];
   total: number;
+  /** 이 회차에 달린 피드백. 아직 안 받았으면 null. */
+  feedback: { kind: "만족" | "수정요청"; reason: string | null } | null;
 };
 
 export type BookingDetail = {
@@ -64,6 +66,8 @@ export type BookingDetail = {
   style_note: string;
   price: number;
   revision_count: number;
+  /** 가장 최근 수정 요청 사유. 고수가 확정안을 쓸 때 반드시 보여야 한다. */
+  revision_reason: string | null;
   created_label: string;
   due_label: string;
   expert: { id: string; nickname: string; temperature: number; intro: string };
