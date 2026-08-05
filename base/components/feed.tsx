@@ -62,7 +62,9 @@ export function Feed() {
 
   return (
     <>
-      <div className="scroll-area flex gap-4 overflow-x-auto border-b border-neutral-400 px-4">
+            {/* scroll-area(overflow-y:auto)를 쓰면 가로 탭 줄에 세로 스크롤까지 붙어
+          손가락이 위아래로 밀린다. 가로만 흐르게 하고 세로는 잠근다. */}
+      <div className="rail flex gap-4 border-b border-neutral-400 px-4">
         {TABS.map((t) => (
           <button
             key={t}

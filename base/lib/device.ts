@@ -94,7 +94,6 @@ export async function registerDevice() {
     device_id: string;
     nickname: string;
     temperature: number;
-    hearts: number;
     /** experts에 등록된 기기인지. 온도로 판별하지 않는다. */
     is_expert: boolean;
   }>;

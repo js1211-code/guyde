@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Chip, PhotoBox, PhotoSlot } from "@/components/badge";
@@ -13,14 +12,11 @@ import {
   ScreenBody,
   TopBar,
 } from "@/components/shell";
-import { AdReward } from "@/components/ad-reward";
 import { ApiError, createPost, uploadImage } from "@/lib/api";
-import { useMe } from "@/lib/use-me";
 import {
   CATEGORIES,
   POLL_OPTION_MAX,
   POLL_OPTION_MIN,
-  POST_COST_HEARTS,
   POST_IMAGE_MAX,
   POST_TYPES,
   POST_TYPE_HINT,
@@ -118,19 +114,11 @@ function Composer({
     setUploading(false);
   }
 
-  const { me } = useMe();
-  const [hearts, setHearts] = useState<number | null>(null);
-  const balance = hearts ?? me?.hearts ?? null;
-  // 정보 공유는 하트를 쓰지 않는다(F-80). DB의 create_post()도 같은 규칙이라
-  // 여기서 막으면 올릴 수 있는 글을 막아버린다.
+  // 정보 공유 글은 여전히 성격이 다르다(투표 대신 좋아요). 하트만 사라졌다.
   const free = isFreePost(postType);
-  // 하트가 없으면 아예 올릴 수 없다. DB도 INSUFFICIENT_HEARTS로 막지만,
-  // 다 써놓고 마지막에 막히면 헛수고라 여기서 먼저 알린다.
-  const noHearts = !free && balance !== null && balance < POST_COST_HEARTS;
 
   const filledOptions = options.map((o) => o.trim()).filter(Boolean);
   const ready =
-    !noHearts &&
     title.trim().length > 0 &&
     body.trim().length > 0 &&
     (postType !== "선택지투표" || filledOptions.length >= POLL_OPTION_MIN);
@@ -150,8 +138,8 @@ function Composer({
       router.push(`/post/${id}`);
     } catch (e) {
       setError(
-        e instanceof ApiError && e.code === "INSUFFICIENT_HEARTS"
-          ? "하트가 부족해요"
+        e instanceof ApiError && e.detail
+          ? e.detail
           : "등록하지 못했어요. 잠시 후 다시 시도해주세요.",
       );
       setSaving(false);
@@ -254,7 +242,7 @@ function Composer({
         {free && (
           <div className="mt-5 rounded-lg border border-brand-tint-b bg-brand-tint p-3">
             <p className="text-[12px] font-semibold text-brand-dark">
-              정보 공유 글은 하트를 쓰지 않아요
+              정보 공유 글이에요
             </p>
             <p className="mt-1 text-[12px] leading-relaxed text-neutral-700">
               투표 대신 좋아요를 받고, 받은 좋아요는 내 온도에 쌓여요.
@@ -288,45 +276,9 @@ function Composer({
       </ScreenBody>
 
       <BottomBar bordered={false}>
-        {noHearts ? (
-          <div className="rounded-xl border border-brand bg-brand/15 p-3.5">
-            <p className="text-[13.5px] font-bold text-brand-dark">
-              하트가 없어 글을 올릴 수 없어요
-            </p>
-            <p className="mt-1 mb-3 text-[12px] text-neutral-700">
-              광고를 보거나 충전하면 바로 올릴 수 있어요.
-            </p>
-            <div className="bg-paper">
-              <AdReward
-                compact
-                onGranted={(next) => setHearts(next)}
-              />
-            </div>
-            <Link
-              href="/hearts"
-              className="mt-2 block bg-brand py-2.5 text-center text-[13px] font-bold text-white"
-            >
-              충전하러 가기
-            </Link>
-          </div>
-        ) : (
-          <>
-            <PrimaryButton disabled={!ready || saving} onClick={submit}>
-              {saving
-                ? "올리는 중…"
-                : free
-                  ? "올리기"
-                  : `하트 ${POST_COST_HEARTS}개로 올리기`}
-            </PrimaryButton>
-            <p className="mt-2 text-center text-[11.5px] text-neutral-600">
-              {free
-                ? "하트를 쓰지 않아요"
-                : balance !== null
-                  ? `내 하트 ${balance}개`
-                  : ""}
-            </p>
-          </>
-        )}
+        <PrimaryButton disabled={!ready || saving} onClick={submit}>
+          {saving ? "올리는 중…" : "올리기"}
+        </PrimaryButton>
       </BottomBar>
     </AppShell>
   );

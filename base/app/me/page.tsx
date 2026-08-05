@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronRightIcon, HeartIcon, LockIcon, PencilIcon } from "@/components/icons";
+import { ChevronRightIcon, LockIcon, PencilIcon } from "@/components/icons";
 import { AppShell, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature, TemperatureProgress } from "@/components/temperature";
@@ -119,16 +119,6 @@ export default function MePage() {
           </div>
         )}
 
-        <div className="mt-4 flex items-center justify-between rounded-xl border border-neutral-400 p-3.5">
-          <span className="flex items-center gap-1.5">
-
-            <HeartIcon size={16} className="text-brand" />
-            <span className="text-[13.5px] font-semibold">보유 하트</span>
-          </span>
-          <span className="cond text-[16px] font-bold text-brand">
-            {me?.hearts ?? "–"}개
-          </span>
-        </div>
 
         <nav className="mt-5">
           {MENU.map((item, i) => (

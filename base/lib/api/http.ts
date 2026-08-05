@@ -43,7 +43,6 @@ export const deviceRequired = () =>
  * 규칙을 DB에 박아뒀기 때문에(트리거·CHECK) 여기서는 번역만 한다.
  */
 const ERROR_STATUS: Record<string, number> = {
-  INSUFFICIENT_HEARTS: 402,
   SELF_LIKE_NOT_ALLOWED: 403,
   LIKE_NOT_ALLOWED_FOR_POST_TYPE: 400,
   POLL_OPTIONS_OUT_OF_RANGE: 400,

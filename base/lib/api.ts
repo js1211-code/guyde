@@ -93,12 +93,15 @@ export async function fetchFeed(params: {
   post_type?: PostType;
   /** 도서관 전용. 피드는 최신순 고정이다(F-13). */
   sort?: "latest" | "reactions";
+  /** 도서관 무난템 전용 — 무난함 % 하한. */
+  min_nanhan?: number;
   limit?: number;
 }): Promise<FeedItem[]> {
   const q = new URLSearchParams();
   if (params.category) q.set("category", params.category);
   if (params.post_type) q.set("post_type", params.post_type);
   if (params.sort) q.set("sort", params.sort);
+  if (params.min_nanhan) q.set("min_nanhan", String(params.min_nanhan));
   if (params.limit) q.set("limit", String(params.limit));
   const res = await apiFetch(`/api/posts?${q}`);
   const { items } = await json<{ items: FeedItem[] }>(res);

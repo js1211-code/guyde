@@ -165,6 +165,20 @@ body {
   }
 }
 
+/*
+  가로로만 흐르는 줄(카테고리 탭 등). 세로 스크롤이 붙으면 손가락이 위아래로
+  밀려서 탭을 고르다 화면이 흔들린다. 스크롤바 자체도 숨긴다.
+*/
+.rail {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
 /* 피드 카드 본문 2줄 미리보기 (F-15) */
 .line-clamp-2 {
   display: -webkit-box;

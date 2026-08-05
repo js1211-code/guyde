@@ -17,6 +17,7 @@ import { CATEGORIES, POST_TYPES, type Category, type PostType } from "@/lib/cons
  * - ?category=옷        → 카테고리 탭
  * - ?post_type=무난함판정 → 무난무난 탭 (카테고리를 가로지른다)
  * - ?sort=reactions     → 반응 많은 순 (도서관의 정보공유 서가)
+ * - ?min_nanhan=60      → 무난함 60% 이상만 (도서관의 무난템 서가)
  *
  * 피드의 정렬은 최신순 고정이다(F-13). sort는 도서관용으로 열어둔 것 —
  * 도서관은 흐름을 보는 곳이 아니라 쓸 만한 걸 찾는 곳이라 최신순이 맞지 않는다.
@@ -28,6 +29,7 @@ export async function GET(req: Request) {
   const category = url.searchParams.get("category");
   const postType = url.searchParams.get("post_type");
   const sort = url.searchParams.get("sort");
+  const minNanhan = url.searchParams.get("min_nanhan");
   const limit = Math.min(Number(url.searchParams.get("limit") ?? 30), 100);
   const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
@@ -56,6 +58,9 @@ export async function GET(req: Request) {
 
   if (category) query = query.eq("category", category);
   if (postType) query = query.eq("post_type", postType);
+  // 0표라 판정이 없는 글은 nanhan_percent가 null이다. gte는 null을 걸러내므로
+  // "아직 판정 안 난 글"이 무난템에 섞이지 않는다.
+  if (minNanhan) query = query.gte("nanhan_percent", Number(minNanhan));
 
   const { data, error } = await query;
   if (error) return fail("DB_ERROR", 500, error.message);
@@ -65,8 +70,8 @@ export async function GET(req: Request) {
 
 /**
  * F-20~24 글 작성
- * 하트 차감 + 글 insert + 선택지 insert가 create_post 안에서 한 트랜잭션이다.
- * 정보 공유 글은 하트를 쓰지 않는다(F-80).
+ * 글 insert + 선택지 insert가 create_post 안에서 한 트랜잭션이다.
+ * 하트는 폐기했다(patch_v3_3) — 답을 받으러 온 사람 앞에 관문을 두지 않는다.
  */
 export async function POST(req: Request) {
   const deviceId = getDeviceId(req);

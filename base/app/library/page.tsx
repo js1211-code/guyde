@@ -4,20 +4,22 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
 import { HeartIcon, MessageIcon } from "@/components/icons";
+import { NANHAN_PICK_PERCENT } from "@/lib/constants";
 import { AppShell, Kicker, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
 import { getHeroArticle, getLatestArticles, getQuizzes } from "@/lib/mock";
 
-const SHELVES = ["아티클", "정보 공유"] as const;
+const SHELVES = ["아티클", "무난템", "정보 공유"] as const;
 type Shelf = (typeof SHELVES)[number];
 
 /**
  * ⑪ 도서관 — 서가 두 개.
  *
  *   아티클   : 우리가 쓴 편집된 읽을거리 (아직 lib/mock.ts)
- *   정보 공유: 커뮤니티가 쌓은 글 (실제 posts 테이블)
+ *   무난템   : 무난함 판정에서 60% 이상 받은 것만
+ *   정보 공유: 커뮤니티가 쌓은 글
  *
  * 커뮤니티 피드에도 '정보공유' 탭이 있지만 성격이 다르다.
  * 피드는 지금 뭐가 올라왔나를 보는 곳이라 최신순이고,
@@ -52,7 +54,11 @@ export default function LibraryPage() {
         ))}
       </div>
 
-      <ScreenBody>{shelf === "아티클" ? <Articles /> : <Guides />}</ScreenBody>
+      <ScreenBody>
+        {shelf === "아티클" && <Articles />}
+        {shelf === "무난템" && <Picks />}
+        {shelf === "정보 공유" && <Guides />}
+      </ScreenBody>
 
       <TabBar />
     </AppShell>
@@ -114,6 +120,82 @@ function Articles() {
           </Link>
         ))}
       </div>
+    </>
+  );
+}
+
+/**
+ * 무난템 — 무난함 판정에서 합격선을 넘긴 것만.
+ *
+ * 커뮤니티의 '무난무난' 탭과 다르다. 그쪽은 판정을 **받는** 곳이라
+ * 0표짜리도 전부 올라오고, 여기는 판정이 **끝난** 것만 모은다.
+ * 무난한지 물어보러 온 사람에게 "이건 이미 통과했다"를 보여주는 자리다.
+ */
+function Picks() {
+  const [items, setItems] = useState<FeedItem[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    fetchFeed({
+      post_type: "무난함판정",
+      min_nanhan: NANHAN_PICK_PERCENT,
+      sort: "reactions",
+      limit: 50,
+    })
+      .then(setItems)
+      .catch(() => setFailed(true));
+  }, []);
+
+  return (
+    <>
+      <p className="px-4 pt-3 pb-2 text-[12.5px] leading-relaxed text-neutral-600">
+        대중이 {NANHAN_PICK_PERCENT}% 이상 무난하다고 판정한 것만 모았어요.
+      </p>
+
+      {failed && (
+        <p className="px-4 py-10 text-center text-[13px] text-neutral-600">
+          불러오지 못했어요
+        </p>
+      )}
+      {!failed && items === null && (
+        <p className="px-4 py-10 text-center text-[13px] text-neutral-500">
+          불러오는 중…
+        </p>
+      )}
+      {items?.length === 0 && (
+        <p className="px-4 py-10 text-center text-[13px] leading-relaxed text-neutral-600">
+          아직 {NANHAN_PICK_PERCENT}%를 넘긴 글이 없어요.
+          <br />
+          커뮤니티에서 무난함 판정에 참여해보세요.
+        </p>
+      )}
+
+      {items?.map((item) => (
+        <Link
+          key={item.id}
+          href={`/post/${item.id}`}
+          className="flex items-center gap-3 border-t border-dashed border-neutral-400 px-4 py-3"
+        >
+          <PhotoBox
+            src={item.thumbnail_url}
+            alt=""
+            className="h-[64px] w-[64px] shrink-0"
+            iconSize={16}
+          />
+          <div className="min-w-0 flex-1">
+            <div className="mb-1 flex items-center gap-1.5">
+              <CategoryBadge>{item.category}</CategoryBadge>
+              <span className="rounded-xs border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+                무난함 {item.nanhan_percent}%
+              </span>
+            </div>
+            <p className="text-[14px] leading-snug font-semibold">{item.title}</p>
+            <p className="mt-1 text-[11.5px] text-neutral-500">
+              {item.reaction_count}명 판정
+            </p>
+          </div>
+        </Link>
+      ))}
     </>
   );
 }

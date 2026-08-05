@@ -18,8 +18,7 @@ export const TEMP_CATEGORIES = CATEGORIES.filter((c) => c !== "자유");
  * 물어보는 방식 — category와 완전히 다른 축이다.
  *
  * '정보공유'만 성격이 다르다. 나머지 셋은 "봐주세요"고 이건 "알려드릴게요"다.
- * 그래서 이 유형만 하트를 안 쓰고(POST_COST_HEARTS 면제), 투표 대신 좋아요를
- * 받고, 받은 좋아요가 온도에 ×0.2로 반영된다.
+ * 그래서 투표 대신 좋아요를 받고, 받은 좋아요가 온도에 ×0.2로 반영된다.
  * 질문해서 온도가 오르는 경로는 없지만 알려줘서 오르는 경로는 있다 —
  * 온도는 고수 판별 장치라서 방향이 이래야 한다.
  */
@@ -42,12 +41,12 @@ export const POST_TYPE_HINT: Record<PostType, string> = {
   일반질문: "그냥 이야기하거나 물어보기",
   선택지투표: "2~5개 중 골라달라기",
   무난함판정: "무난한지 애매한지 판정받기",
-  정보공유: "아는 걸 알려주기 · 하트를 쓰지 않아요",
+  정보공유: "아는 걸 알려주기",
 };
 
-/** 하트를 쓰지 않는 유형. DB의 create_post()도 같은 규칙으로 면제한다. */
-export const FREE_POST_TYPES: readonly PostType[] = ["정보공유"];
-export const isFreePost = (t: PostType) => FREE_POST_TYPES.includes(t);
+/** 투표가 아니라 좋아요를 받는 유형. 화면이 다른 안내를 띄운다. */
+export const LIKE_POST_TYPES: readonly PostType[] = ["정보공유"];
+export const isFreePost = (t: PostType) => LIKE_POST_TYPES.includes(t);
 
 export const TEMP_START = 36.5;
 /**
@@ -57,13 +56,15 @@ export const TEMP_START = 36.5;
 export const TEMP_EXPERT_GATE = 42.0;
 export const EXPERT_TOP_PERCENT = 10;
 
-export const POST_COST_HEARTS = 1;
 
-/** 광고 한 번 보면 주는 하트 (F-80) */
-export const AD_REWARD_HEARTS = 2;
-/** 무한 수급을 막는 상한. 최근 24시간 기준. */
-export const AD_REWARD_LIMIT = 5;
-export const AD_REWARD_WINDOW_HOURS = 24;
+/**
+ * 무난템 기준.
+ * 무난함 판정에서 이 % 이상을 받은 글만 도서관 '무난템' 서가에 오른다.
+ * 커뮤니티의 '무난무난' 탭은 판정글을 전부 보여준다 — 그쪽은 판정을 받는
+ * 곳이고, 여기는 판정이 끝난 것만 모으는 곳이라 역할이 다르다.
+ */
+export const NANHAN_PICK_PERCENT = 60;
+
 export const POLL_OPTION_MIN = 2;
 export const POLL_OPTION_MAX = 5;
 export const POST_IMAGE_MAX = 2;

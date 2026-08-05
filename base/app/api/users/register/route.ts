@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   const existing = await db
     .from("users")
-    .select("device_id, nickname, hearts")
+    .select("device_id, nickname")
     .eq("device_id", deviceId)
     .maybeSingle();
 
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     const created = await db
       .from("users")
       .insert({ device_id: deviceId, nickname })
-      .select("device_id, nickname, hearts")
+      .select("device_id, nickname")
       .single();
 
     if (!created.error) {
