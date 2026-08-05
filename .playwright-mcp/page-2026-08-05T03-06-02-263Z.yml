@@ -1,0 +1,41 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - heading "기기 전환 (데모용)" [level=1] [ref=e4]
+      - paragraph [ref=e5]:
+        - text: 로그인이 없는 앱이라 신원은 UUID 하나뿐이에요.
+        - strong [ref=e6]: 이 탭에서만
+        - text: 바꾸면 다른 탭은 그대로라서, 일반 사용자와 고수를 동시에 띄워둘 수 있어요.
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: 현재 기기
+      - paragraph [ref=e9]: 25cd8aa6-eed4-495e-a74c-5e70d3141e82
+      - paragraph [ref=e10]: 일반 사용자
+    - generic [ref=e11]:
+      - paragraph [ref=e12]: 이 탭에서만 고수로
+      - paragraph [ref=e13]:
+        - text: 다른 탭은 계속 일반 사용자예요. 고수 신원은 이 탭에만 남으므로
+        - code [ref=e14]: localhost:3000
+        - text: 은 언제나 일반 사용자로 열립니다.
+      - 'button "정갈한 여우 #4192 · 44.1°C?as=1" [ref=e15]':
+        - text: "정갈한 여우 #4192 · 44.1°C"
+        - generic [ref=e16]: "?as=1"
+      - 'button "말쑥한 사슴 #4231 · 43.6°C?as=2" [ref=e17]':
+        - text: "말쑥한 사슴 #4231 · 43.6°C"
+        - generic [ref=e18]: "?as=2"
+      - 'button "차분한 부엉이 #4774 · 42.9°C?as=3" [ref=e19]':
+        - text: "차분한 부엉이 #4774 · 42.9°C"
+        - generic [ref=e20]: "?as=3"
+      - 'button "말끔한 하마 #4455 · 42.5°C?as=4" [ref=e21]':
+        - text: "말끔한 하마 #4455 · 42.5°C"
+        - generic [ref=e22]: "?as=4"
+    - group [ref=e23]:
+      - generic "기기 초기화" [ref=e24] [cursor=pointer]
+    - generic [ref=e25]:
+      - paragraph [ref=e26]: 데모 준비
+      - text: 탭 A는
+      - code [ref=e27]: localhost:3000
+      - text: (일반 사용자)탭 B는
+      - code [ref=e28]: localhost:3000/test/device?as=1
+      - text: (정갈한 여우 고수)탭 B는 새 탭을 열어 주소를 직접 입력하세요. 탭을 복제하면 sessionStorage까지 복사돼서 둘 다 고수가 됩니다.
+  - button "Open Next.js Dev Tools" [ref=e34] [cursor=pointer]
+  - alert [ref=e38]

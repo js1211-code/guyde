@@ -1,0 +1,282 @@
+- generic [active] [ref=f11e1]:
+  - generic [ref=f11e2]:
+    - banner [ref=f11e3]:
+      - generic [ref=f11e4]:
+        - generic [ref=f11e5]: GUYDE
+        - paragraph [ref=f11e14]: GUY를 위한 GUIDE.
+      - link "하트 충전" [ref=f11e15] [cursor=pointer]:
+        - /url: /hearts
+        - generic [ref=f11e18]: "5"
+    - main [ref=f11e19]:
+      - generic [ref=f11e20]:
+        - button "전체" [ref=f11e21]
+        - button "무난무난" [ref=f11e22]
+        - button "정보공유" [ref=f11e23]
+        - button "헤어" [ref=f11e24]
+        - button "옷" [ref=f11e25]
+        - button "스킨케어" [ref=f11e26]
+        - button "바디&향수" [ref=f11e27]
+        - button "자유" [ref=f11e28]
+      - generic [ref=f11e29]:
+        - button "최신순" [ref=f11e30]
+        - button "인기순" [ref=f11e31]
+      - generic [ref=f11e32]:
+        - 'link "스킨케어 정보 1시간 전 정보 공유합니다 정보 공유다. 친절한 두더지 #5175 36.5°C" [ref=f11e33] [cursor=pointer]':
+          - /url: /post/47b6d815-4b24-438b-ab83-991b2a733d03
+          - generic [ref=f11e34]:
+            - generic [ref=f11e35]: 스킨케어
+            - generic [ref=f11e36]: 정보
+            - generic [ref=f11e37]: 1시간 전
+          - paragraph [ref=f11e38]: 정보 공유합니다
+          - paragraph [ref=f11e39]: 정보 공유다.
+          - generic [ref=f11e40]:
+            - generic [ref=f11e41]: "친절한 두더지 #5175"
+            - generic [ref=f11e42]: 36.5°C
+        - 'link "옷 정보 8시간 전 무신사 사이즈표에서 어깨너비 읽는 법 어깨너비는 봉제선 기준이라 실제 어깨보다 1~2cm 크게 표기됩니다. 지금 잘 맞는 옷을 바닥에 펴놓고 재서 그 숫자에 맞추는 게 제일 정확해요. 총장은 뒷목 중앙부터라 앞에서 재면 계속 짧게 나옵니다. 8 정갈한 여우 #0192 38.9°C" [ref=f11e43] [cursor=pointer]':
+          - /url: /post/aaaa0006-0000-4000-8000-000000000001
+          - generic [ref=f11e44]:
+            - generic [ref=f11e45]: 옷
+            - generic [ref=f11e46]: 정보
+            - generic [ref=f11e47]: 8시간 전
+          - paragraph [ref=f11e48]: 무신사 사이즈표에서 어깨너비 읽는 법
+          - paragraph [ref=f11e49]: 어깨너비는 봉제선 기준이라 실제 어깨보다 1~2cm 크게 표기됩니다. 지금 잘 맞는 옷을 바닥에 펴놓고 재서 그 숫자에 맞추는 게 제일 정확해요. 총장은 뒷목 중앙부터라 앞에서 재면 계속 짧게 나옵니다.
+          - generic [ref=f11e50]: "8"
+          - generic [ref=f11e54]:
+            - generic [ref=f11e55]: "정갈한 여우 #0192"
+            - generic [ref=f11e56]: 38.9°C
+        - 'link "헤어 정보 8시간 전 미용실에서 통하는 말 세 가지 \"짧게\"는 사람마다 기준이 달라서 안 통합니다. 옆은 몇 mm, 앞머리는 눈썹 위/아래, 전체 느낌은 사진 한 장. 이 셋만 정해가면 실패가 확 줍니다. 사진은 원하는 것 하나, 피하고 싶은 것 하나를 같이 보여주는 게 제일 정확해요. 5 차분한 부엉이 #0774 37.5°C" [ref=f11e57] [cursor=pointer]':
+          - /url: /post/aaaa0006-0000-4000-8000-000000000002
+          - generic [ref=f11e58]:
+            - generic [ref=f11e59]: 헤어
+            - generic [ref=f11e60]: 정보
+            - generic [ref=f11e61]: 8시간 전
+          - paragraph [ref=f11e62]: 미용실에서 통하는 말 세 가지
+          - paragraph [ref=f11e63]: "\"짧게\"는 사람마다 기준이 달라서 안 통합니다. 옆은 몇 mm, 앞머리는 눈썹 위/아래, 전체 느낌은 사진 한 장. 이 셋만 정해가면 실패가 확 줍니다. 사진은 원하는 것 하나, 피하고 싶은 것 하나를 같이 보여주는 게 제일 정확해요."
+          - generic [ref=f11e64]: "5"
+          - generic [ref=f11e68]:
+            - generic [ref=f11e69]: "차분한 부엉이 #0774"
+            - generic [ref=f11e70]: 37.5°C
+        - 'link "스킨케어 정보 8시간 전 선크림 백탁 줄이는 순서 무기자차는 바르고 바로 문지르면 하얗게 뜹니다. 점 찍듯 올린 뒤 30초 두고 두드려 펴면 훨씬 덜해요. 톤업 기능이 들어간 제품은 백탁이 기능이라 아무리 발라도 안 없어집니다 — 성분표에서 티타늄디옥사이드 함량을 먼저 보세요. 4 4 정갈한 여우 #0192 38.9°C" [ref=f11e71] [cursor=pointer]':
+          - /url: /post/aaaa0006-0000-4000-8000-000000000003
+          - generic [ref=f11e72]:
+            - generic [ref=f11e73]: 스킨케어
+            - generic [ref=f11e74]: 정보
+            - generic [ref=f11e75]: 8시간 전
+          - paragraph [ref=f11e76]: 선크림 백탁 줄이는 순서
+          - paragraph [ref=f11e77]: 무기자차는 바르고 바로 문지르면 하얗게 뜹니다. 점 찍듯 올린 뒤 30초 두고 두드려 펴면 훨씬 덜해요. 톤업 기능이 들어간 제품은 백탁이 기능이라 아무리 발라도 안 없어집니다 — 성분표에서 티타늄디옥사이드 함량을 먼저 보세요.
+          - generic [ref=f11e78]:
+            - generic [ref=f11e79]: "4"
+            - generic [ref=f11e82]: "4"
+          - generic [ref=f11e85]:
+            - generic [ref=f11e86]: "정갈한 여우 #0192"
+            - generic [ref=f11e87]: 38.9°C
+        - 'link "헤어 투표 9시간 전 투블럭 옆머리 어디까지 치는 게 무난할까요 기르는 중인데 옆이 붕 떠서 고민이에요. 6mm랑 9mm 중에 어느 쪽이 나아 보이나요? 13 3 성실한 라쿤 #1204 36.5°C" [ref=f11e88] [cursor=pointer]':
+          - /url: /post/aaaa0001-0000-4000-8000-000000000001
+          - generic [ref=f11e89]:
+            - generic [ref=f11e90]: 헤어
+            - generic [ref=f11e91]: 투표
+            - generic [ref=f11e92]: 9시간 전
+          - paragraph [ref=f11e93]: 투블럭 옆머리 어디까지 치는 게 무난할까요
+          - paragraph [ref=f11e94]: 기르는 중인데 옆이 붕 떠서 고민이에요. 6mm랑 9mm 중에 어느 쪽이 나아 보이나요?
+          - generic [ref=f11e95]:
+            - generic [ref=f11e96]: "13"
+            - generic [ref=f11e100]: "3"
+          - generic [ref=f11e103]:
+            - generic [ref=f11e104]: "성실한 라쿤 #1204"
+            - generic [ref=f11e105]: 36.5°C
+        - 'link "옷 투표 9시간 전 겨울 코트 색깔 뭐가 더 무난할까요 회사 통근용으로 하나 살 건데 블랙이랑 카멜 중에 고민이에요. 둘 다 무난한 편인 것 같아서 의견 듣고 싶습니다. 15 7 성실한 라쿤 #1204 36.5°C" [ref=f11e106] [cursor=pointer]':
+          - /url: /post/aaaa0002-0000-4000-8000-000000000001
+          - generic [ref=f11e107]:
+            - generic [ref=f11e108]: 옷
+            - generic [ref=f11e109]: 투표
+            - generic [ref=f11e110]: 9시간 전
+          - paragraph [ref=f11e111]: 겨울 코트 색깔 뭐가 더 무난할까요
+          - paragraph [ref=f11e112]: 회사 통근용으로 하나 살 건데 블랙이랑 카멜 중에 고민이에요. 둘 다 무난한 편인 것 같아서 의견 듣고 싶습니다.
+          - generic [ref=f11e113]:
+            - generic [ref=f11e114]: "15"
+            - generic [ref=f11e118]: "7"
+          - generic [ref=f11e121]:
+            - generic [ref=f11e122]: "성실한 라쿤 #1204"
+            - generic [ref=f11e123]: 36.5°C
+        - 'link "헤어 무난함 79% 9시간 전 이 앞머리 길이 무난한가요 눈썹 살짝 덮는 정도인데 회사 다니기에 부담스럽지 않을지 궁금합니다. 1 부지런한 판다 #3901 36.5°C" [ref=f11e124] [cursor=pointer]':
+          - /url: /post/aaaa0001-0000-4000-8000-000000000002
+          - generic [ref=f11e125]:
+            - generic [ref=f11e126]: 헤어
+            - generic [ref=f11e127]: 무난함 79%
+            - generic [ref=f11e128]: 9시간 전
+          - paragraph [ref=f11e129]: 이 앞머리 길이 무난한가요
+          - paragraph [ref=f11e130]: 눈썹 살짝 덮는 정도인데 회사 다니기에 부담스럽지 않을지 궁금합니다.
+          - generic [ref=f11e131]: "1"
+          - generic [ref=f11e135]:
+            - generic [ref=f11e136]: "부지런한 판다 #3901"
+            - generic [ref=f11e137]: 36.5°C
+        - 'link "바디&향수 무난함 82% 9시간 전 이 향수 데일리로 뿌리기 무난한가요 우디 계열인데 회사에서 매일 뿌려도 부담스럽지 않을지 궁금합니다. 잔향은 강하지 않은 편이에요. 2 부지런한 판다 #3901 36.5°C" [ref=f11e138] [cursor=pointer]':
+          - /url: /post/aaaa0004-0000-4000-8000-000000000001
+          - generic [ref=f11e139]:
+            - generic [ref=f11e140]: 바디&향수
+            - generic [ref=f11e141]: 무난함 82%
+            - generic [ref=f11e142]: 9시간 전
+          - paragraph [ref=f11e143]: 이 향수 데일리로 뿌리기 무난한가요
+          - paragraph [ref=f11e144]: 우디 계열인데 회사에서 매일 뿌려도 부담스럽지 않을지 궁금합니다. 잔향은 강하지 않은 편이에요.
+          - generic [ref=f11e145]: "2"
+          - generic [ref=f11e149]:
+            - generic [ref=f11e150]: "부지런한 판다 #3901"
+            - generic [ref=f11e151]: 36.5°C
+        - 'link "스킨케어 10시간 전 스킨케어 기본템 추천해주세요 지성 피부인데 세안 후 당김이 심해요. 토너-로션 순서로 쓰는 제품 중에 무난한 조합 부탁드립니다. 6 조용한 수달 #0587 36.5°C" [ref=f11e152] [cursor=pointer]':
+          - /url: /post/aaaa0003-0000-4000-8000-000000000001
+          - generic [ref=f11e153]:
+            - generic [ref=f11e154]: 스킨케어
+            - generic [ref=f11e155]: 10시간 전
+          - paragraph [ref=f11e156]: 스킨케어 기본템 추천해주세요
+          - paragraph [ref=f11e157]: 지성 피부인데 세안 후 당김이 심해요. 토너-로션 순서로 쓰는 제품 중에 무난한 조합 부탁드립니다.
+          - generic [ref=f11e158]: "6"
+          - generic [ref=f11e162]:
+            - generic [ref=f11e163]: "조용한 수달 #0587"
+            - generic [ref=f11e164]: 36.5°C
+        - 'link "옷 무난함 92% 10시간 전 이 재킷 무난하게 입고 다닐 수 있나요 어깨가 조금 넓은 편인데 이런 핏이 튀어 보이지 않을지 봐주세요. 4 조용한 수달 #0587 36.5°C" [ref=f11e165] [cursor=pointer]':
+          - /url: /post/aaaa0002-0000-4000-8000-000000000002
+          - generic [ref=f11e166]:
+            - generic [ref=f11e167]: 옷
+            - generic [ref=f11e168]: 무난함 92%
+            - generic [ref=f11e169]: 10시간 전
+          - paragraph [ref=f11e170]: 이 재킷 무난하게 입고 다닐 수 있나요
+          - paragraph [ref=f11e171]: 어깨가 조금 넓은 편인데 이런 핏이 튀어 보이지 않을지 봐주세요.
+          - generic [ref=f11e172]: "4"
+          - generic [ref=f11e176]:
+            - generic [ref=f11e177]: "조용한 수달 #0587"
+            - generic [ref=f11e178]: 36.5°C
+        - 'link "자유 10시간 전 다들 아침 루틴 몇 시에 시작하세요 요즘 기상이 계속 늦어지는데, 씻고 스킨케어까지 챙기는 분들은 몇 시에 일어나시는지 궁금해요. 2 느긋한 곰 #2210 36.5°C" [ref=f11e179] [cursor=pointer]':
+          - /url: /post/aaaa0005-0000-4000-8000-000000000001
+          - generic [ref=f11e180]:
+            - generic [ref=f11e181]: 자유
+            - generic [ref=f11e182]: 10시간 전
+          - paragraph [ref=f11e183]: 다들 아침 루틴 몇 시에 시작하세요
+          - paragraph [ref=f11e184]: 요즘 기상이 계속 늦어지는데, 씻고 스킨케어까지 챙기는 분들은 몇 시에 일어나시는지 궁금해요.
+          - generic [ref=f11e185]: "2"
+          - generic [ref=f11e189]:
+            - generic [ref=f11e190]: "느긋한 곰 #2210"
+            - generic [ref=f11e191]: 36.5°C
+        - 'link "스킨케어 무난함 62% 10시간 전 이 선크림 백탁 없이 무난한가요 실내에서 형광등 아래 찍은 사진이에요. 얼굴만 하얗게 뜨는 느낌인지 봐주세요. 1 정갈한 여우 #0192 38.9°C" [ref=f11e192] [cursor=pointer]':
+          - /url: /post/aaaa0003-0000-4000-8000-000000000002
+          - generic [ref=f11e193]:
+            - generic [ref=f11e194]: 스킨케어
+            - generic [ref=f11e195]: 무난함 62%
+            - generic [ref=f11e196]: 10시간 전
+          - paragraph [ref=f11e197]: 이 선크림 백탁 없이 무난한가요
+          - paragraph [ref=f11e198]: 실내에서 형광등 아래 찍은 사진이에요. 얼굴만 하얗게 뜨는 느낌인지 봐주세요.
+          - generic [ref=f11e199]: "1"
+          - generic [ref=f11e203]:
+            - generic [ref=f11e204]: "정갈한 여우 #0192"
+            - generic [ref=f11e205]: 38.9°C
+        - 'link "헤어 11시간 전 미용실에서 뭐라고 말해야 원하는 머리가 나오나요 매번 사진 보여줘도 다르게 나와요. 다들 어떻게 주문하시는지 궁금합니다. 3 정갈한 여우 #0192 38.9°C" [ref=f11e206] [cursor=pointer]':
+          - /url: /post/aaaa0001-0000-4000-8000-000000000003
+          - generic [ref=f11e207]:
+            - generic [ref=f11e208]: 헤어
+            - generic [ref=f11e209]: 11시간 전
+          - paragraph [ref=f11e210]: 미용실에서 뭐라고 말해야 원하는 머리가 나오나요
+          - paragraph [ref=f11e211]: 매번 사진 보여줘도 다르게 나와요. 다들 어떻게 주문하시는지 궁금합니다.
+          - generic [ref=f11e212]: "3"
+          - generic [ref=f11e216]:
+            - generic [ref=f11e217]: "정갈한 여우 #0192"
+            - generic [ref=f11e218]: 38.9°C
+        - 'link "바디&향수 11시간 전 향수 처음 사는데 뭐부터 봐야 하나요 시향하러 가면 다 좋게 느껴져서 고르질 못하겠어요. 첫 향수 고르는 기준이 있을까요? 3 차분한 부엉이 #0774 37.5°C" [ref=f11e219] [cursor=pointer]':
+          - /url: /post/aaaa0004-0000-4000-8000-000000000002
+          - generic [ref=f11e220]:
+            - generic [ref=f11e221]: 바디&향수
+            - generic [ref=f11e222]: 11시간 전
+          - paragraph [ref=f11e223]: 향수 처음 사는데 뭐부터 봐야 하나요
+          - paragraph [ref=f11e224]: 시향하러 가면 다 좋게 느껴져서 고르질 못하겠어요. 첫 향수 고르는 기준이 있을까요?
+          - generic [ref=f11e225]: "3"
+          - generic [ref=f11e229]:
+            - generic [ref=f11e230]: "차분한 부엉이 #0774"
+            - generic [ref=f11e231]: 37.5°C
+        - 'link "옷 12시간 전 반팔 오버핏 아직도 괜찮은지 애매하네요 작년까지는 다 오버핏이었는데 요즘 매장 보면 좁아진 것 같아서요. 지금 사면 손해일까요? 5 느긋한 곰 #2210 36.5°C" [ref=f11e232] [cursor=pointer]':
+          - /url: /post/aaaa0002-0000-4000-8000-000000000003
+          - generic [ref=f11e233]:
+            - generic [ref=f11e234]: 옷
+            - generic [ref=f11e235]: 12시간 전
+          - paragraph [ref=f11e236]: 반팔 오버핏 아직도 괜찮은지 애매하네요
+          - paragraph [ref=f11e237]: 작년까지는 다 오버핏이었는데 요즘 매장 보면 좁아진 것 같아서요. 지금 사면 손해일까요?
+          - generic [ref=f11e238]: "5"
+          - generic [ref=f11e242]:
+            - generic [ref=f11e243]: "느긋한 곰 #2210"
+            - generic [ref=f11e244]: 36.5°C
+        - 'link "스킨케어 13시간 전 지성 피부인데 아침에도 폼클렌징 해야 하나요 물세안만 하면 낮에 번들거리고, 폼클을 쓰면 당겨요. 다들 어떻게 하시나요. 3 부지런한 판다 #3901 36.5°C" [ref=f11e245] [cursor=pointer]':
+          - /url: /post/aaaa0003-0000-4000-8000-000000000003
+          - generic [ref=f11e246]:
+            - generic [ref=f11e247]: 스킨케어
+            - generic [ref=f11e248]: 13시간 전
+          - paragraph [ref=f11e249]: 지성 피부인데 아침에도 폼클렌징 해야 하나요
+          - paragraph [ref=f11e250]: 물세안만 하면 낮에 번들거리고, 폼클을 쓰면 당겨요. 다들 어떻게 하시나요.
+          - generic [ref=f11e251]: "3"
+          - generic [ref=f11e255]:
+            - generic [ref=f11e256]: "부지런한 판다 #3901"
+            - generic [ref=f11e257]: 36.5°C
+        - 'link "옷 투표 14시간 전 면접 넥타이 뭐가 무난해요 차콜 정장에 화이트 셔츠입니다. 첫 대면 면접이라 튀지 않게 가고 싶어요. 13 6 차분한 부엉이 #0774 37.5°C" [ref=f11e258] [cursor=pointer]':
+          - /url: /post/aaaa0002-0000-4000-8000-000000000004
+          - generic [ref=f11e259]:
+            - generic [ref=f11e260]: 옷
+            - generic [ref=f11e261]: 투표
+            - generic [ref=f11e262]: 14시간 전
+          - paragraph [ref=f11e263]: 면접 넥타이 뭐가 무난해요
+          - paragraph [ref=f11e264]: 차콜 정장에 화이트 셔츠입니다. 첫 대면 면접이라 튀지 않게 가고 싶어요.
+          - generic [ref=f11e265]:
+            - generic [ref=f11e266]: "13"
+            - generic [ref=f11e270]: "6"
+          - generic [ref=f11e273]:
+            - generic [ref=f11e274]: "차분한 부엉이 #0774"
+            - generic [ref=f11e275]: 37.5°C
+        - 'link "바디&향수 투표 15시간 전 바디워시 향 어떤 계열이 무난해요 같이 사는 사람이 향에 민감해서요. 둘 중에 덜 부담스러운 쪽으로 고르려고 합니다. 12 2 느긋한 곰 #2210 36.5°C" [ref=f11e276] [cursor=pointer]':
+          - /url: /post/aaaa0004-0000-4000-8000-000000000003
+          - generic [ref=f11e277]:
+            - generic [ref=f11e278]: 바디&향수
+            - generic [ref=f11e279]: 투표
+            - generic [ref=f11e280]: 15시간 전
+          - paragraph [ref=f11e281]: 바디워시 향 어떤 계열이 무난해요
+          - paragraph [ref=f11e282]: 같이 사는 사람이 향에 민감해서요. 둘 중에 덜 부담스러운 쪽으로 고르려고 합니다.
+          - generic [ref=f11e283]:
+            - generic [ref=f11e284]: "12"
+            - generic [ref=f11e288]: "2"
+          - generic [ref=f11e291]:
+            - generic [ref=f11e292]: "느긋한 곰 #2210"
+            - generic [ref=f11e293]: 36.5°C
+        - 'link "자유 16시간 전 자기관리 시작하고 뭐가 제일 달라졌나요 한 달째 하고 있는데 눈에 띄는 변화가 없어서 좀 지칩니다. 다들 언제부터 체감하셨어요? 2 성실한 라쿤 #1204 36.5°C" [ref=f11e294] [cursor=pointer]':
+          - /url: /post/aaaa0005-0000-4000-8000-000000000002
+          - generic [ref=f11e295]:
+            - generic [ref=f11e296]: 자유
+            - generic [ref=f11e297]: 16시간 전
+          - paragraph [ref=f11e298]: 자기관리 시작하고 뭐가 제일 달라졌나요
+          - paragraph [ref=f11e299]: 한 달째 하고 있는데 눈에 띄는 변화가 없어서 좀 지칩니다. 다들 언제부터 체감하셨어요?
+          - generic [ref=f11e300]: "2"
+          - generic [ref=f11e304]:
+            - generic [ref=f11e305]: "성실한 라쿤 #1204"
+            - generic [ref=f11e306]: 36.5°C
+        - 'link "자유 무난함 50% 18시간 전 주말에 이 정도 차림으로 나가도 무난한가요 동네 카페 가는 정도인데 너무 대충인가 싶어서요. 1 조용한 수달 #0587 36.5°C" [ref=f11e307] [cursor=pointer]':
+          - /url: /post/aaaa0005-0000-4000-8000-000000000003
+          - generic [ref=f11e308]:
+            - generic [ref=f11e309]: 자유
+            - generic [ref=f11e310]: 무난함 50%
+            - generic [ref=f11e311]: 18시간 전
+          - paragraph [ref=f11e312]: 주말에 이 정도 차림으로 나가도 무난한가요
+          - paragraph [ref=f11e313]: 동네 카페 가는 정도인데 너무 대충인가 싶어서요.
+          - generic [ref=f11e314]: "1"
+          - generic [ref=f11e318]:
+            - generic [ref=f11e319]: "조용한 수달 #0587"
+            - generic [ref=f11e320]: 36.5°C
+    - link "글쓰기" [ref=f11e321] [cursor=pointer]:
+      - /url: /write
+      - generic: +
+      - generic: +
+      - generic: +
+      - generic: +
+    - navigation [ref=f11e323]:
+      - link "커뮤니티" [ref=f11e324] [cursor=pointer]:
+        - /url: /
+      - link "도서관" [ref=f11e329] [cursor=pointer]:
+        - /url: /library
+      - link "컨설팅" [ref=f11e334] [cursor=pointer]:
+        - /url: /experts
+      - link "내정보" [ref=f11e339] [cursor=pointer]:
+        - /url: /me
+  - button "Open Next.js Dev Tools" [ref=f11e349] [cursor=pointer]
+  - alert [ref=f11e353]

@@ -1,0 +1,26 @@
+- generic [ref=f59e1]:
+  - generic [ref=f59e2]:
+    - banner [ref=f59e3]:
+      - link "뒤로" [ref=f59e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f59e8]: GUYDE
+      - button "더보기" [ref=f59e21]
+    - main [ref=f59e26]:
+      - article [ref=f59e27]:
+        - generic [ref=f59e28]:
+          - generic [ref=f59e29]: 자유
+          - generic [ref=f59e30]: 1시간 전
+        - generic [ref=f59e31]:
+          - generic [ref=f59e32]: "부지런한 다람쥐 #2651"
+          - generic [ref=f59e33]: 36.5°C
+        - heading "맛있겠지요" [level=1] [ref=f59e34]
+        - paragraph [ref=f59e35]: 묵호 콩국이랑 문어닭강정입니다. 참말로 맛있어요
+        - button "사진 크게 보기" [active] [ref=f59e36]
+        - dialog [ref=f59e38]:
+          - button "닫기" [ref=f59e40]: ×
+      - paragraph [ref=f59e42]: COMMENTS 0
+      - generic [ref=f59e44]:
+        - textbox "댓글을 남겨보세요" [ref=f59e45]
+        - button "등록" [disabled] [ref=f59e46]
+  - button "Open Next.js Dev Tools" [ref=f59e15] [cursor=pointer]
+  - alert [ref=f59e19]

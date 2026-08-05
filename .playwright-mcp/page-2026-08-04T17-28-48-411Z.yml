@@ -1,0 +1,39 @@
+- generic [active] [ref=f8e1]:
+  - generic [ref=f8e2]:
+    - banner [ref=f8e3]:
+      - generic [ref=f8e4]:
+        - paragraph [ref=f8e5]: GUYDE+
+        - paragraph [ref=f8e6]: GUY를 위한 GUIDE.
+      - link "하트 충전" [ref=f8e7] [cursor=pointer]:
+        - /url: /hearts
+        - generic [ref=f8e10]: –
+    - main [ref=f8e11]:
+      - generic [ref=f8e12]:
+        - button "전체" [ref=f8e13]
+        - button "무난무난" [ref=f8e14]
+        - button "정보공유" [ref=f8e15]
+        - button "헤어" [ref=f8e16]
+        - button "옷" [ref=f8e17]
+        - button "스킨케어" [ref=f8e18]
+        - button "바디&향수" [ref=f8e19]
+        - button "자유" [ref=f8e20]
+      - generic [ref=f8e21]:
+        - button "최신순" [ref=f8e22]
+        - button "인기순" [ref=f8e23]
+      - paragraph [ref=f8e25]: 불러오는 중…
+    - link "글쓰기" [ref=f8e26] [cursor=pointer]:
+      - /url: /write
+      - generic: +
+      - generic: +
+      - generic: +
+      - generic: +
+    - navigation [ref=f8e28]:
+      - link "커뮤니티" [ref=f8e29] [cursor=pointer]:
+        - /url: /
+      - link "도서관" [ref=f8e34] [cursor=pointer]:
+        - /url: /library
+      - link "컨설팅" [ref=f8e39] [cursor=pointer]:
+        - /url: /experts
+      - link "내정보" [ref=f8e44] [cursor=pointer]:
+        - /url: /me
+  - button "Open Next.js Dev Tools" [ref=f8e54] [cursor=pointer]

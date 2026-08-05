@@ -180,18 +180,151 @@ const articles: Article[] = [
   },
 ];
 
+/**
+ * 테스트 문항.
+ *
+ * 결과 타입을 여러 개 두고 점수를 매기는 대신, 선택지마다 가중치를 주고
+ * 합이 가장 높은 결과를 낸다 — 문항이 4개뿐이라 이 정도면 충분하고,
+ * 무엇보다 "어떤 답을 골라도 결과가 하나"인 가짜 테스트를 피할 수 있다.
+ */
+export type QuizQuestion = {
+  q: string;
+  options: { text: string; scores: Record<string, number> }[];
+};
+
 export type Quiz = {
   id: string;
   slug: string;
   title: string;
   category: Category;
   taker_count: number;
+  questions: QuizQuestion[];
 };
 
 const quizzes: Quiz[] = [
-  { id: "q-hair", slug: "hair-shape", title: "내 얼굴형에 맞는 헤어는?", category: "옷", taker_count: 12402 },
-  { id: "q-skin", slug: "skin-type", title: "내 피부 타입 진단", category: "스킨케어", taker_count: 8915 },
-  { id: "q-perfume", slug: "perfume-taste", title: "나의 향수 취향 찾기", category: "바디&향수", taker_count: 6203 },
+  {
+    id: "q-hair",
+    slug: "hair-shape",
+    title: "내 얼굴형에 맞는 헤어는?",
+    category: "헤어",
+    taker_count: 12402,
+    questions: [
+      {
+        q: "거울을 봤을 때 얼굴이 어떤 편인가요?",
+        options: [
+          { text: "세로로 길쭉한 편", scores: { long: 2 } },
+          { text: "가로로 넓은 편", scores: { round: 2 } },
+          { text: "턱선이 각진 편", scores: { square: 2 } },
+        ],
+      },
+      {
+        q: "이마는 어떤가요?",
+        options: [
+          { text: "넓은 편이라 자꾸 가리게 된다", scores: { long: 2 } },
+          { text: "좁아서 앞머리를 올리는 편", scores: { round: 1, square: 1 } },
+          { text: "보통", scores: { round: 1 } },
+        ],
+      },
+      {
+        q: "머리를 만졌을 때 느낌은?",
+        options: [
+          { text: "가늘고 힘이 없다", scores: { long: 1, round: 1 } },
+          { text: "굵고 뻣뻣하다", scores: { square: 2 } },
+          { text: "곱슬기가 있다", scores: { round: 2 } },
+        ],
+      },
+      {
+        q: "미용실에서 제일 자주 듣는 말은?",
+        options: [
+          { text: "옆이 자꾸 뜬다", scores: { long: 2 } },
+          { text: "숱이 많다", scores: { square: 1, round: 1 } },
+          { text: "두상이 예쁘다", scores: { round: 2 } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "q-skin",
+    slug: "skin-type",
+    title: "내 피부 타입 진단",
+    category: "스킨케어",
+    taker_count: 8915,
+    questions: [
+      {
+        q: "세안하고 아무것도 안 바르면 30분 뒤에?",
+        options: [
+          { text: "이마·코가 번들거린다", scores: { oily: 2 } },
+          { text: "얼굴 전체가 당긴다", scores: { dry: 2 } },
+          { text: "T존만 번들, 볼은 당김", scores: { combo: 2 } },
+        ],
+      },
+      {
+        q: "낮 12시쯤 거울을 보면?",
+        options: [
+          { text: "기름종이가 필요하다", scores: { oily: 2 } },
+          { text: "각질이 일어나 있다", scores: { dry: 2 } },
+          { text: "코만 살짝 번들거린다", scores: { combo: 2 } },
+        ],
+      },
+      {
+        q: "트러블은 어떤가요?",
+        options: [
+          { text: "자주 올라온다", scores: { oily: 2 } },
+          { text: "거의 없는데 붉어진다", scores: { dry: 1, combo: 1 } },
+          { text: "가끔 T존에만", scores: { combo: 2 } },
+        ],
+      },
+      {
+        q: "겨울에 얼굴이?",
+        options: [
+          { text: "그래도 번들거린다", scores: { oily: 2 } },
+          { text: "심하게 건조하다", scores: { dry: 2 } },
+          { text: "볼만 건조하다", scores: { combo: 2 } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "q-perfume",
+    slug: "perfume-taste",
+    title: "나의 향수 취향 찾기",
+    category: "바디&향수",
+    taker_count: 6203,
+    questions: [
+      {
+        q: "향수를 뿌리는 이유에 가까운 건?",
+        options: [
+          { text: "튀지 않게 깔끔한 인상", scores: { woody: 2 } },
+          { text: "기억에 남는 향", scores: { spicy: 2 } },
+          { text: "산뜻하고 가벼운 느낌", scores: { citrus: 2 } },
+        ],
+      },
+      {
+        q: "어디에 주로 뿌리나요?",
+        options: [
+          { text: "출근·등교할 때 매일", scores: { woody: 2 } },
+          { text: "약속 있는 날만", scores: { spicy: 2 } },
+          { text: "운동하거나 더울 때", scores: { citrus: 2 } },
+        ],
+      },
+      {
+        q: "이런 향은 부담스럽다",
+        options: [
+          { text: "달고 무거운 향", scores: { woody: 1, citrus: 1 } },
+          { text: "비누 냄새처럼 흔한 향", scores: { spicy: 2 } },
+          { text: "나무·흙 냄새", scores: { citrus: 2 } },
+        ],
+      },
+      {
+        q: "지속력은?",
+        options: [
+          { text: "은은하게 오래", scores: { woody: 2 } },
+          { text: "강하게 확실히", scores: { spicy: 2 } },
+          { text: "짧아도 상관없다", scores: { citrus: 2 } },
+        ],
+      },
+    ],
+  },
 ];
 
 export type QuizResult = {
@@ -203,50 +336,152 @@ export type QuizResult = {
   recommendations: string[];
 };
 
-const quizResults: Record<string, QuizResult> = {
+/**
+ * 결과는 slug 하나에 여러 개다. 선택지 가중치의 합이 가장 높은 키가 뽑힌다.
+ * 동점이면 아래 순서에서 먼저 나오는 키가 이긴다 — 무작위로 고르면
+ * 같은 답을 넣었는데 결과가 달라져서 테스트로 안 읽힌다.
+ */
+const quizResults: Record<string, Record<string, QuizResult>> = {
   "skin-type": {
-    quiz_slug: "skin-type",
-    quiz_title: "내 피부 타입 진단",
-    result_type: "복합성 · 수분 부족형",
-    description:
-      "T존은 유분이 많고 볼은 당기는 타입이에요. 겉은 번들거려도 속은 건조해서 유수분 밸런스 관리가 관건입니다.",
-    top_percent: 34,
-    recommendations: [
-      "저자극 젤 타입 세안제로 교체하기",
-      "수분 토너 후 가벼운 로션으로 마무리",
-      "T존만 위크엔드 팩으로 유분 관리",
-    ],
+    combo: {
+      quiz_slug: "skin-type",
+      quiz_title: "내 피부 타입 진단",
+      result_type: "복합성 · 수분 부족형",
+      description:
+        "T존은 유분이 많고 볼은 당기는 타입이에요. 겉은 번들거려도 속은 건조해서 유수분 밸런스 관리가 관건입니다.",
+      top_percent: 34,
+      recommendations: [
+        "저자극 젤 타입 세안제로 교체하기",
+        "수분 토너 후 가벼운 로션으로 마무리",
+        "T존만 위크엔드 팩으로 유분 관리",
+      ],
+    },
+    oily: {
+      quiz_slug: "skin-type",
+      quiz_title: "내 피부 타입 진단",
+      result_type: "지성 · 유분 과다형",
+      description:
+        "하루 종일 유분이 올라오는 타입이에요. 기름을 걷어내는 것보다 덜 나오게 두는 쪽이 결과가 낫습니다. 세게 닦아낼수록 더 나옵니다.",
+      top_percent: 29,
+      recommendations: [
+        "하루 두 번까지만 세안하기",
+        "무거운 크림 대신 가벼운 수분 젤",
+        "기름종이는 눌러서 흡수만, 문지르지 않기",
+      ],
+    },
+    dry: {
+      quiz_slug: "skin-type",
+      quiz_title: "내 피부 타입 진단",
+      result_type: "건성 · 장벽 약화형",
+      description:
+        "씻고 나면 바로 당기고 각질이 이는 타입이에요. 자극을 줄이고 수분을 가둬두는 순서가 중요합니다.",
+      top_percent: 22,
+      recommendations: [
+        "미온수로 짧게 세안하기",
+        "물기가 남아 있을 때 바로 보습제",
+        "각질은 밀지 말고 보습으로 녹이기",
+      ],
+    },
   },
   "hair-shape": {
-    quiz_slug: "hair-shape",
-    quiz_title: "내 얼굴형에 맞는 헤어는?",
-    result_type: "긴 얼굴형 · 볼륨 보완형",
-    description:
-      "세로가 길어 보이는 편이라 윗머리를 세우기보다 옆으로 넓혀주는 컷이 무난합니다.",
-    top_percent: 28,
-    recommendations: [
-      "앞머리를 조금 내려 세로 길이 줄이기",
-      "옆 볼륨을 살리는 레이어드 컷",
-      "왁스는 매트한 제형으로",
-    ],
+    long: {
+      quiz_slug: "hair-shape",
+      quiz_title: "내 얼굴형에 맞는 헤어는?",
+      result_type: "긴 얼굴형 · 볼륨 보완형",
+      description:
+        "세로가 길어 보이는 편이라 윗머리를 세우기보다 옆으로 넓혀주는 컷이 무난합니다.",
+      top_percent: 28,
+      recommendations: [
+        "앞머리를 조금 내려 세로 길이 줄이기",
+        "옆 볼륨을 살리는 레이어드 컷",
+        "왁스는 매트한 제형으로",
+      ],
+    },
+    round: {
+      quiz_slug: "hair-shape",
+      quiz_title: "내 얼굴형에 맞는 헤어는?",
+      result_type: "둥근 얼굴형 · 세로 보완형",
+      description:
+        "가로가 넓어 보이는 편이라 옆을 정리하고 위를 살짝 세우면 인상이 정돈됩니다.",
+      top_percent: 31,
+      recommendations: [
+        "옆·뒤는 짧게 쳐서 부피 줄이기",
+        "앞머리는 내리기보다 살짝 올리기",
+        "가르마를 한쪽으로 확실히 내기",
+      ],
+    },
+    square: {
+      quiz_slug: "hair-shape",
+      quiz_title: "내 얼굴형에 맞는 헤어는?",
+      result_type: "각진 얼굴형 · 각 완화형",
+      description:
+        "턱선이 뚜렷한 편이에요. 각을 가리기보다 위쪽에 부드러운 흐름을 만들면 균형이 맞습니다.",
+      top_percent: 24,
+      recommendations: [
+        "옆을 너무 밀지 않고 자연스럽게 남기기",
+        "앞머리에 흐름을 주는 컷",
+        "왁스는 딱딱하게 굳지 않는 제형으로",
+      ],
+    },
   },
   "perfume-taste": {
-    quiz_slug: "perfume-taste",
-    quiz_title: "나의 향수 취향 찾기",
-    result_type: "우디 · 데일리형",
-    description:
-      "튀지 않으면서 오래 남는 향을 선호하는 편이에요. 회사나 학교에서도 부담 없는 계열입니다.",
-    top_percent: 41,
-    recommendations: [
-      "우디 계열 오드뚜왈렛부터 시작",
-      "손목 대신 목덜미에 한 번만",
-      "겨울에는 한 번 더 덧뿌리기",
-    ],
+    woody: {
+      quiz_slug: "perfume-taste",
+      quiz_title: "나의 향수 취향 찾기",
+      result_type: "우디 · 데일리형",
+      description:
+        "튀지 않으면서 오래 남는 향을 선호하는 편이에요. 회사나 학교에서도 부담 없는 계열입니다.",
+      top_percent: 41,
+      recommendations: [
+        "우디 계열 오드뚜왈렛부터 시작",
+        "손목 대신 목덜미에 한 번만",
+        "겨울에는 한 번 더 덧뿌리기",
+      ],
+    },
+    citrus: {
+      quiz_slug: "perfume-taste",
+      quiz_title: "나의 향수 취향 찾기",
+      result_type: "시트러스 · 산뜻형",
+      description:
+        "가볍고 깨끗한 향을 좋아하는 편이에요. 지속력이 짧은 계열이라 덧뿌릴 걸 감안하고 고르면 됩니다.",
+      top_percent: 36,
+      recommendations: [
+        "시트러스 계열 오드코롱으로 시작",
+        "여름·운동 전후에 특히 잘 맞는다",
+        "지속력이 짧으니 작은 용량부터",
+      ],
+    },
+    spicy: {
+      quiz_slug: "perfume-taste",
+      quiz_title: "나의 향수 취향 찾기",
+      result_type: "스파이시 · 존재감형",
+      description:
+        "기억에 남는 향을 원하는 편이에요. 다만 강한 계열이라 뿌리는 양을 줄이는 게 실패를 막는 유일한 방법입니다.",
+      top_percent: 18,
+      recommendations: [
+        "한 번만 뿌리고 시작하기",
+        "좁은 실내·식사 자리는 피하기",
+        "겨울 저녁 약속에 특히 잘 맞는다",
+      ],
+    },
   },
 };
-// ─────────────────────────────────────────────────────────────
-// 조회 함수
-// ─────────────────────────────────────────────────────────────
+
+/** 선택지 가중치를 합해 결과 키를 정한다. */
+export function scoreQuiz(quiz: Quiz, picks: number[]): string {
+  const total: Record<string, number> = {};
+  quiz.questions.forEach((q, i) => {
+    const opt = q.options[picks[i]];
+    if (!opt) return;
+    for (const [k, v] of Object.entries(opt.scores)) {
+      total[k] = (total[k] ?? 0) + v;
+    }
+  });
+
+  const keys = Object.keys(quizResults[quiz.slug] ?? {});
+  // 동점일 때 선언 순서가 이기도록 keys를 기준으로 훑는다.
+  return keys.reduce((best, k) => ((total[k] ?? 0) > (total[best] ?? 0) ? k : best), keys[0]);
+}
 
 export const getArticles = () => articles;
 export const getHeroArticle = () => articles.find((a) => a.is_hero) ?? articles[0];
@@ -255,5 +490,6 @@ export const getArticle = (id: string) => articles.find((a) => a.id === id) ?? n
 export const getArticleIds = () => articles.map((a) => a.id);
 
 export const getQuizzes = () => quizzes;
-export const getQuizResult = (slug: string) => quizResults[slug] ?? null;
+export const getQuiz = (slug: string) => quizzes.find((q) => q.slug === slug) ?? null;
+export const getQuizResults = (slug: string) => quizResults[slug] ?? null;
 export const getQuizSlugs = () => Object.keys(quizResults);

@@ -1,0 +1,36 @@
+- generic [active] [ref=f39e1]:
+  - generic [ref=f39e2]:
+    - banner [ref=f39e3]:
+      - generic [ref=f39e4]:
+        - generic [ref=f39e5]: GUYDE
+        - paragraph [ref=f39e14]: GUY를 위한 GUIDE.
+      - link "하트 충전" [ref=f39e15] [cursor=pointer]:
+        - /url: /hearts
+        - generic [ref=f39e18]: –
+    - main [ref=f39e19]:
+      - generic [ref=f39e20]:
+        - button "전체" [ref=f39e21]
+        - button "무난무난" [ref=f39e22]
+        - button "정보공유" [ref=f39e23]
+        - button "헤어" [ref=f39e24]
+        - button "옷" [ref=f39e25]
+        - button "스킨케어" [ref=f39e26]
+        - button "바디&향수" [ref=f39e27]
+        - button "자유" [ref=f39e28]
+      - generic [ref=f39e29]:
+        - button "최신순" [ref=f39e30]
+        - button "인기순" [ref=f39e31]
+      - paragraph [ref=f39e33]: 불러오는 중…
+    - link "글쓰기" [ref=f39e34] [cursor=pointer]:
+      - /url: /write
+    - navigation [ref=f39e36]:
+      - generic [ref=f39e37]:
+        - link "커뮤니티" [ref=f39e40] [cursor=pointer]:
+          - /url: /
+        - link "도서관" [ref=f39e44] [cursor=pointer]:
+          - /url: /library
+        - link "컨설팅" [ref=f39e49] [cursor=pointer]:
+          - /url: /experts
+        - link "내정보" [ref=f39e54] [cursor=pointer]:
+          - /url: /me
+  - alert [ref=f39e59]

@@ -1,0 +1,31 @@
+- generic [active] [ref=f29e1]:
+  - generic [ref=f29e2]:
+    - heading "내정보" [level=1] [ref=f29e4]
+    - main [ref=f29e5]:
+      - generic [ref=f29e6]:
+        - generic [ref=f29e7]: …
+        - button "닉네임 변경" [ref=f29e8]
+      - generic [ref=f29e11]: 36.5°C
+      - paragraph [ref=f29e14]: 고수 자격까지 5.5도 남았어요
+      - generic [ref=f29e16]: 고수 개설하기
+      - generic [ref=f29e21]:
+        - generic [ref=f29e22]: 보유 하트
+        - generic [ref=f29e26]: –개
+      - navigation [ref=f29e27]:
+        - link "내 글" [ref=f29e28] [cursor=pointer]:
+          - /url: /me/activity
+        - link "내 댓글" [ref=f29e32] [cursor=pointer]:
+          - /url: /me/activity?tab=comments
+        - link "내 컨설팅" [ref=f29e36] [cursor=pointer]:
+          - /url: /me/bookings
+    - navigation [ref=f29e40]:
+      - link "커뮤니티" [ref=f29e41] [cursor=pointer]:
+        - /url: /
+      - link "도서관" [ref=f29e45] [cursor=pointer]:
+        - /url: /library
+      - link "컨설팅" [ref=f29e50] [cursor=pointer]:
+        - /url: /experts
+      - link "내정보" [ref=f29e55] [cursor=pointer]:
+        - /url: /me
+  - button "Open Next.js Dev Tools" [ref=f29e65] [cursor=pointer]
+  - alert [ref=f29e69]

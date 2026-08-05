@@ -1,0 +1,16 @@
+- generic [active] [ref=f58e1]:
+  - generic [ref=f58e2]:
+    - banner [ref=f58e3]:
+      - generic [ref=f58e4]: TEST
+    - main [ref=f58e5]:
+      - generic [ref=f58e6]:
+        - paragraph [ref=f58e7]: 내 피부 타입 진단
+        - generic [ref=f58e8]: 3 / 4
+      - paragraph [ref=f58e10]: 트러블은 어떤가요?
+      - generic [ref=f58e11]:
+        - button "자주 올라온다" [ref=f58e32]
+        - button "거의 없는데 붉어진다" [ref=f58e33]
+        - button "가끔 T존에만" [ref=f58e34]
+    - button "이전 문항" [ref=f58e31]
+  - button "Open Next.js Dev Tools" [ref=f58e22] [cursor=pointer]
+  - alert [ref=f58e26]

@@ -1,0 +1,23 @@
+- generic [active] [ref=f41e1]:
+  - main [ref=f41e2]:
+    - generic [ref=f41e3]:
+      - heading "기기 전환 (데모용)" [level=1] [ref=f41e4]
+      - paragraph [ref=f41e5]: 로그인이 없는 앱이라 신원은 localStorage의 UUID 하나뿐이에요. 고수 입장에서 답변을 써보려면 이 값을 시드 고수의 것으로 바꿉니다.
+    - generic [ref=f41e6]:
+      - paragraph [ref=f41e7]: 현재 기기
+      - paragraph [ref=f41e8]: 25cd8aa6-eed4-495e-a74c-5e70d3141e82
+    - generic [ref=f41e9]:
+      - paragraph [ref=f41e10]: 고수로 전환
+      - 'button "정갈한 여우 #4192 · 44.1°C" [ref=f41e11]'
+      - 'button "말쑥한 사슴 #4231 · 43.6°C" [ref=f41e12]'
+      - 'button "차분한 부엉이 #4774 · 42.9°C" [ref=f41e13]'
+      - 'button "말끔한 하마 #4455 · 42.5°C" [ref=f41e14]'
+    - button "완전 초기화 (새 UUID 발급)" [ref=f41e15]
+    - paragraph [ref=f41e16]:
+      - text: "데모 순서: 일반 사용자로 컨설팅을 신청 → 여기서 고수로 전환해 답변 작성 →"
+      - strong [ref=f41e17]: 돌아가기
+      - text: 로 복귀해 답변 확인.
+      - strong [ref=f41e18]: 완전 초기화
+      - text: 는 새 UUID를 발급하므로 그 전에 신청한 컨설팅과 쓴 글이 더 이상 보이지 않아요.
+  - button "Open Next.js Dev Tools" [ref=f41e24] [cursor=pointer]
+  - alert [ref=f41e28]

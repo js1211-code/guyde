@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { ZoomablePhoto } from "@/components/lightbox";
 import { use, useEffect, useRef, useState } from "react";
 import {
   CategoryBadge,
   ExpertBadge,
   MineBadge,
-  PhotoBox,
   PostTypeBadge,
 } from "@/components/badge";
 import {
@@ -119,7 +119,7 @@ export default function PostPage({
           )}
 
           {post.images.map((img) => (
-            <PhotoBox
+            <ZoomablePhoto
               key={img.id}
               src={img.url}
               alt=""

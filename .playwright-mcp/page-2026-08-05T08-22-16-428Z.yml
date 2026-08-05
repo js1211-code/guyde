@@ -1,0 +1,16 @@
+- generic [active] [ref=f58e1]:
+  - generic [ref=f58e2]:
+    - banner [ref=f58e3]:
+      - generic [ref=f58e4]: TEST
+    - main [ref=f58e5]:
+      - generic [ref=f58e6]:
+        - paragraph [ref=f58e7]: 내 피부 타입 진단
+        - generic [ref=f58e8]: 1 / 4
+      - paragraph [ref=f58e10]: 세안하고 아무것도 안 바르면 30분 뒤에?
+      - generic [ref=f58e11]:
+        - button "이마·코가 번들거린다" [ref=f58e12]
+        - button "얼굴 전체가 당긴다" [ref=f58e13]
+        - button "T존만 번들, 볼은 당김" [ref=f58e14]
+    - link "그만두기" [ref=f58e16] [cursor=pointer]:
+      - /url: /library
+  - button "Open Next.js Dev Tools" [ref=f58e22] [cursor=pointer]

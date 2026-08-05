@@ -1,0 +1,10 @@
+- generic [active] [ref=f15e1]:
+  - generic [ref=f15e2]:
+    - banner [ref=f15e3]:
+      - link "뒤로" [ref=f15e5] [cursor=pointer]:
+        - /url: /me/bookings
+      - generic [ref=f15e8]: 내 컨설팅
+    - main [ref=f15e9]:
+      - paragraph [ref=f15e10]: 불러오는 중…
+  - button "Open Next.js Dev Tools" [ref=f15e16] [cursor=pointer]
+  - alert [ref=f15e20]

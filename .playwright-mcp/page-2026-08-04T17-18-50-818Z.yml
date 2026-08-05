@@ -1,0 +1,56 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - banner [ref=f4e3]:
+      - link "뒤로" [ref=f4e5] [cursor=pointer]:
+        - /url: /experts
+      - generic [ref=f4e8]: 사전 설문
+    - main [ref=f4e9]:
+      - generic [ref=f4e10]:
+        - paragraph [ref=f4e11]: 어떤 자리인가요?*
+        - generic [ref=f4e12]:
+          - button "소개팅" [ref=f4e13]
+          - button "데이트" [ref=f4e14]
+          - button "면접" [ref=f4e15]
+          - button "결혼식 하객" [ref=f4e16]
+          - button "일상" [ref=f4e17]
+      - generic [ref=f4e18]:
+        - paragraph [ref=f4e19]: 예산*
+        - generic [ref=f4e20]:
+          - button "15만원" [ref=f4e21]
+          - button "20만원" [ref=f4e22]
+          - button "25만원" [ref=f4e23]
+          - button "30만원" [ref=f4e24]
+        - paragraph [ref=f4e25]: 현재 15~30만원 예산만 지원해요.
+        - list [ref=f4e26]:
+          - listitem [ref=f4e27]: · 15만원 미만 — 상의/하의/신발을 새로 갖추기엔 예산이 빠듯해 만족스러운 제안이 어려워요.
+          - listitem [ref=f4e28]: · 30만원 초과 — 더 큰 예산의 컨설팅은 준비 중이에요.
+      - generic [ref=f4e29]:
+        - paragraph [ref=f4e30]: 전신 사진*
+        - paragraph [ref=f4e31]: 체형 판단과 최종 확정안 사이즈 산정에 쓰여요 · 최대 5장얼굴은 가려도 괜찮아요 — 모자이크·크롭한 사진도 컨설팅엔 충분해요.
+        - generic "사진 추가" [ref=f4e33] [cursor=pointer]
+      - generic [ref=f4e35]:
+        - paragraph [ref=f4e36]: 자주 입는 옷 사진*
+        - paragraph [ref=f4e37]: 지금 뭘 갖고 있는지 알아야 이미 있는 것과 겹치지 않게 골라드릴 수 있어요
+        - generic "사진 추가" [ref=f4e39] [cursor=pointer]
+      - generic [ref=f4e41]:
+        - paragraph [ref=f4e42]: 신경 쓰이는 부위
+        - generic [ref=f4e43]:
+          - button "어깨·상체" [ref=f4e44]
+          - button "배·허리" [ref=f4e45]
+          - button "다리 길이" [ref=f4e46]
+          - button "마른 체형" [ref=f4e47]
+          - button "통통한 체형" [ref=f4e48]
+          - button "키" [ref=f4e49]
+          - button "피부톤" [ref=f4e50]
+        - textbox "어떤 부분이 신경 쓰이는지 적어주세요" [ref=f4e51]
+      - generic [ref=f4e52]:
+        - paragraph [ref=f4e53]: 원하는 스타일
+        - textbox "그 외에 고수에게 전하고 싶은 정보를 적어주세요" [ref=f4e54]
+    - generic [ref=f4e55]:
+      - generic [ref=f4e56]:
+        - generic [ref=f4e57]: 컨설팅비
+        - generic [ref=f4e58]: ₩0
+      - button "₩0 결제하고 제출" [disabled] [ref=f4e59]
+      - paragraph [ref=f4e60]: 자리·예산·사진을 채우면 신청할 수 있어요
+  - button "Open Next.js Dev Tools" [ref=f4e66] [cursor=pointer]
+  - alert [ref=f4e70]

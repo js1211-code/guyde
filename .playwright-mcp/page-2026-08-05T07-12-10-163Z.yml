@@ -1,0 +1,84 @@
+- generic [ref=f46e4]:
+  - navigation [ref=f46e5]:
+    - link "Unsplash 홈" [ref=f46e8] [cursor=pointer]:
+      - /url: /ko
+      - img "Unsplash 홈" [ref=f46e9]
+    - generic [ref=f46e11]:
+      - link "로그인 / 가입" [ref=f46e12] [cursor=pointer]:
+        - /url: /ko/%EB%A1%9C%EA%B7%B8%EC%9D%B8?referrer=%2Fko%2F%25EC%2582%25AC%25EC%25A7%2584%2F%25ED%259D%25B0%25EC%2583%2589-%25ED%2581%25AC%25EB%25A3%25A8%25EB%2584%25A5-%25EC%2585%2594%25EC%25B8%25A0%25EC%2599%2580-%25EA%25B2%2580%25EC%259D%2580%25EC%2583%2589-%25EB%258D%25B0%25EB%258B%2598-%25EC%25B2%25AD%25EB%25B0%2594%25EC%25A7%2580%25EB%25A5%25BC-%25EC%259E%2585%25EA%25B3%25A0-%25EC%25A3%25BC%25EB%25A8%25B8%25EB%258B%2588%25EC%2597%2590-%25EC%2586%2590%25EC%259D%2584-%25EB%2584%25A3%25EC%259D%2580-%25EB%2582%25A8%25EC%259E%2590-7WE1LbSc4zM
+      - button "언어" [ref=f46e15] [cursor=pointer]
+      - button "메뉴" [ref=f46e18] [cursor=pointer]
+  - generic [ref=f46e21]:
+    - generic [ref=f46e22]:
+      - navigation [ref=f46e23]:
+        - search "사이트 전체에서 이미지 찾기" [ref=f46e25]:
+          - button "Unsplash 검색" [ref=f46e26] [cursor=pointer]
+          - combobox [ref=f46e29]:
+            - searchbox "Unsplash 검색" [ref=f46e30]
+            - listbox
+      - generic [ref=f46e31]:
+        - generic [ref=f46e32]:
+          - banner [ref=f46e34]:
+            - generic [ref=f46e36]:
+              - link [ref=f46e37] [cursor=pointer]:
+                - /url: /ko/@brandomakesbranding
+              - generic [ref=f46e40]:
+                - link "Brando Makes Branding" [ref=f46e41] [cursor=pointer]:
+                  - /url: /ko/@brandomakesbranding
+                - link "brandomakesbranding" [ref=f46e43] [cursor=pointer]:
+                  - /url: /ko/@brandomakesbranding
+            - generic [ref=f46e44]:
+              - button "북마크" [ref=f46e45] [cursor=pointer]
+              - button "컬렉션에 추가" [ref=f46e48] [cursor=pointer]
+              - generic [ref=f46e52]:
+                - link "무료 다운로드" [ref=f46e53] [cursor=pointer]:
+                  - /url: https://unsplash.com/photos/7WE1LbSc4zM/download?force=true
+                - button "다운로드 크기 선택" [ref=f46e55] [cursor=pointer]
+          - img "흰색 크루넥 셔츠와 검은색 데님 청바지를 입고 주머니에 손을 넣은 남자" [ref=f46e61]
+          - generic [ref=f46e62]:
+            - generic [ref=f46e63]:
+              - generic [ref=f46e64]:
+                - generic [ref=f46e65]:
+                  - generic [ref=f46e66]: ––– –– ––
+                  - text: ––– –––– ––––
+                - generic [ref=f46e67]:
+                  - generic [ref=f46e68]: ––– –– ––
+                  - text: ––– –––– ––––
+              - generic [ref=f46e69]:
+                - button "이 이미지 공유" [ref=f46e70] [cursor=pointer]
+                - button "이 이미지 관련 통계" [ref=f46e73] [cursor=pointer]
+                - button "더 많은 작업" [ref=f46e76] [cursor=pointer]
+            - generic [ref=f46e80]:
+              - heading "흰색 크루넥 셔츠와 검은색 데님 청바지를 입고 주머니에 손을 넣은 남자" [level=1] [ref=f46e82]
+              - paragraph [ref=f46e86]: 남자, 파랑, 남자 및 티셔츠을(를) 촬영한 Brando Makes Branding (@brandomakesbranding)의 이 무료 HD 사진 다운로드
+              - generic [ref=f46e88]:
+                - generic [ref=f46e93]:
+                  - time [ref=f46e94]: 2019년 11월 19일(UTC)
+                  - text: 에 게시됨
+                - button "Canon, EOS 70D" [ref=f46e99] [cursor=pointer]
+                - generic [ref=f46e103]:
+                  - link "Unsplash 라이선스" [ref=f46e104] [cursor=pointer]:
+                    - /url: /ko/%EB%9D%BC%EC%9D%B4%EC%84%A0%EC%8A%A4
+                  - text: 하에서 무료로 사용 가능
+            - generic [ref=f46e106]:
+              - link "남자" [ref=f46e107] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%EB%82%A8%EC%9E%90
+              - link "파랑" [ref=f46e108] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%ED%8C%8C%EB%9E%91
+              - link "남자" [ref=f46e109] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%EB%82%A8%EC%9E%90
+              - link "티셔츠" [ref=f46e110] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%ED%8B%B0%EC%85%94%EC%B8%A0
+              - link "화이트 티셔츠" [ref=f46e111] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%ED%99%94%EC%9D%B4%ED%8A%B8-%ED%8B%B0%EC%85%94%EC%B8%A0
+              - link "화이트 티셔츠" [ref=f46e112] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%ED%99%94%EC%9D%B4%ED%8A%B8-%ED%8B%B0%EC%85%94%EC%B8%A0
+              - link "티셔츠 모형" [ref=f46e113] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%ED%8B%B0%EC%85%94%EC%B8%A0-%EB%AA%A8%ED%98%95
+              - link "셔츠" [ref=f46e114] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%EC%85%94%EC%B8%A0
+              - link "신사 복" [ref=f46e115] [cursor=pointer]:
+                - /url: /ko/s/%EC%82%AC%EC%A7%84/%EC%8B%A0%EC%82%AC-%EB%B3%B5
+        - paragraph [ref=f46e121]: iStock에서 프리미엄 관련 이미지 찾아보기 | 코드 UNSPLASH20로 20% 할인 혜택 받기
+    - generic:
+      - region "Notifications"

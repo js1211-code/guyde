@@ -1,0 +1,66 @@
+- generic [active] [ref=f42e1]:
+  - generic [ref=f42e2]:
+    - banner [ref=f42e3]:
+      - link "뒤로" [ref=f42e5] [cursor=pointer]:
+        - /url: /experts
+      - generic [ref=f42e8]: 사전 설문
+    - main [ref=f42e9]:
+      - generic [ref=f42e10]:
+        - paragraph [ref=f42e11]:
+          - text: 어떤 자리인가요?
+          - generic [ref=f42e12]: 필수
+        - generic [ref=f42e13]:
+          - button "소개팅" [ref=f42e14]
+          - button "데이트" [ref=f42e15]
+          - button "면접" [ref=f42e16]
+          - button "결혼식 하객" [ref=f42e17]
+          - button "일상" [ref=f42e18]
+      - generic [ref=f42e19]:
+        - paragraph [ref=f42e20]:
+          - text: 예산
+          - generic [ref=f42e21]: 필수
+        - generic [ref=f42e22]:
+          - button "15만원" [ref=f42e23]
+          - button "20만원" [ref=f42e24]
+          - button "25만원" [ref=f42e25]
+          - button "30만원" [ref=f42e26]
+        - paragraph [ref=f42e27]: 현재 15~30만원 예산만 지원해요.
+        - list [ref=f42e28]:
+          - listitem [ref=f42e29]:
+            - generic [ref=f42e30]: ·
+            - generic [ref=f42e31]: 15만원 미만 — 상의/하의/신발을 새로 갖추기엔 예산이 빠듯해 만족스러운 제안이 어려워요.
+          - listitem [ref=f42e32]:
+            - generic [ref=f42e33]: ·
+            - generic [ref=f42e34]: 30만원 초과 — 더 큰 예산의 컨설팅은 준비 중이에요.
+      - generic [ref=f42e35]:
+        - paragraph [ref=f42e36]:
+          - text: 전신 사진
+          - generic [ref=f42e37]: 필수
+        - paragraph [ref=f42e38]: 체형 판단과 최종 확정안 사이즈 산정에 쓰여요 · 최대 5장얼굴은 가려도 괜찮아요 — 모자이크·크롭한 사진도 컨설팅엔 충분해요.
+        - generic "사진 추가" [ref=f42e40] [cursor=pointer]
+      - generic [ref=f42e42]:
+        - paragraph [ref=f42e43]: 자주 입는 옷 사진
+        - paragraph [ref=f42e44]: 지금 뭘 갖고 있는지 알면 겹치지 않게 골라드릴 수 있어요 · 선택
+        - generic "사진 추가" [ref=f42e46] [cursor=pointer]
+      - generic [ref=f42e48]:
+        - paragraph [ref=f42e49]: 신경 쓰이는 부위
+        - generic [ref=f42e50]:
+          - button "어깨·상체" [ref=f42e51]
+          - button "배·허리" [ref=f42e52]
+          - button "다리 길이" [ref=f42e53]
+          - button "마른 체형" [ref=f42e54]
+          - button "통통한 체형" [ref=f42e55]
+          - button "키" [ref=f42e56]
+          - button "피부톤" [ref=f42e57]
+        - textbox "어떤 부분이 신경 쓰이는지 적어주세요" [ref=f42e58]
+      - generic [ref=f42e59]:
+        - paragraph [ref=f42e60]: 원하는 스타일
+        - textbox "그 외에 고수에게 전하고 싶은 정보를 적어주세요" [ref=f42e61]
+    - generic [ref=f42e62]:
+      - generic [ref=f42e63]:
+        - generic [ref=f42e64]: 컨설팅비
+        - generic [ref=f42e65]: ₩0
+      - button "₩0 결제하고 제출" [disabled] [ref=f42e66]
+      - paragraph [ref=f42e67]: 자리·예산·전신 사진을 채우면 신청할 수 있어요
+  - button "Open Next.js Dev Tools" [ref=f42e73] [cursor=pointer]
+  - alert [ref=f42e77]

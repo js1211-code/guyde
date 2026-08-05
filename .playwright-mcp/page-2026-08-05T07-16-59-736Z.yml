@@ -1,0 +1,81 @@
+- generic [active] [ref=f50e1]:
+  - generic [ref=f50e2]:
+    - heading "도서관" [level=1] [ref=f50e4]
+    - generic [ref=f50e5]:
+      - button "아티클" [ref=f50e6]
+      - button "정보 공유" [ref=f50e7]
+    - main [ref=f50e8]:
+      - link "옷 올여름 남자 반팔, 오버핏은 이제 끝났나 체형 상관없이 통했던 오버핏 유행이 저물면서 실루엣이 다시 좁아지고 있다. 무난하게 갈아탈 라인을 정리했다." [ref=f50e9] [cursor=pointer]:
+        - /url: /library/a-oversize
+        - generic [ref=f50e11]: 옷
+        - paragraph [ref=f50e12]: 올여름 남자 반팔, 오버핏은 이제 끝났나
+        - paragraph [ref=f50e13]: 체형 상관없이 통했던 오버핏 유행이 저물면서 실루엣이 다시 좁아지고 있다. 무난하게 갈아탈 라인을 정리했다.
+      - paragraph [ref=f50e14]: ALL
+      - link "선크림 백탁 없는 제품만 모아봤습니다 스킨케어 · 3분" [ref=f50e15] [cursor=pointer]:
+        - /url: /library/a-suncream
+        - generic [ref=f50e17]:
+          - paragraph [ref=f50e18]: 선크림 백탁 없는 제품만 모아봤습니다
+          - paragraph [ref=f50e19]:
+            - generic [ref=f50e20]: 스킨케어
+            - generic [ref=f50e21]: · 3분
+      - link "투블럭, 이제 안 치는 사람이 더 많다 헤어 · 3분" [ref=f50e22] [cursor=pointer]:
+        - /url: /library/a-twoblock
+        - generic [ref=f50e24]:
+          - paragraph [ref=f50e25]: 투블럭, 이제 안 치는 사람이 더 많다
+          - paragraph [ref=f50e26]:
+            - generic [ref=f50e27]: 헤어
+            - generic [ref=f50e28]: · 3분
+      - link "겨울 니트 하나로 3주 버티는 법 옷 · 2분" [ref=f50e29] [cursor=pointer]:
+        - /url: /library/a-knit
+        - generic [ref=f50e31]:
+          - paragraph [ref=f50e32]: 겨울 니트 하나로 3주 버티는 법
+          - paragraph [ref=f50e33]:
+            - generic [ref=f50e34]: 옷
+            - generic [ref=f50e35]: · 2분
+      - link "겨울철 향수, 잔향 오래 남기는 법 바디&향수 · 4분" [ref=f50e36] [cursor=pointer]:
+        - /url: /library/a-perfume
+        - generic [ref=f50e38]:
+          - paragraph [ref=f50e39]: 겨울철 향수, 잔향 오래 남기는 법
+          - paragraph [ref=f50e40]:
+            - generic [ref=f50e41]: 바디&향수
+            - generic [ref=f50e42]: · 4분
+      - link "면접 코디, 무난함의 기준이 바뀌고 있다 옷 · 5분" [ref=f50e43] [cursor=pointer]:
+        - /url: /library/a-interview
+        - generic [ref=f50e45]:
+          - paragraph [ref=f50e46]: 면접 코디, 무난함의 기준이 바뀌고 있다
+          - paragraph [ref=f50e47]:
+            - generic [ref=f50e48]: 옷
+            - generic [ref=f50e49]: · 5분
+      - link "지성 피부를 위한 클렌징 순서 정리 스킨케어 · 3분" [ref=f50e50] [cursor=pointer]:
+        - /url: /library/a-cleansing
+        - generic [ref=f50e52]:
+          - paragraph [ref=f50e53]: 지성 피부를 위한 클렌징 순서 정리
+          - paragraph [ref=f50e54]:
+            - generic [ref=f50e55]: 스킨케어
+            - generic [ref=f50e56]: · 3분
+      - paragraph [ref=f50e57]: TEST
+      - generic [ref=f50e58]:
+        - link [ref=f50e59] [cursor=pointer]:
+          - /url: /library/quiz/hair-shape
+          - paragraph [ref=f50e60]: 내 얼굴형에 맞는 헤어는?
+          - paragraph [ref=f50e61]: 12,402명 참여
+        - link [ref=f50e62] [cursor=pointer]:
+          - /url: /library/quiz/skin-type
+          - paragraph [ref=f50e63]: 내 피부 타입 진단
+          - paragraph [ref=f50e64]: 8,915명 참여
+        - link [ref=f50e65] [cursor=pointer]:
+          - /url: /library/quiz/perfume-taste
+          - paragraph [ref=f50e66]: 나의 향수 취향 찾기
+          - paragraph [ref=f50e67]: 6,203명 참여
+    - navigation [ref=f50e68]:
+      - generic [ref=f50e69]:
+        - link "커뮤니티" [ref=f50e72] [cursor=pointer]:
+          - /url: /
+        - link "도서관" [ref=f50e76] [cursor=pointer]:
+          - /url: /library
+        - link "컨설팅" [ref=f50e81] [cursor=pointer]:
+          - /url: /experts
+        - link "내정보" [ref=f50e86] [cursor=pointer]:
+          - /url: /me
+  - button "Open Next.js Dev Tools" [ref=f50e96] [cursor=pointer]
+  - alert [ref=f50e100]

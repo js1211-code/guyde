@@ -1,0 +1,27 @@
+- generic [active] [ref=f26e1]:
+  - generic [ref=f26e2]:
+    - banner [ref=f26e3]:
+      - link "뒤로" [ref=f26e5] [cursor=pointer]:
+        - /url: /
+      - generic [ref=f26e8]: 글쓰기
+    - main [ref=f26e9]:
+      - heading "어떻게 물어볼까요?" [level=1] [ref=f26e10]
+      - generic [ref=f26e11]:
+        - button [ref=f26e12]:
+          - generic: +
+          - generic: +
+          - paragraph [ref=f26e13]: 일반 글
+          - paragraph [ref=f26e14]: 그냥 이야기하거나 물어보기
+        - button [ref=f26e15]:
+          - generic: +
+          - generic: +
+          - paragraph [ref=f26e16]: 선택지 투표
+          - paragraph [ref=f26e17]: 2~5개 중 골라달라기
+        - button [ref=f26e18]:
+          - generic: +
+          - generic: +
+          - paragraph [ref=f26e19]: 무난함 판정
+          - paragraph [ref=f26e20]: 무난한지 애매한지 판정받기
+    - button "다음" [disabled] [ref=f26e22]
+  - button "Open Next.js Dev Tools" [ref=f26e28] [cursor=pointer]
+  - alert [ref=f26e32]

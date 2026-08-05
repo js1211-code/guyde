@@ -1,0 +1,36 @@
+- generic [active] [ref=f32e1]:
+  - generic [ref=f32e2]:
+    - banner [ref=f32e3]:
+      - generic [ref=f32e4]:
+        - generic [ref=f32e5]: GUYDE
+        - paragraph [ref=f32e14]: GUY를 위한 GUIDE.
+      - link "하트 충전" [ref=f32e15] [cursor=pointer]:
+        - /url: /hearts
+        - generic [ref=f32e18]: –
+    - main [ref=f32e19]:
+      - generic [ref=f32e20]:
+        - button "전체" [ref=f32e21]
+        - button "무난무난" [ref=f32e22]
+        - button "정보공유" [ref=f32e23]
+        - button "헤어" [ref=f32e24]
+        - button "옷" [ref=f32e25]
+        - button "스킨케어" [ref=f32e26]
+        - button "바디&향수" [ref=f32e27]
+        - button "자유" [ref=f32e28]
+      - generic [ref=f32e29]:
+        - button "최신순" [ref=f32e30]
+        - button "인기순" [ref=f32e31]
+      - paragraph [ref=f32e33]: 불러오는 중…
+    - link "글쓰기" [ref=f32e34] [cursor=pointer]:
+      - /url: /write
+    - navigation [ref=f32e36]:
+      - link "커뮤니티" [ref=f32e37] [cursor=pointer]:
+        - /url: /
+      - link "도서관" [ref=f32e42] [cursor=pointer]:
+        - /url: /library
+      - link "컨설팅" [ref=f32e48] [cursor=pointer]:
+        - /url: /experts
+      - link "내정보" [ref=f32e54] [cursor=pointer]:
+        - /url: /me
+  - button "Open Next.js Dev Tools" [ref=f32e65] [cursor=pointer]
+  - alert [ref=f32e69]

@@ -1,0 +1,41 @@
+- generic [active] [ref=f22e1]:
+  - generic [ref=f22e2]:
+    - banner [ref=f22e3]:
+      - link "뒤로" [ref=f22e5] [cursor=pointer]:
+        - /url: /me/bookings
+      - generic [ref=f22e8]: 내 컨설팅
+    - main [ref=f22e9]:
+      - list [ref=f22e11]:
+        - listitem [ref=f22e12]:
+          - generic [ref=f22e13]: "1"
+          - generic [ref=f22e14]: 신청 접수
+        - listitem [ref=f22e15]:
+          - generic [ref=f22e16]: "2"
+          - generic [ref=f22e17]: 답변 도착
+        - listitem [ref=f22e18]:
+          - generic [ref=f22e19]: "3"
+          - generic [ref=f22e20]: 수정 요청됨
+        - listitem [ref=f22e21]:
+          - generic [ref=f22e22]: "4"
+          - generic [ref=f22e23]: 완료
+      - generic [ref=f22e24]:
+        - generic [ref=f22e25]:
+          - generic [ref=f22e26]: 고수
+          - generic [ref=f22e27]: "말끔한 하마 #0455"
+          - generic [ref=f22e28]: 42.5°C
+          - generic [ref=f22e29]: 신청 접수
+        - generic [ref=f22e30]:
+          - generic [ref=f22e31]: 목적
+          - generic [ref=f22e32]: 면접
+        - generic [ref=f22e33]:
+          - generic [ref=f22e34]: 예산
+          - generic [ref=f22e35]: 15~30만원
+        - generic [ref=f22e36]:
+          - generic [ref=f22e37]: 신경 쓰이는 부위
+          - generic [ref=f22e38]: 배·허리
+      - generic [ref=f22e39]:
+        - paragraph [ref=f22e40]: 신청이 접수됐어요
+        - paragraph [ref=f22e41]: 48시간 안에 1회차 답변이 도착해요46시간 남음
+    - link "내 컨설팅 보기" [ref=f22e43] [cursor=pointer]:
+      - /url: /me/bookings
+  - button "Open Next.js Dev Tools" [ref=f22e49] [cursor=pointer]
