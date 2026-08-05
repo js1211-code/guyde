@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
 import { HeartIcon, MessageIcon, VoteIcon } from "@/components/icons";
-import { NoticeBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
@@ -82,28 +81,26 @@ export function Feed() {
         ))}
       </div>
 
-      {isTypeTab(tab) ? (
-        <NoticeBar>
-          {tab === "무난무난"
-            ? "대중이 무난하다고 판정한 글만 모았어요"
-            : "묻는 글이 아니라 알려주는 글만 모았어요"}
-        </NoticeBar>
-      ) : (
-        <div className="flex items-center gap-3 px-4 py-2">
-          {(["최신순", "인기순"] as Sort[]).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setSort(s)}
-              className={`text-[12.5px] ${
-                sort === s ? "font-bold text-brand" : "text-neutral-500"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
+      {/*
+        탭마다 안내 띠를 두지 않는다. 탭 이름이 이미 그 뜻이라 한 줄 더 붙이면
+        같은 말을 두 번 하는 셈이고, 탭을 옮길 때마다 목록 시작 위치가 들쭉날쭉해진다.
+        (무난무난은 설명 자체가 틀리기도 했다 — 이 탭은 판정글을 전부 보여준다.
+         60% 이상만 모은 곳은 도서관의 무난템 서가다.)
+      */}
+      <div className="flex items-center gap-3 px-4 py-2">
+        {(["최신순", "인기순"] as Sort[]).map((s) => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => setSort(s)}
+            className={`text-[12.5px] ${
+              sort === s ? "font-bold text-brand" : "text-neutral-500"
+            }`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
 
       <div>
         {visible === null && (
