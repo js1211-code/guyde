@@ -117,6 +117,45 @@ body {
   --safe-bottom: env(safe-area-inset-bottom);
 }
 
+/*
+  스플래시 — 마크가 먼저 뜨고, 워드마크가 뒤따르고, 점이 맥박친다.
+  디자인 파일의 타이밍(0.8s / 1.2s / 1.4s 무한)을 그대로 가져왔다.
+
+  덮는 시간은 1.6초. 이보다 길면 로딩이 아니라 기다림이 된다.
+  사라진 뒤에는 visibility:hidden 이라 밑의 화면을 클릭할 수 있다 —
+  opacity:0만으로는 투명한 판이 화면 전체를 덮은 채 남는다.
+*/
+.splash {
+  animation: splash-exit 2s ease-in-out forwards;
+}
+
+@keyframes splash-exit {
+  0%, 80%   { opacity: 1; visibility: visible; }
+  100%      { opacity: 0; visibility: hidden; }
+}
+
+.splash-mark {
+  animation: splash-fade 0.8s ease-in-out both;
+}
+.splash-word {
+  /* both — 시작 전에도 opacity:0을 유지한다. 안 그러면 한 프레임 번쩍인다. */
+  animation: splash-fade 1.2s ease-in-out both;
+}
+.splash-dot {
+  animation: splash-pulse 1.4s infinite;
+}
+.splash-dot:nth-child(2) { animation-delay: 0.2s; }
+.splash-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes splash-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes splash-pulse {
+  0%, 60%, 100% { opacity: 0.3; }
+  30%           { opacity: 1; }
+}
+
 /* 카드 그림자 — 디자인이 쓰는 값 하나로 통일 */
 .card {
   background: var(--color-bg);

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { ServiceWorker } from "@/components/pwa";
+import { Splash } from "@/components/splash";
 import { BRAND } from "@/lib/brand";
 
 // 숫자·영문 라벨 전용. 한글 본문은 Pretendard(아래 CDN)가 받는다.
@@ -54,6 +55,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <ServiceWorker />
+        {/* 화면보다 위에 덮인다. 라우트마다 두지 않고 여기 한 번만 둔다 —
+            화면을 옮길 때마다 다시 뜨면 그건 스플래시가 아니라 방해다. */}
+        <Splash />
         {children}
       </body>
     </html>
