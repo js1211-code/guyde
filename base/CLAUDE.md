@@ -23,6 +23,12 @@
 - Tailwind CSS v4 (`@theme` 기반, 별도 config 파일 없음)
 - Supabase (PostgreSQL, Storage) — **Auth는 쓰지 않는다**
 - 서버 로직: Next.js Route Handlers (`app/api/...`)
+- **설치형 PWA다.** 홈 화면에 추가하면 주소창 없이 앱처럼 뜬다(`display: standalone`).
+  - `app/manifest.ts` · `public/sw.js` · `public/icons/*.png`(192·512·apple-touch 180).
+  - 아이콘은 SVG가 아니라 PNG다 — 안드로이드 런처와 iOS가 SVG를 제대로 못 다룬다. `maskable`을 따로 넣어야 안드로이드가 원형으로 잘라낼 때 타일 모서리가 안 잘린다. iOS는 매니페스트를 안 읽으므로 `apple-touch-icon`이 따로 필요하다.
+  - 🚨 **서비스 워커를 cache-first로 바꾸지 말 것.** 글·댓글·온도가 계속 바뀌는 앱이라 캐시를 먼저 주면 몇 시간 전 화면이 남아 고장으로 보인다. 지금은 network-first이고 실패할 때만 캐시로 떨어진다. `/api/*`는 아예 캐시하지 않는다 — 남의 기기 응답이 남으면 신원이 섞여 보인다.
+  - 개발 중에는 워커를 등록하지 않는다(`NODE_ENV !== production`). 등록하면 HMR로 고친 파일 대신 캐시가 나가서 "고쳤는데 화면이 안 바뀐다"가 반복된다.
+  - `viewportFit: "cover"` + `env(safe-area-inset-bottom)` — 이게 없으면 standalone에서 아이폰 홈 인디케이터가 하단 탭바와 결제 바를 덮는다.
 - 배포: Vercel + Supabase Cloud
   - **배포본이 둘이다. 같은 코드, 환경변수만 다르다.**
 

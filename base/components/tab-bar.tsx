@@ -80,7 +80,7 @@ export function TabBar() {
   }, [activeIndex, slideTo]);
 
   return (
-    <nav className="shrink-0 border-t border-neutral-400 bg-paper px-2 pt-2 pb-1">
+    <nav className="shrink-0 border-t border-neutral-400 bg-paper px-2 pt-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
       {/*
         4등분 그리드여야 인디케이터를 index × 100%로 옮길 수 있다.
         justify-around은 간격이 균등하지 않아서 위치를 계산할 수 없다.

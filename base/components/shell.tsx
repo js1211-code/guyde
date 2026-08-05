@@ -126,7 +126,10 @@ export function BottomBar({
 }) {
   return (
     <div
-      className={`px-4 pt-2 pb-3 ${bordered ? "border-t border-neutral-400" : ""}`}
+      // 설치형(standalone)에서는 홈 인디케이터가 이 자리에 겹친다.
+      className={`px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] ${
+        bordered ? "border-t border-neutral-400" : ""
+      }`}
     >
       {children}
     </div>
