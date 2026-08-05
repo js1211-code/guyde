@@ -22,7 +22,18 @@ export default async function ArticlePage({
   return (
     <AppShell>
       <div className="relative flex h-[240px] shrink-0 items-center justify-center border-b border-neutral-400 bg-brand-tint">
-        <PhotoBox className="absolute inset-0 border-0" iconSize={28} />
+        {/* absolute inset-0 을 주면 안 된다. PhotoBox가 이미 relative라
+            Tailwind에서 relative가 absolute보다 뒤에 정의돼 이겨버리고,
+            높이가 0이 되어 사진이 통째로 사라진다. 부모 높이를 채우게 한다. */}
+        <PhotoBox
+          src={article.cover_url}
+          alt=""
+          className="h-full w-full border-0"
+          iconSize={28}
+        />
+        {/* 사진 위에 뒤로가기 버튼이 얹히므로 위쪽만 어둡게 깔아 대비를 만든다.
+            밝은 표지에서는 흰 아이콘이 그냥 사라진다. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-ink/45 to-transparent" />
         <Link
           href="/library"
           aria-label="뒤로"
@@ -40,6 +51,11 @@ export default async function ArticlePage({
           <span>·</span>
           <span>{article.read_minutes}분</span>
         </p>
+        {/* Unsplash 라이선스상 표기 의무는 없지만, 남의 사진을 쓰면서
+            누가 찍었는지 안 밝히는 건 예의가 아니다. */}
+        <p className="mt-1 text-[11px] text-neutral-500">
+          사진 {article.cover_by} · Unsplash
+        </p>
 
         {article.sections.map((s) => (
           <section key={s.heading}>
@@ -47,6 +63,7 @@ export default async function ArticlePage({
             <p className="text-[13.5px] leading-relaxed text-neutral-700">
               {s.body}
             </p>
+            {/* 본문 삽화는 아직 없다. 표지를 또 쓰면 같은 사진이 두 번 나온다. */}
             {s.has_image && (
               <PhotoBox className="mt-3 h-[130px]" iconSize={20} />
             )}

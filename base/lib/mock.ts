@@ -22,6 +22,16 @@ export type Article = {
   category: Category;
   read_minutes: number;
   is_hero: boolean;
+  /**
+   * 표지 사진. Unsplash 호스팅 URL을 그대로 쓴다 —
+   * 표지는 우리가 만든 자산이 아니라 인용이라 Storage에 복사할 이유가 없다.
+   * crop=faces,entropy 로 잘라낼 지점을 CDN에 맡긴다 — 세로 사진을 CSS로만
+   * 자르면 얼굴이 잘려 나가고 몸통 여백만 남아 빈 화면처럼 보인다.
+   * next.config.ts의 remotePatterns에 images.unsplash.com이 있어야 뜬다.
+   */
+  cover_url: string;
+  /** 촬영자. Unsplash 라이선스상 표기 의무는 없지만 밝히는 게 예의다. */
+  cover_by: string;
   published_at: string;
   /** 본문 — 소제목 + 단락이 번갈아 나온다 */
   sections: { heading: string; body: string; has_image?: boolean }[];
@@ -32,6 +42,8 @@ export type Article = {
 const articles: Article[] = [
   {
     id: "a-oversize",
+    cover_url: "https://images.unsplash.com/photo-1574180566232-aaad1b5b8450?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Brando Makes Branding",
     title: "올여름 남자 반팔, 오버핏은 이제 끝났나",
     lead: "체형 상관없이 통했던 오버핏 유행이 저물면서 실루엣이 다시 좁아지고 있다. 무난하게 갈아탈 라인을 정리했다.",
     category: "옷",
@@ -56,6 +68,8 @@ const articles: Article[] = [
   },
   {
     id: "a-suncream",
+    cover_url: "https://images.unsplash.com/photo-1623676714504-edd78728155e?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Onela Ymeri",
     title: "선크림 백탁 없는 제품만 모아봤습니다",
     lead: "톤업 기능을 뺀 무기자차 위주로 골랐다.",
     category: "스킨케어",
@@ -72,6 +86,8 @@ const articles: Article[] = [
   },
   {
     id: "a-twoblock",
+    cover_url: "https://images.unsplash.com/photo-1635273051937-a0ddef9573b6?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Salah Regouane",
     title: "투블럭, 이제 안 치는 사람이 더 많다",
     lead: "옆을 바짝 치는 대신 두상을 살리는 쪽으로 옮겨가는 중이다.",
     category: "헤어",
@@ -92,6 +108,8 @@ const articles: Article[] = [
   },
   {
     id: "a-knit",
+    cover_url: "https://images.unsplash.com/photo-1608975321561-176c1b187d24?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Daniil Onischenko",
     title: "겨울 니트 하나로 3주 버티는 법",
     lead: "세탁 주기를 늘리는 관리법.",
     category: "옷",
@@ -108,6 +126,8 @@ const articles: Article[] = [
   },
   {
     id: "a-perfume",
+    cover_url: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Jeroen den Otter",
     title: "겨울철 향수, 잔향 오래 남기는 법",
     lead: "온도가 낮으면 향이 덜 퍼진다.",
     category: "바디&향수",
@@ -124,6 +144,8 @@ const articles: Article[] = [
   },
   {
     id: "a-interview",
+    cover_url: "https://images.unsplash.com/photo-1624797432677-6f803a98acb3?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Danny Ocean",
     title: "면접 코디, 무난함의 기준이 바뀌고 있다",
     lead: "정장 아니어도 되는 자리가 늘었다.",
     category: "옷",
@@ -140,6 +162,8 @@ const articles: Article[] = [
   },
   {
     id: "a-cleansing",
+    cover_url: "https://images.unsplash.com/photo-1536098624746-8b23d2a11cd3?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
+    cover_by: "Tadeusz Lakota",
     title: "지성 피부를 위한 클렌징 순서 정리",
     lead: "이중 세안이 항상 답은 아니다.",
     category: "스킨케어",

@@ -270,6 +270,11 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
 1. ~~공통 기반~~ ✅ 기기 UUID · 유저 등록 · 랜덤 닉네임 · X-Device-Id · 4탭+FAB
 2. ~~커뮤니티 핵심~~ ✅ 피드 · 글쓰기 3택 · 상세(투표/판정/일반) · 댓글·추천 · 사진 업로드
 3. **시드 데이터** ← 지금 여기. 6개 탭 어디를 눌러도 비지 않게. 무난함 판정글은 투표가 쌓인 상태로. (콜드스타트 방어 = 데모 생명줄)
+- 도서관 아티클 표지는 **Unsplash CDN을 그대로 쓴다**(`images.unsplash.com`, `next.config.ts`의 remotePatterns에 등록). 우리 자산이 아니라 인용이라 Storage에 복사하지 않는다.
+  - URL에 `crop=faces,entropy&w=900&h=600`을 붙인다. 세로 사진을 CSS로만 자르면 얼굴이 날아가고 몸통 여백만 남아 빈 화면처럼 보인다 — CDN이 잘라낼 지점을 고르게 맡긴다.
+  - ⚠️ `PhotoBox`에 `absolute inset-0`을 주지 말 것. PhotoBox가 이미 `relative`인데 Tailwind에서 `relative`가 `absolute`보다 뒤에 정의돼 이겨버리고, 높이가 0이 되어 사진이 통째로 사라진다. 부모 높이를 채우려면 `h-full w-full`을 쓴다.
+  - 촬영자를 상세 화면에 표기한다. Unsplash 라이선스상 의무는 없지만 남의 사진을 쓰면서 안 밝히는 건 예의가 아니다.
+
 4. 도서관 — 서가 2개. **'정보 공유' 서가는 실제 posts 연결 완료 ✅ / '아티클' 서가는 아직 `lib/mock.ts`**
    - 옛 이름은 '매거진'. 라우트도 `/magazine` → `/library`로 옮겼다. DB 테이블은 `articles`·`quizzes` 그대로다.
    - `articles.is_hero`는 컬럼명이 남아 있다(상단 대표 글). 이름 때문에 마이그레이션하지 않는다.

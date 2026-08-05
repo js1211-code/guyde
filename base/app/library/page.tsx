@@ -66,7 +66,7 @@ function Articles() {
   return (
     <>
       <Link href={`/library/${hero.id}`} className="mt-3 block px-4">
-        <PhotoBox className="h-[150px]" iconSize={24} />
+        <PhotoBox src={hero.cover_url} alt="" className="h-[150px]" iconSize={24} />
         <span className="mt-2.5 inline-block">
           <CategoryBadge>{hero.category}</CategoryBadge>
         </span>
@@ -84,6 +84,8 @@ function Articles() {
           className="flex items-center gap-3 border-t border-dashed border-neutral-400 px-4 py-2.5"
         >
           <PhotoBox
+            src={a.cover_url}
+            alt=""
             className="h-[64px] w-[64px] shrink-0"
             iconSize={16}
           />
