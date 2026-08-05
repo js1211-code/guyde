@@ -38,7 +38,7 @@
     - `default`는 OS가 상태바 자리를 비우고 웹뷰를 그 아래에 놓아서 바닥까지 닿는다. 상태바 밑으로 내용을 못 넣지만 어차피 안전 영역만큼 패딩으로 밀어내고 있었다.
     - ⚠️ **iOS는 이 값을 설치 시점에 기억한다.** 바꾼 뒤에는 홈 화면 아이콘을 지웠다 다시 추가해야 반영된다.
   - **안전 영역은 `globals.css`의 `--safe-top` / `--safe-bottom` 변수로만 쓴다.** `env(safe-area-inset-*)`를 컴포넌트에서 직접 부르지 말 것 — 데스크톱 브라우저에서는 항상 0이라 눈으로 확인할 수가 없다. 변수로 두면 검사할 때 값만 덮어써서 실제 기기와 같은 상태를 만들 수 있다(아이폰 15 Pro = 상단 59px · 하단 34px).
-  - 🚨 **`AppShell`의 `pt-[var(--safe-top)]`을 빼지 말 것.** `statusBarStyle: "black-translucent"` + `viewportFit: "cover"` 조합이라 화면이 상태바 **밑까지** 올라간다. 여백이 없으면 노치·다이내믹 아일랜드가 상단바를 덮어서 **뒤로가기 버튼이 안 눌린다.** `box-sizing: border-box`라 `h-dvh`는 그대로 유지된다 — 내용 영역만 줄어들 뿐 화면 밖으로 넘치지 않는다.
+  - **`AppShell`의 `pt-[var(--safe-top)]`은 남겨둔다.** `statusBarStyle: "default"`에서는 OS가 상태바 자리를 비워주므로 `env(safe-area-inset-top)`이 0이 되어 이 패딩도 0이 된다 — 있어도 손해가 없고, 노치 밑까지 그리는 기기·브라우저에서는 이게 유일한 방어다. `box-sizing: border-box`라 셸 높이는 그대로 유지된다.
   - 하단도 마찬가지다. 탭바·결제 바는 `pb-` 유틸에 `max(기본값, var(--safe-bottom))`, 글쓰기 FAB은 `bottom-[calc(82px+var(--safe-bottom))]`. **FAB의 82px을 고정값으로 두면 안 된다** — 홈 인디케이터가 있는 기기는 탭바가 그만큼 두꺼워져서 FAB이 탭바에 깔린다.
 - 배포: Vercel + Supabase Cloud
   - **배포본이 둘이다. 같은 코드, 환경변수만 다르다.**
