@@ -74,6 +74,22 @@
   --font-cond: var(--font-barlow-condensed), "Pretendard Variable", sans-serif;
 }
 
+/*
+  문서는 스크롤하지 않는다. 스크롤은 오직 .scroll-area 안에서만 일어난다.
+
+  🚨 이걸 빼면 iOS에서 탭바가 위아래로 흔들린다.
+  문서에 스크롤 여지가 남아 있으면 손가락을 놓을 때 화면 전체가 고무줄처럼
+  튕기는데(overscroll bounce), 그때 position:fixed 인 셸이 통째로 같이
+  끌려다닌다. 문서가 실제로 넘치지 않아도 iOS는 바운스를 허용한다 —
+  그래서 높이만 맞춰서는 안 되고 overflow와 overscroll-behavior를 같이 잠가야 한다.
+*/
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }
@@ -198,6 +214,12 @@ body {
   overflow-y: auto;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+  /*
+    끝까지 내린 뒤 더 당겨도 그 힘이 문서로 넘어가지 않게 막는다.
+    이게 없으면 목록 끝에서 한 번 더 당길 때 바깥이 딸려 움직여서
+    탭바가 흔들린다.
+  */
+  overscroll-behavior-y: contain;
 }
 .scroll-area::-webkit-scrollbar {
   width: 3px;

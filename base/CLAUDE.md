@@ -289,6 +289,7 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
 - ⚠️ **셸(`AppShell`)은 `position: fixed` + `inset-0`이고 스크롤은 `ScreenBody` 안에서만 일어난다.**
   - 🚨 **높이를 `h-dvh`로 되돌리지 말 것.** 설치형 iOS에서 첫 페인트 때 `dvh`가 안전 영역을 뺀 높이(화면 − 노치 − 홈 인디케이터)를 돌려준다. 셸이 화면보다 90pt쯤 짧아져 **탭바 밑이 텅 빈 채로 뜨고**, 한 번 스크롤해서 다시 계산될 때야 화면 끝까지 늘어난다 — 실제 기기에서 그랬다. `fixed + inset-0`은 `dvh`를 거치지 않고 화면에 직접 맞는다.
   - 가로 가운데 정렬은 `left/right:0` + `margin-inline:auto`로 그대로 된다(1280px 창에서 좌우 여백 425px 동일 확인).
+  - 🚨 **문서 자체의 스크롤을 잠가야 한다**(`html, body { overflow: hidden; overscroll-behavior: none }` + `.scroll-area`에 `overscroll-behavior-y: contain`). iOS는 문서가 넘치지 않아도 고무줄 바운스를 허용하는데, 그때 `position: fixed`인 셸이 통째로 끌려다녀서 **탭바가 위아래로 흔들린다.** 높이만 맞춰서는 안 되고 overflow와 overscroll-behavior를 같이 잠가야 한다.
   - `min-h-dvh`도 안 된다 — 셸이 내용만큼 늘어나면 `overflow-y:auto`가 발동하지 않아 문서 전체가 스크롤되고, 탭바·FAB·결제 바가 문서 맨 아래에 붙는다. `ScreenBody`의 `min-h-0`도 같은 이유로 필요하다(flex 자식의 기본 `min-height:auto`가 overflow를 무력화한다).
 
 ## 코딩 컨벤션
