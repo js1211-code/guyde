@@ -57,5 +57,11 @@ const ERROR_STATUS: Record<string, number> = {
 export function fromDbError(message: string | undefined) {
   const code = Object.keys(ERROR_STATUS).find((k) => message?.includes(k));
   if (code) return fail(code, ERROR_STATUS[code]);
+
+  // 유니크 위반은 "이미 했다"는 뜻이다. 원문을 그대로 흘리면
+  // 제약 이름 같은 내부 사정이 화면에 뜬다.
+  if (message?.includes("duplicate key value")) {
+    return fail("ALREADY_EXISTS", 409, "이미 처리된 요청이에요");
+  }
   return fail("DB_ERROR", 500, message);
 }

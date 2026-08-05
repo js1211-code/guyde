@@ -86,10 +86,11 @@ export default function BookingDetailPage({
     setError(null);
     try {
       await sendFeedback(id, "만족");
-      load();
+      // 목록으로 돌려보내면 후기를 다시 찾아 들어와야 해서 대부분 안 쓴다.
+      // 고수 평점이 쌓이는 유일한 경로라 흐름 안에서 바로 받는다.
+      router.push(`/booking/done/${id}/review`);
     } catch (e) {
       setError((e as { detail?: string }).detail ?? "처리에 실패했어요");
-    } finally {
       setBusy(false);
     }
   }
@@ -177,6 +178,28 @@ export default function BookingDetailPage({
               링크는 계속 열어둘게요. 사이즈가 애매하면 착장 카드의 이유를 다시
               읽어보세요.
             </p>
+
+            {booking.review ? (
+              <div className="mt-3 rounded-lg bg-white p-3">
+                <p className="cond text-[13px] font-semibold text-brand">
+                  {"★".repeat(booking.review.rating)}
+                </p>
+                {booking.review.body && (
+                  <p className="mt-1 text-[13px] leading-relaxed">
+                    {booking.review.body}
+                  </p>
+                )}
+              </div>
+            ) : (
+              booking.is_owner && (
+                <Link
+                  href={`/booking/done/${booking.id}/review`}
+                  className="mt-3 block rounded-md bg-brand py-2.5 text-center text-[13px] font-bold text-white"
+                >
+                  후기 남기기
+                </Link>
+              )
+            )}
           </section>
         )}
 

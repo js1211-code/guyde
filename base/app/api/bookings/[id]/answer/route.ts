@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { deviceRequired, fail, fromDbError, getDeviceId, ok } from "@/lib/api/http";
 import {
+  looksLikeUrl,
   OUTFIT_REASON_MIN,
   OUTFIT_SLOTS,
   REVISION_MAX,
@@ -104,6 +105,13 @@ export async function POST(
     const item = bySlot.get(slot);
     if (!item) return fail("SLOT_MISSING", 400, `${slot}를 채워주세요`);
     if (!item.url?.trim()) return fail("URL_REQUIRED", 400, `${slot} 구매 링크가 필요해요`);
+    // 링크가 아니면 받는 쪽이 눌러도 아무 데도 가지 못한다.
+    if (!looksLikeUrl(item.url)) {
+      return fail("INVALID_URL", 400, `${slot} 구매 링크가 주소 형식이 아니에요`);
+    }
+    if (item.alt_url?.trim() && !looksLikeUrl(item.alt_url)) {
+      return fail("INVALID_URL", 400, `${slot} 대체 링크가 주소 형식이 아니에요`);
+    }
     if (!item.name?.trim()) return fail("NAME_REQUIRED", 400, `${slot} 상품명이 필요해요`);
     if (!Number.isFinite(item.price) || (item.price as number) < 0) {
       return fail("PRICE_REQUIRED", 400, `${slot} 가격이 필요해요`);

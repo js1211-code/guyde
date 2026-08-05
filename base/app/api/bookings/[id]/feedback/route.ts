@@ -75,6 +75,19 @@ export async function POST(
     .maybeSingle();
   if (!answer) return fail("NOT_ANSWERED_YET", 409);
 
+  // 같은 회차에 이미 피드백을 줬으면 막는다. DB에도 unique가 걸려 있지만
+  // 거기서 터지면 Postgres 메시지가 그대로 화면에 나온다 —
+  // 화면을 두 번 누르는 것만으로도 그 꼴을 볼 수 있어서 여기서 먼저 끊는다.
+  const { data: already } = await db
+    .from("feedbacks")
+    .select("id")
+    .eq("booking_id", id)
+    .eq("answer_id", answer.id)
+    .maybeSingle();
+  if (already) {
+    return fail("ALREADY_RESPONDED", 409, "이 답변에는 이미 응답했어요");
+  }
+
   const { error } = await db.from("feedbacks").insert({
     booking_id: id,
     answer_id: answer.id,

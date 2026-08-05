@@ -109,6 +109,7 @@ export async function loadBooking(
     { data: expertUser },
     temps,
     { data: answers },
+    { data: review },
     { data: feedbacks },
     { data: images },
   ] = await Promise.all([
@@ -121,6 +122,11 @@ export async function loadBooking(
         .select("id, round, diagnosis, avoid, created_at, outfit_items(*)")
         .eq("booking_id", bookingId)
         .order("round", { ascending: true }),
+      db
+        .from("reviews")
+        .select("rating, body")
+        .eq("booking_id", bookingId)
+        .maybeSingle(),
       db
         .from("feedbacks")
         .select("answer_id, kind, reason, created_at")
@@ -158,6 +164,8 @@ export async function loadBooking(
         (feedbacks ?? [])
           .filter((f) => f.kind === "수정요청")
           .at(-1)?.reason ?? null,
+      /** 이미 남긴 후기. 없으면 화면이 "후기 남기기"를 띄운다. */
+      review: review ? { rating: review.rating, body: review.body } : null,
       created_label: dayLabel(booking.created_at),
       due_label: dueLabel(booking.due_at, booking.status),
       expert: {

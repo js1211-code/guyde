@@ -68,6 +68,8 @@ export type BookingDetail = {
   revision_count: number;
   /** 가장 최근 수정 요청 사유. 고수가 확정안을 쓸 때 반드시 보여야 한다. */
   revision_reason: string | null;
+  /** 이미 남긴 후기. 없으면 null. */
+  review: { rating: number; body: string | null } | null;
   created_label: string;
   due_label: string;
   expert: { id: string; nickname: string; temperature: number; intro: string };
@@ -148,6 +150,19 @@ export async function sendFeedback(
     await apiFetch(`/api/bookings/${bookingId}/feedback`, {
       method: "POST",
       body: JSON.stringify({ kind, reason }),
+    }),
+  );
+}
+
+export async function submitReview(
+  bookingId: string,
+  rating: number,
+  body: string,
+): Promise<{ rating: number }> {
+  return json(
+    await apiFetch(`/api/bookings/${bookingId}/review`, {
+      method: "POST",
+      body: JSON.stringify({ rating, body }),
     }),
   );
 }

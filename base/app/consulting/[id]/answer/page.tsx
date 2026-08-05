@@ -12,6 +12,7 @@ import {
   TopBar,
 } from "@/components/shell";
 import {
+  looksLikeUrl,
   OUTFIT_REASON_MIN,
   OUTFIT_SLOTS,
   type OutfitSlot,
@@ -93,7 +94,8 @@ export default function AnswerWritePage({
   const slotDone = (slot: string) => {
     const d = items[slot];
     return (
-      d.url.trim() !== "" &&
+      looksLikeUrl(d.url) &&
+      (d.alt_url.trim() === "" || looksLikeUrl(d.alt_url)) &&
       d.name.trim() !== "" &&
       Number(d.price) > 0 &&
       d.reason.trim().length >= OUTFIT_REASON_MIN
@@ -229,7 +231,12 @@ export default function AnswerWritePage({
         </section>
 
         {/* ① 진단 */}
-        <Step n="①" title="진단" done={diagnosis.trim().length >= OUTFIT_REASON_MIN}>
+        <Step
+          n="①"
+          title="진단"
+          done={diagnosis.trim().length >= OUTFIT_REASON_MIN}
+          hint={`최소 ${OUTFIT_REASON_MIN}자`}
+        >
           <textarea
             value={diagnosis}
             onChange={(e) => setDiagnosis(e.target.value)}
@@ -241,7 +248,7 @@ export default function AnswerWritePage({
         </Step>
 
         {/* ② 피해야 할 것 */}
-        <Step n="②" title="피해야 할 것" done={avoid.length > 0}>
+        <Step n="②" title="피해야 할 것" done={avoid.length > 0} hint="최소 1개">
           <div className="flex gap-2">
             <input
               value={avoidInput}
@@ -281,7 +288,12 @@ export default function AnswerWritePage({
         </Step>
 
         {/* ③ 착장 1세트 */}
-        <Step n="③" title="착장 1세트" done={OUTFIT_SLOTS.every(slotDone)}>
+        <Step
+          n="③"
+          title="착장 1세트"
+          done={OUTFIT_SLOTS.every(slotDone)}
+          hint="세 칸 모두"
+        >
           <BudgetBadge total={total} budget={booking.budget} />
           <p className="mt-2 mb-4 text-[11px] leading-relaxed text-neutral-500">
             합계가 예산의 80~100%면 초록 배지가 돼요. 벗어나면 주황·빨강으로 바뀝니다.
@@ -305,7 +317,7 @@ export default function AnswerWritePage({
                 value={items[slot].url}
                 onChange={(v) => patch(slot, "url", v)}
                 placeholder="상품 링크를 붙여넣어 주세요"
-                invalid={items[slot].url.trim() === ""}
+                invalid={!looksLikeUrl(items[slot].url)}
               />
 
               <Label optional>대체 링크 (품절 대비)</Label>
@@ -313,6 +325,7 @@ export default function AnswerWritePage({
                 value={items[slot].alt_url}
                 onChange={(v) => patch(slot, "alt_url", v)}
                 placeholder="선택"
+                invalid={!looksLikeUrl(items[slot].alt_url)}
               />
 
               <div className="mt-3 flex gap-2">
@@ -404,15 +417,24 @@ function Row({ k, v }: { k: string; v: string }) {
   );
 }
 
+/**
+ * 단계 머리.
+ *
+ * 세 단계 다 필수인데 표시가 제각각이었다 — 진단은 글자수 카운터,
+ * 착장은 칸마다 별표, 피해야 할 것은 아무것도 없었다.
+ * 채우기 전에는 별표, 채우고 나면 체크로 통일한다.
+ */
 function Step({
   n,
   title,
   done,
+  hint,
   children,
 }: {
   n: string;
   title: string;
   done: boolean;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -420,7 +442,12 @@ function Step({
       <p className="mb-2 flex items-center gap-1.5 text-[14px] font-bold">
         <span className={done ? "text-ok" : "text-brand"}>{n}</span>
         {title}
-        {done && <CheckIcon size={14} className="text-ok" />}
+        {done ? <CheckIcon size={14} className="text-ok" /> : <Required />}
+        {!done && hint && (
+          <span className="text-[11.5px] font-normal text-neutral-500">
+            {hint}
+          </span>
+        )}
       </p>
       {children}
     </section>

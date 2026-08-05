@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  ArrowUpRightIcon,
   CheckIcon,
   PantsIcon,
   ShirtIcon,
@@ -203,16 +204,37 @@ export function AnswerView({
   );
 }
 
+/**
+ * 구매 링크. 눌러서 바로 상품 페이지로 간다.
+ *
+ * 고수는 보통 프로토콜 없이 "musinsa.com/..." 처럼 붙여넣는데,
+ * 그대로 href에 넣으면 상대 경로로 잡혀서 앱 안에서 404가 난다.
+ * 없으면 https를 붙인다.
+ *
+ * 새 탭으로 여는 이유: 컨설팅 화면은 되돌아와서 다음 아이템을 봐야 하는
+ * 문서라, 같은 탭에서 나가면 흐름이 끊긴다.
+ * rel은 noreferrer까지 — 새 탭이 원래 창을 조작할 수 있는 구멍을 막는다.
+ */
 function ShopLink({ url, alt = false }: { url: string; alt?: boolean }) {
+  const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+
   return (
-    <div className="mt-2 flex items-center gap-2 rounded-md bg-brand-tint px-3 py-2.5">
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-2 flex items-center gap-2 rounded-md bg-brand-tint px-3 py-2.5"
+    >
       {alt && (
         <span className="rounded-xs bg-neutral-300 px-1.5 py-0.5 text-[10px] font-bold text-neutral-700">
           대체
         </span>
       )}
-      <span className="flex-1 truncate text-[12.5px] text-brand-dark">{url}</span>
-    </div>
+      <span className="flex-1 truncate text-[12.5px] text-brand-dark underline underline-offset-2">
+        {url}
+      </span>
+      <ArrowUpRightIcon size={14} className="shrink-0 text-brand-dark" />
+    </a>
   );
 }
 

@@ -158,3 +158,18 @@ export const REVISION_MAX = 1;
 export const BODY_PHOTO_MIN = 1;
 export const OUTFIT_PHOTO_MIN = 1;
 export const BOOKING_PHOTO_MAX = 5;
+
+/**
+ * 구매 링크가 링크처럼 생겼는지.
+ *
+ * 엄격한 URL 파싱까지는 안 한다 — 고수는 "musinsa.com/goods/1" 처럼
+ * 프로토콜 없이 붙여넣고, 화면이 https를 붙여 연다.
+ * 다만 공백이 있거나 점이 없으면 주소가 아니라 문장이다.
+ * 이걸 안 막으면 신청자가 링크를 눌렀을 때 아무 데도 가지 못한다.
+ */
+export function looksLikeUrl(value: string): boolean {
+  const v = value.trim();
+  if (!v || /\s/.test(v)) return false;
+  const host = v.replace(/^https?:\/\//i, "").split("/")[0];
+  return /^[^.]+\.[^.]{2,}/.test(host);
+}
