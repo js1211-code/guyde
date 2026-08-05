@@ -24,6 +24,10 @@
 - Supabase (PostgreSQL, Storage) — **Auth는 쓰지 않는다**
 - 서버 로직: Next.js Route Handlers (`app/api/...`)
 - 배포: Vercel + Supabase Cloud
+  - 프로덕션: **https://guyde.vercel.app** (Vercel 프로젝트 `guyde`, 루트 디렉터리 `base/`)
+  - 환경변수 3개는 Vercel Production에 등록돼 있다. **이름을 바꾸면 Vercel 쪽도 같이 바꿔야 한다** — 로컬만 고치면 배포본이 조용히 죽는다.
+  - 배포: `cd base && npx vercel --prod`
+  - ⚠️ **`/test`·`/test/device`가 공개 URL에 그대로 열려 있다.** 누구나 시드 고수로 전환해 답변을 쓸 수 있다. 데모용으로 일부러 남긴 것이고, 실서비스 전에는 `app/test` 폴더째 지운다.
 - ❌ 결제 PG 연동 없음 (안내 문구만)
 - TanStack Query는 아직 안 붙였다. 지금은 `fetch` + `useState`로 충분해서 미도입.
 
