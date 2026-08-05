@@ -77,6 +77,28 @@ export const ShoeIcon = (p: P) => (
   </S>
 );
 
+/** 삭제 — 쓰레기통. 뚜껑·몸통·안쪽 세로선. */
+export const TrashIcon = (p: P) => (
+  <S {...p}>
+    <path d="M3 6h18" />
+    <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+  </S>
+);
+
+/** 신고 — 경찰차 위 사이렌. 등피 + 받침 + 퍼지는 빛. */
+export const SirenIcon = (p: P) => (
+  <S {...p}>
+    <path d="M9 15V9a3 3 0 0 1 6 0v6" />
+    <path d="M6.5 15h11a1.5 1.5 0 0 1 1.5 1.5v2h-14v-2A1.5 1.5 0 0 1 6.5 15z" />
+    <path d="M4 8.5 2.5 7.5" />
+    <path d="M20 8.5 21.5 7.5" />
+    <path d="M12 4V2.5" />
+  </S>
+);
+
 export const HomeIcon = (p: P) => (
   <S {...p}>
     <path d="m3 11 9-8 9 8" />

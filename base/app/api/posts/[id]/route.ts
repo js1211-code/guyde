@@ -1,5 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { fail, getDeviceId, ok, stripDevice } from "@/lib/api/http";
+import {
+  deviceRequired,
+  fail,
+  getDeviceId,
+  ok,
+  stripDevice,
+} from "@/lib/api/http";
 
 /**
  * S3 글 상세 (F-30·31·32·34·38·41·43)
@@ -76,6 +82,39 @@ export async function GET(
       liked_by_me: likedComments.has(c.id),
     })),
   });
+}
+
+/**
+ * 글 삭제 — 글쓴이만.
+ *
+ * 사진·선택지·투표·판정·좋아요·댓글은 FK가 연쇄로 지운다.
+ * 남의 글은 403이 아니라 404다 — 403이면 "그 글이 있긴 하다"가 새어 나간다.
+ *
+ * 하트는 돌려주지 않는다. 올렸다 지우기를 반복해 하트를 아끼는 길이 생기면
+ * 글 하나에 하트 하나라는 규칙이 무의미해진다.
+ */
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const deviceId = getDeviceId(req);
+  if (!deviceId) return deviceRequired();
+
+  const { id } = await params;
+  const db = createAdminClient();
+
+  const { data: post, error } = await db
+    .from("posts")
+    .select("id, device_id")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) return fail("DB_ERROR", 500, error.message);
+  if (!post || post.device_id !== deviceId) return fail("POST_NOT_FOUND", 404);
+
+  const { error: delError } = await db.from("posts").delete().eq("id", id);
+  if (delError) return fail("DB_ERROR", 500, delError.message);
+
+  return ok({ deleted: id });
 }
 
 type Db = ReturnType<typeof createAdminClient>;

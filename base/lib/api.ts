@@ -202,6 +202,21 @@ export async function addComment(
  * 정보 공유 글 좋아요 (F-80).
  * 이 좋아요는 글쓴이 온도에 ×0.2로 쌓인다 — 서버 트리거가 자가 좋아요를 막는다.
  */
+/** 내 글 삭제. 사진·투표·댓글은 DB가 연쇄로 지운다. */
+export async function deletePost(postId: string) {
+  return json(await apiFetch(`/api/posts/${postId}`, { method: "DELETE" }));
+}
+
+/** 남의 글 신고. 기록만 남고 글이 자동으로 내려가지는 않는다. */
+export async function reportPost(postId: string, reason?: string) {
+  return json<{ reported: boolean; duplicated?: boolean }>(
+    await apiFetch(`/api/posts/${postId}/report`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+  );
+}
+
 export async function togglePostLike(postId: string, liked: boolean) {
   return json(
     await apiFetch(`/api/posts/${postId}/like`, {

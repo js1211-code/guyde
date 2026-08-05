@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { use, useEffect, useRef, useState } from "react";
 import {
   CategoryBadge,
@@ -8,7 +9,13 @@ import {
   PhotoBox,
   PostTypeBadge,
 } from "@/components/badge";
-import { CheckIcon, HeartIcon, MoreIcon } from "@/components/icons";
+import {
+  CheckIcon,
+  HeartIcon,
+  MoreIcon,
+  SirenIcon,
+  TrashIcon,
+} from "@/components/icons";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
 import { timeAgo } from "@/lib/format";
@@ -17,6 +24,8 @@ import {
   castNanhanVote,
   castPollVote,
   fetchPost,
+  deletePost,
+  reportPost,
   togglePostLike,
   toggleCommentLike,
   type Comment,
@@ -76,8 +85,8 @@ export default function PostPage({
     <AppShell>
       <TopBar
         backHref="/"
-        title={`Q-${post.id.slice(0, 4).toUpperCase()}`}
-        right={<MoreIcon size={20} />}
+        title="GUYDE"
+        right={<PostMenu postId={post.id} isMine={post.is_mine} />}
       />
 
       <ScreenBody>
@@ -625,5 +634,111 @@ function Avatar({ nickname, size = 30 }: { nickname: string; size?: number }) {
     >
       {ch}
     </span>
+  );
+}
+
+/**
+ * 글 우상단 메뉴.
+ *
+ * 내 글이면 삭제, 남의 글이면 신고. 둘을 같이 보여주지 않는다 —
+ * 내 글을 신고하거나 남의 글을 지우는 건 애초에 불가능해서,
+ * 눌리지 않는 항목을 늘어놓을 이유가 없다.
+ */
+function PostMenu({ postId, isMine }: { postId: string; isMine: boolean }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  async function remove() {
+    // 지우면 되돌릴 수 없다. 한 번 더 묻는다.
+    if (!confirm("이 글을 삭제할까요? 댓글도 함께 사라져요.")) return;
+    setBusy(true);
+    try {
+      await deletePost(postId);
+      // replace로 나간다 — 뒤로가기로 사라진 글에 돌아오면 404가 뜬다.
+      router.replace("/");
+    } catch {
+      setBusy(false);
+      alert("삭제하지 못했어요. 잠시 후 다시 시도해주세요.");
+    }
+  }
+
+  async function report() {
+    setBusy(true);
+    try {
+      await reportPost(postId);
+      setDone(true);
+      setTimeout(() => setOpen(false), 1200);
+    } catch {
+      alert("신고하지 못했어요. 잠시 후 다시 시도해주세요.");
+    }
+    setBusy(false);
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="더보기"
+        aria-haspopup="menu"
+        className="transition-transform duration-100 active:scale-90"
+      >
+        <MoreIcon size={20} />
+      </button>
+
+      {open && (
+        <>
+          {/* 바깥을 누르면 닫힌다. 시트보다 아래에 깔린다. */}
+          <button
+            type="button"
+            aria-label="닫기"
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 bg-ink/25"
+          />
+          <div
+            role="menu"
+            className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] rounded-t-2xl bg-bg p-3 pb-5"
+          >
+            {done ? (
+              <p className="py-4 text-center text-[14px] font-bold text-brand">
+                신고가 접수됐어요
+              </p>
+            ) : isMine ? (
+              <button
+                type="button"
+                role="menuitem"
+                disabled={busy}
+                onClick={remove}
+                className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold text-danger disabled:opacity-50"
+              >
+                <TrashIcon size={19} />
+                글 삭제하기
+              </button>
+            ) : (
+              <button
+                type="button"
+                role="menuitem"
+                disabled={busy}
+                onClick={report}
+                className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold text-danger disabled:opacity-50"
+              >
+                <SirenIcon size={19} />
+                글 신고하기
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="mt-1 w-full rounded-lg px-4 py-3 text-[14px] font-semibold text-neutral-600"
+            >
+              닫기
+            </button>
+          </div>
+        </>
+      )}
+    </>
   );
 }

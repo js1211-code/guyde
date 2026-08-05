@@ -209,6 +209,8 @@ POST   /api/posts                     글 작성
 GET    /api/posts/[id]                상세 (유형별 위젯 + 댓글)
 POST   /api/posts/[id]/poll-vote      선택지 투표
 POST   /api/posts/[id]/nanhan-vote    무난함 판정
+DELETE /api/posts/[id]                글 삭제 (글쓴이만)
+POST   /api/posts/[id]/report         글 신고 (남의 글만, 중복은 한 건)
 POST|DELETE /api/posts/[id]/like      정보공유 글 좋아요
 POST   /api/posts/[id]/comments       댓글 작성
 POST|DELETE /api/comments/[id]/like   댓글 추천
@@ -277,11 +279,11 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
 
 ## 하지 말 것 (스코프 밖)
 - 로그인·회원가입·소셜 로그인·세션/JWT/쿠키, Supabase Auth
-- 글 수정·삭제, 검색, 알림, 팔로우, 무한스크롤
+- 글 수정, 검색, 알림, 팔로우, 무한스크롤 (~~글 삭제~~ → **채택됨.** 글쓴이만, 우상단 메뉴에서. 하트는 돌려주지 않는다 — 올렸다 지우기로 하트를 아끼는 길이 생기면 안 된다)
   - ~~대댓글~~ → **채택됨.** 인스타처럼 1단계까지만(답글에 답글 불가). 깊이 제한은 DB 트리거가 강제한다.
 - 결제·PG 연동·카드 입력 UI (₩14,900은 화면 표시만, 누르면 통과)
 - 유저가 고수가 되는 경로(고수는 시드 고정), 리뷰 작성 UI, 환불 처리
-- 신고 클릭 동작(버튼 자리만), 사진 편집·필터
+- 사진 편집·필터 (~~신고 클릭 동작~~ → **채택됨.** `reports`에 기록만 남고 글이 자동으로 내려가지는 않는다. 모더레이션 정책은 여전히 미정)
 - 스택 임의 교체, 불필요한 라이브러리 추가
 
 ## 미결정 / 열린 질문
