@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { ServiceWorker } from "@/components/pwa";
+import { BRAND } from "@/lib/brand";
 
 // 숫자·영문 라벨 전용. 한글 본문은 Pretendard(아래 CDN)가 받는다.
 const barlowCondensed = Barlow_Condensed({
@@ -12,18 +13,19 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "GUYDE — GUY를 위한 GUIDE.",
+  title: BRAND.name,
   description: "익명으로 묻고 대중에게 검증받는 남자 자기관리 커뮤니티",
   // 아이콘은 app/icon.svg 파일 규약이 자동으로 잡는다.
   appleWebApp: {
-    title: "GUYDE",
+    // 홈 화면 아이콘 밑에 뜨는 이름. 고수 배포본은 여기서도 갈린다.
+    title: BRAND.shortName,
     capable: true,
     // 반투명 상태바 — 배경이 상태바 뒤까지 이어져 앱처럼 보인다.
     statusBarStyle: "black-translucent",
   },
   // iOS는 매니페스트 아이콘을 안 읽는다. apple-touch-icon이 따로 있어야
   // 홈 화면에 제대로 뜨고, 없으면 화면을 캡처해서 쓴다.
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  icons: { apple: BRAND.appleTouchIcon },
 };
 
 export const viewport: Viewport = {
