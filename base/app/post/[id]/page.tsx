@@ -26,6 +26,7 @@ import {
   addComment,
   castNanhanVote,
   castPollVote,
+  clearPollVote,
   fetchPost,
   deletePost,
   reportPost,
@@ -236,9 +237,17 @@ function Poll({
 }) {
   const [busy, setBusy] = useState(false);
 
+  /**
+   * 이미 고른 걸 다시 누르면 취소, 아니면 그 선택지로 표를 옮긴다.
+   * 취소하면 결과도 다시 감춰진다 — 투표해야 결과가 열리는 규칙(F-32)이
+   * 취소한 뒤에도 그대로 지켜져야 한다.
+   */
   async function vote(optionId: string) {
     setBusy(true);
-    await castPollVote(postId, optionId).catch(() => {});
+    const 취소 = optionId === poll.my_option_id;
+    await (취소 ? clearPollVote(postId) : castPollVote(postId, optionId)).catch(
+      () => {},
+    );
     await onDone();
     setBusy(false);
   }
@@ -295,7 +304,8 @@ function Poll({
               key={o.id}
               type="button"
               disabled={busy}
-              onClick={() => !mine && vote(o.id)}
+              // mine이어도 막지 않는다 — 그게 취소하는 유일한 방법이다.
+              onClick={() => vote(o.id)}
               className={`relative flex items-center overflow-hidden rounded-lg border text-left ${
                 withPhotos ? "h-[60px]" : "h-[38px]"
               } ${

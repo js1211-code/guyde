@@ -185,6 +185,13 @@ export async function castPollVote(postId: string, optionId: string) {
   );
 }
 
+/** 투표 취소 — 같은 선택지를 다시 누르면 표를 뺀다. 결과도 다시 감춰진다. */
+export async function clearPollVote(postId: string) {
+  return json(
+    await apiFetch(`/api/posts/${postId}/poll-vote`, { method: "DELETE" }),
+  );
+}
+
 export async function castNanhanVote(
   postId: string,
   choice: "무난해요" | "애매해요",
