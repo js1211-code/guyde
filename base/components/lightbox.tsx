@@ -20,18 +20,24 @@ export function ZoomablePhoto({
   alt = "",
   className = "",
   iconSize = 18,
+  natural = false,
 }: {
   src?: string | null;
   alt?: string;
   className?: string;
   iconSize?: number;
+  /** 원본 비율로 보여준다. 칸을 정하지 않으므로 className에 크기를 주지 않는다. */
+  natural?: boolean;
 }) {
   const btnRef = useRef<HTMLButtonElement>(null);
   // 확대가 어디서 출발할지. 누른 순간의 위치를 재둔다.
   const [origin, setOrigin] = useState<DOMRect | null>(null);
 
   // 사진이 없으면 확대할 것도 없다.
-  if (!src) return <PhotoBox className={className} iconSize={iconSize} />;
+  if (!src)
+    return (
+      <PhotoBox className={className} iconSize={iconSize} natural={natural} />
+    );
 
   return (
     <>
@@ -42,7 +48,14 @@ export function ZoomablePhoto({
         aria-label="사진 크게 보기"
         className={`block w-full ${className}`}
       >
-        <PhotoBox src={src} alt={alt} className="h-full w-full" iconSize={iconSize} />
+        <PhotoBox
+          src={src}
+          alt={alt}
+          // 원본 비율일 땐 높이를 채우지 않는다 — 사진이 높이를 정한다.
+          className={natural ? "" : "h-full w-full"}
+          iconSize={iconSize}
+          natural={natural}
+        />
       </button>
 
       {origin && (

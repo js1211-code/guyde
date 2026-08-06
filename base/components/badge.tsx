@@ -113,12 +113,45 @@ export function PhotoBox({
   alt = "",
   className = "",
   iconSize = 18,
+  natural = false,
 }: {
   src?: string | null;
   alt?: string;
   className?: string;
   iconSize?: number;
+  /**
+   * 원본 비율로 보여준다 — 3:4로 올리면 3:4, 1:1이면 1:1.
+   *
+   * 기본값(false)은 부모가 정한 칸을 `object-cover`로 채운다. 목록 썸네일처럼
+   * 칸 크기가 정해져 있어야 하는 자리에 쓴다.
+   *
+   * ⚠️ 원본 비율은 브라우저가 사진을 받아봐야 알 수 있어서, 로딩 중에는
+   * 자리를 차지하지 않다가 뜨는 순간 아래 내용이 밀린다. 그래서 목록에는
+   * 쓰지 않는다 — 스크롤 중에 글이 밀리면 읽던 자리를 놓친다.
+   */
+  natural?: boolean;
 }) {
+  if (natural) {
+    return src ? (
+      // width/height 0 + sizes 는 "크기를 모른다"는 뜻이다.
+      // Next가 img를 그대로 두고 CSS(h-auto w-full)가 비율을 잡는다.
+      <Image
+        src={src}
+        alt={alt}
+        width={0}
+        height={0}
+        sizes="(max-width: 430px) 100vw, 430px"
+        className={`h-auto w-full rounded-lg border border-neutral-400 ${className}`}
+      />
+    ) : (
+      <div
+        className={`flex items-center justify-center rounded-lg border border-neutral-400 bg-brand-tint py-10 ${className}`}
+      >
+        <ImageIcon size={iconSize} className="text-brand-dark" />
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative flex items-center justify-center overflow-hidden rounded-lg border border-neutral-400 bg-brand-tint ${className}`}

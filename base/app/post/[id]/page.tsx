@@ -148,17 +148,18 @@ export default function PostPage({
           )}
 
           {/*
-            16:9 가로. 높이 160px 고정이던 걸 화면 폭에 맞춰 늘렸다 —
-            비율이 정해져 있으면 사진마다 카드 높이가 들쭉날쭉하지 않다.
-            잘리는 건 여전하므로 눌러서 원본 비율로 크게 볼 수 있게 둔다.
+            비율을 정하지 않는다. 3:4로 올리면 3:4, 1:1이면 1:1로 그대로 뜬다.
+            어떤 비율로 고정하든 누군가의 사진은 잘리는데, 이 앱의 사진은
+            착장·머리처럼 잘리면 판단이 안 되는 것들이다.
           */}
           {post.images.map((img) => (
             <ZoomablePhoto
               key={img.id}
               src={img.url}
               alt=""
-              className="mt-3 aspect-[16/9] w-full"
+              className="mt-3"
               iconSize={24}
+              natural
             />
           ))}
 
