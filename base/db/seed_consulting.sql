@@ -33,6 +33,36 @@
 -- ============================================================
 
 -- ---------- 0) 이전 고수 시드 정리 ----------
+--
+-- 🚨 **users 만 지우고 cascade 에 맡기면 안 된다.** 실제로 이렇게 죽었다:
+--
+--   users 삭제 → posts cascade → comments cascade → comment_likes cascade
+--   → sync_comment_likes 트리거가 `update comments set likes = likes-1` 실행
+--   → 그 댓글이 달린 글은 **같은 cascade 안에서 이미 지워진 뒤**라
+--      FK 재검사에 걸린다
+--   → ERROR: comments_post_id_fkey ... Key (post_id)=(...) is not present
+--
+-- 남의 글에 단 댓글이 있을 때 터진다 — 댓글 주인은 안 지워지는데 글은
+-- 지워지기 때문이다. 고수 댓글이 딱 그 모양이라 매번 걸린다.
+--
+-- 그래서 안쪽부터 명시적으로 걷어낸다: 추천 → 댓글 → 글 → 유저.
+-- 이 순서면 트리거가 도는 시점에 댓글도 글도 아직 살아 있다.
+
+delete from comment_likes cl
+ using comments c
+  left join posts p on p.id = c.post_id
+ where cl.comment_id = c.id
+   and (c.device_id::text like '00000000-0000-4000-8001-%'
+     or p.device_id::text like '00000000-0000-4000-8001-%');
+
+delete from comment_likes where device_id::text like '00000000-0000-4000-8001-%';
+
+delete from comments
+ where device_id::text like '00000000-0000-4000-8001-%'
+    or post_id in (select id from posts
+                    where device_id::text like '00000000-0000-4000-8001-%');
+
+delete from posts where device_id::text like '00000000-0000-4000-8001-%';
 delete from users where device_id::text like '00000000-0000-4000-8001-%';
 
 -- ---------- 1) 고수 유저 4명 ----------

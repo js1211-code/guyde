@@ -22,7 +22,34 @@
 -- ============================================================
 
 -- ---------- 0) 이전 시드 정리 ----------
+--
+-- 🚨 **users 만 지우고 cascade 에 맡기면 안 된다.** 실제로 이렇게 죽었다:
+--
+--   users 삭제 → posts cascade → comments cascade → comment_likes cascade
+--   → sync_comment_likes 트리거가 `update comments set likes = likes-1` 실행
+--   → 그 댓글이 달린 글은 **같은 cascade 안에서 이미 지워진 뒤**라
+--      FK 재검사에 걸린다
+--   → ERROR: comments_post_id_fkey ... Key (post_id)=(...) is not present
+--
+-- 남의 글에 단 댓글이 있을 때 터진다 — 댓글 주인은 안 지워지는데 글은
+-- 지워지기 때문이다. 고수 댓글이 딱 그 모양이라 매번 걸린다.
+--
+-- 그래서 안쪽부터 명시적으로 걷어낸다: 추천 → 댓글 → 글 → 유저.
+-- 이 순서면 트리거가 도는 시점에 댓글도 글도 아직 살아 있다.
+--
 -- 카드는 글에 매여 있어 글이 지워지면 같이 지워진다(on delete cascade).
+-- 여기 글에는 시드 댓글이 없지만 진짜 방문자가 달았을 수 있어 같은 순서를 쓴다.
+
+delete from comment_likes cl
+ using comments c
+ where cl.comment_id = c.id
+   and c.post_id in (select id from posts
+                      where id::text like 'b0001%-0000-4000-8000-000000000001');
+
+delete from comments
+ where post_id in (select id from posts
+                    where id::text like 'b0001%-0000-4000-8000-000000000001');
+
 delete from posts where id::text like 'b0001%-0000-4000-8000-000000000001';
 
 -- ---------- 1) 판정글 14개 ----------
