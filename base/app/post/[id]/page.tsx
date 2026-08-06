@@ -25,6 +25,7 @@ import { timeAgo } from "@/lib/format";
 import {
   addComment,
   castNanhanVote,
+  clearNanhanVote,
   castPollVote,
   clearPollVote,
   fetchPost,
@@ -373,9 +374,18 @@ function Nanhan({
 }) {
   const [busy, setBusy] = useState(false);
 
+  /**
+   * 이미 고른 걸 다시 누르면 취소, 아니면 반대편으로 표를 옮긴다.
+   *
+   * 선택지투표와 달리 취소해도 %를 감추지 않는다. 무난함 %는 피드 배지에도
+   * 그대로 나오는 공개 정보라, 여기서만 가린다고 감춰지지 않는다.
+   */
   async function vote(choice: "무난해요" | "애매해요") {
     setBusy(true);
-    await castNanhanVote(postId, choice).catch(() => {});
+    const 취소 = choice === nanhan.my_choice;
+    await (취소 ? clearNanhanVote(postId) : castNanhanVote(postId, choice)).catch(
+      () => {},
+    );
     await onDone();
     setBusy(false);
   }

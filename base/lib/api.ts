@@ -204,6 +204,13 @@ export async function castNanhanVote(
   );
 }
 
+/** 판정 취소 — 같은 버튼을 다시 누르면 표를 뺀다. */
+export async function clearNanhanVote(postId: string) {
+  return json(
+    await apiFetch(`/api/posts/${postId}/nanhan-vote`, { method: "DELETE" }),
+  );
+}
+
 export async function addComment(
   postId: string,
   body: string,

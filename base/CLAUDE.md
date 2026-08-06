@@ -133,6 +133,7 @@ Storage: **`post-images`** 버킷(공개 읽기, 5MB, 이미지 타입만). 업�
 2. 글 작성은 **`create_post()` 함수**로(하트 차감 + 글 insert + 선택지 insert가 한 트랜잭션). 하트 부족이면 `INSUFFICIENT_HEARTS`.
 3. 투표는 **`cast_poll_vote()` / `cast_nanhan_vote()`** 로(upsert — 다른 선택지를 누르면 표가 이동).
    - **선택지투표는 같은 선택지를 다시 누르면 취소된다**(`DELETE /api/posts/[id]/poll-vote`). 취소하면 결과도 다시 감춰진다 — 표를 뺀 채로 결과를 계속 볼 수 있으면 아무거나 눌렀다 취소하는 것만으로 결과를 훔쳐볼 수 있다(F-32).
+   - **무난함 판정도 같은 버튼을 다시 누르면 취소된다**(`DELETE /api/posts/[id]/nanhan-vote`). 다만 선택지투표와 달리 **%를 감추지 않는다** — 무난함 %는 피드 배지에도 그대로 나오는 공개 정보라 여기서만 가린다고 감춰지지 않는다.
    - 표가 이미 없어도 성공으로 돌려준다. 두 번 눌렀을 때 오류가 뜨면 사용자가 뭘 잘못한 것처럼 보이는데, 원하는 상태(표 없음)는 이미 이뤄져 있다.
 4. `comments.likes` 직접 update 금지 — 트리거가 자동 반영.
    - 답글은 `parent_id`로 붙인다. 서버는 평평한 목록을 추천순으로 주고, 화면이 부모 밑에 다시 묶으면서 답글끼리는 **오래된 순**으로 뒤집는다 — 답글은 대화라서 추천순으로 세우면 흐름이 끊긴다.
@@ -252,7 +253,7 @@ GET    /api/posts                     피드 (?category= &post_type= &sort= &q=)
 POST   /api/posts                     글 작성
 GET    /api/posts/[id]                상세 (유형별 위젯 + 댓글)
 POST|DELETE /api/posts/[id]/poll-vote 선택지 투표 / 취소
-POST   /api/posts/[id]/nanhan-vote    무난함 판정
+POST|DELETE /api/posts/[id]/nanhan-vote 무난함 판정 / 취소
 PATCH  /api/posts/[id]                글 수정 (글쓴이만, 제목·본문만)
 DELETE /api/posts/[id]                글 삭제 (글쓴이만)
 POST   /api/posts/[id]/report         글 신고 (남의 글만, 중복은 한 건)
