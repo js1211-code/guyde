@@ -88,6 +88,36 @@ export const ShoeIcon = (p: P) => (
   </S>
 );
 
+/**
+ * 판사봉 — 들려 있는 상태. 아직 판정 전.
+ *
+ * 망치머리는 **굵은 선**으로 그린다. 얇은 선으로 윤곽만 그리면 화살표처럼
+ * 보인다(처음에 그렇게 그렸다가 못 알아봤다).
+ * 두 상태의 차이는 망치 각도와 받침대까지의 거리뿐이고 나머지는 같다 —
+ * 그래야 바뀌는 순간 "내려쳤다"로 읽힌다.
+ */
+export const GavelUpIcon = (p: P) => (
+  <S {...p}>
+    <path d="M4.4 7.2 L9.4 3.4" strokeWidth={4.4} />
+    <path d="M7.6 5.9 L14.6 14.4" />
+    <path d="M7 20.4h11" strokeWidth={3} />
+  </S>
+);
+
+/**
+ * 판사봉 — 내려친 상태. 판정이 끝났다.
+ * 망치가 받침대 바로 위로 내려왔고, 부딪힌 자리에 짧은 선 둘.
+ */
+export const GavelDownIcon = (p: P) => (
+  <S {...p}>
+    <path d="M4.4 14h6.6" strokeWidth={4.4} />
+    <path d="M10.4 13.6 L16.4 8.6" />
+    <path d="M7 20.4h11" strokeWidth={3} />
+    <path d="M4.4 17.4l-1 1.7" />
+    <path d="M11.4 17.4l1 1.7" />
+  </S>
+);
+
 /** 검색 — 돋보기. */
 export const SearchIcon = (p: P) => (
   <S {...p}>

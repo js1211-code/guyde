@@ -120,8 +120,8 @@ const articles: Article[] = [
   },
   {
     id: "a-knit",
-    cover_url: "https://images.unsplash.com/photo-1608975321561-176c1b187d24?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
-    cover_by: "Daniil Onischenko",
+    cover_url: "https://images.unsplash.com/photo-1599032909736-0155c1d43a6c?auto=format&fit=crop&crop=entropy&w=900&h=600&q=70",
+    cover_by: "Majid Akbari",
     title: "겨울 니트 하나로 3주 버티는 법",
     lead: "세탁 주기를 늘리는 관리법.",
     category: "옷",

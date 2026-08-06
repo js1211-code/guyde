@@ -13,6 +13,8 @@ import {
 } from "@/components/badge";
 import {
   CheckIcon,
+  GavelDownIcon,
+  GavelUpIcon,
   HeartIcon,
   ImageIcon,
   MoreIcon,
@@ -445,8 +447,15 @@ function Nanhan({
       본문과의 간격도 넉넉히 둔다 — 붙어 있으면 떼어낸 티가 안 난다.
     */
     <div className="mt-7 rounded-2xl border border-neutral-400 px-4 pt-4 pb-4">
-      <p className="text-center">
-        <span className="cond text-[45.5px] leading-none font-bold text-brand">
+      {/* 판사봉이 판정 전에는 들려 있고, 판정하고 나면 내려친 모양으로 바뀐다.
+          글자만으로도 알 수 있지만 모양이 같이 바뀌면 눌린 게 더 확실해진다. */}
+      <p className="flex items-center justify-center gap-2">
+        {nanhan.revealed ? (
+          <GavelDownIcon size={30} className="shrink-0 text-brand" />
+        ) : (
+          <GavelUpIcon size={30} className="shrink-0 text-brand" />
+        )}
+        <span className="cond text-[36px] leading-none font-bold text-brand">
           {!nanhan.revealed
             ? "무난함 판정"
             : nanhan.percent === null
@@ -465,7 +474,7 @@ function Nanhan({
               // 보였다가 실패하면 고장으로 읽힌다.
               disabled={busy || closed}
               onClick={() => vote(choice)}
-              className={`relative flex flex-1 flex-col items-center gap-0.5 py-3 ${
+              className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-xl py-3 ${
                 picked
                   ? "border-2 border-brand bg-brand-tint"
                   : "border border-neutral-400"
