@@ -116,7 +116,13 @@ insert into posts (id, device_id, category, post_type, title, body, created_at) 
   ('aaaa0006-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000005','스킨케어','정보공유',
    '선크림 백탁 줄이는 순서',
    '무기자차는 바르고 바로 문지르면 하얗게 뜹니다. 점 찍듯 올린 뒤 30초 두고 두드려 펴면 훨씬 덜해요. 톤업 기능이 들어간 제품은 백탁이 기능이라 아무리 발라도 안 없어집니다 — 성분표에서 티타늄디옥사이드 함량을 먼저 보세요.',
-   now() - interval '4 hours 15 minutes');
+   now() - interval '4 hours 15 minutes'),
+  -- 글쓴이를 5·6번이 아닌 1번으로 둔다. 5번은 이미 정보공유 글이 둘이라
+  -- 좋아요를 더 얹으면 온도가 42를 넘는다(아래 주석 참고).
+  ('aaaa0006-0000-4000-8000-000000000004','00000000-0000-4000-8000-000000000001','바디&향수','정보공유',
+   '향수 어디에 뿌려야 오래 가나',
+   '손목에 뿌리고 비비면 향이 부서져서 더 빨리 날아갑니다. 체온이 높고 옷에 덜 닿는 목덜미나 귀 뒤에 한 번, 그걸로 충분해요. 옷에 직접 뿌리면 오래는 가는데 얼룩이 남을 수 있으니 안감 쪽에만.',
+   now() - interval '6 hours 40 minutes');
 
 -- ---------- 3) 선택지 ----------
 insert into poll_options (post_id, text, sort_order) values
@@ -242,8 +248,18 @@ insert into comments (id, post_id, device_id, body, created_at) values
 
 -- ---------- 6-1) 정보공유 글 좋아요 ----------
 -- post_likes는 정보공유 글에만 걸 수 있다(block_invalid_post_like 트리거).
--- 좋아요 1개가 글쓴이 온도에 +0.2다. 여기 개수는 아래 댓글 추천과 합쳐
--- 아무도 42.0을 넘지 않도록 잡아둔 값이다.
+--
+-- 도서관 '정보 공유' 서가는 좋아요 20개 이상만 싣는다(GUIDE_PICK_MIN_LIKES).
+-- 서가가 비어 보이지 않게 세 글을 그 위로 올려둔다.
+--
+-- ⚠️ 좋아요 1개가 글쓴이 온도에 +0.2다. 여기 개수는 아래 댓글 추천과 합쳐
+-- **아무도 42.0을 넘지 않도록** 잡아둔 값이다 — 42는 고수 자격선이라
+-- 시드 일반 유저가 넘어가면 "왜 고수가 아니지"가 된다.
+--   5번은 정보공유 글이 둘(0001·0003)이라 여유가 16개뿐이다 → 0001만 21개.
+--   0003은 4개 그대로 둔다. 세 번째 20+ 글은 1번이 쓴 0004로 채웠다.
+-- 좋아요를 누를 사람은 여기선 일반 20명뿐이다. 고수(8001 대)는
+-- seed_consulting.sql 에서 만들어지므로 이 시점엔 아직 없다.
+-- 글쓴이를 빼면 19명이 상한이라, 20개를 넘기는 몫은 그쪽에서 더한다.
 with likers as (
   select device_id, row_number() over (order by device_id) as n
   from users
@@ -251,9 +267,10 @@ with likers as (
 )
 insert into post_likes (post_id, device_id)
 select post_id, device_id from (
-  select 'aaaa0006-0000-4000-8000-000000000001'::uuid as post_id, device_id from likers where n between 1 and 9
-  union all select 'aaaa0006-0000-4000-8000-000000000002', device_id from likers where n between 1 and 6
+  select 'aaaa0006-0000-4000-8000-000000000001'::uuid as post_id, device_id from likers where n between 1 and 20
+  union all select 'aaaa0006-0000-4000-8000-000000000002', device_id from likers where n between 1 and 20
   union all select 'aaaa0006-0000-4000-8000-000000000003', device_id from likers where n between 1 and 4
+  union all select 'aaaa0006-0000-4000-8000-000000000004', device_id from likers where n between 1 and 20
 ) t
 -- 자기 글 좋아요는 트리거가 막으므로 미리 걸러낸다
 where not exists (

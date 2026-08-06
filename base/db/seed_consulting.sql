@@ -176,3 +176,30 @@ select u.nickname,
   from users u
  where u.device_id::text like '00000000-0000-4000-8001-%'
  order by temp desc;
+
+-- ---------- 고수도 정보공유 글에 좋아요를 누른다 ----------
+--
+-- 도서관 '정보 공유' 서가는 좋아요 20개 이상만 싣는다(GUIDE_PICK_MIN_LIKES).
+-- seed.sql 시점에는 누를 사람이 일반 20명뿐이라 글쓴이를 빼면 19가 상한이다.
+-- 고수는 여기서 만들어지므로, 문턱을 넘기는 몫을 여기서 더한다.
+--
+-- ⚠️ 좋아요 1개가 글쓴이 온도에 +0.2다. 아래 세 글의 글쓴이가 42.0을 넘지
+--    않는 선까지만 더한다 — 42는 고수 자격선이라 시드 일반 유저가 넘어가면
+--    "왜 고수가 아니지"가 된다.
+insert into post_likes (post_id, device_id)
+select post_id, device_id from (
+  select 'aaaa0006-0000-4000-8000-000000000001'::uuid as post_id, device_id
+    from experts limit 3
+) t
+where not exists (
+  select 1 from posts p where p.id = t.post_id and p.device_id = t.device_id
+)
+on conflict do nothing;
+
+insert into post_likes (post_id, device_id)
+select 'aaaa0006-0000-4000-8000-000000000002', device_id from experts
+on conflict do nothing;
+
+insert into post_likes (post_id, device_id)
+select 'aaaa0006-0000-4000-8000-000000000004', device_id from experts
+on conflict do nothing;

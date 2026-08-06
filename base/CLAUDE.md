@@ -108,8 +108,8 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 | `patch_v3_3.sql` | **하트 폐기** — `create_post()`에서 차감 제거 |
 | `patch_v3_4.sql` | **글 수정**(`posts.edited_at`) · **투표 선택지 사진**(`poll_options.image_url`, `create_post()` 인자 추가) |
 | `patch_v3_5.sql` | **투표 종료** — 72시간 자동 + 손 종료(`posts.closed_at`), 뷰에 `closes_at`·`is_closed`, 닫힌 글에 표를 막는 트리거 |
-| `seed.sql` | 데모용 커뮤니티 데이터 (사용자 20 · 글 19 · 댓글 28 · 정보공유 좋아요 17) |
-| `seed_consulting.sql` | 고수 4명 (**반드시 `seed.sql` 다음에**) |
+| `seed.sql` | 데모용 커뮤니티 데이터 (사용자 20 · 글 20 · 댓글 28 · 정보공유 글 4) |
+| `seed_consulting.sql` | 고수 4명 + 고수가 누른 정보공유 좋아요 (**반드시 `seed.sql` 다음에**) |
 | `test_v2_1.sql` | 검증 23종 (검증 전용 DB에서만 실행) |
 | `test_v3.sql` | 컨설팅 제약 검증 17종 (검증 전용 DB에서만 실행) |
 | `test_v3_2.sql` | 답글 깊이·고수 판별 검증 11종 (검증 전용 DB에서만 실행) |
