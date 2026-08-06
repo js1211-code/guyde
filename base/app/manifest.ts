@@ -25,8 +25,11 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
+    // 안드로이드가 앱을 띄우는 동안 깔아두는 색. 우리 스플래시와 이어지도록
+    // 종이색을 유지한다 — 상태바 색(theme_color)과는 쓰임이 다르다.
     background_color: "#f6f3ef",
-    theme_color: "#f6f3ef",
+    // 상태바 자리. app/layout.tsx의 themeColor와 반드시 같은 값.
+    theme_color: "#ffffff",
     lang: "ko",
     icons: [
       { src: BRAND.icon192, sizes: "192x192", type: "image/png", purpose: "any" },

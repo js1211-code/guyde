@@ -54,7 +54,14 @@ export const viewport: Viewport = {
   // 노치·홈 인디케이터 영역까지 화면을 쓴다. 이게 있어야 env(safe-area-*)가
   // 실제 값을 준다 — 없으면 항상 0이라 하단 탭바가 홈 인디케이터에 깔린다.
   viewportFit: "cover",
-  themeColor: "#f6f3ef",
+  /*
+    상태바 자리 색. statusBarStyle이 default라 OS가 이 띠를 직접 칠하는데,
+    앱 배경(종이색)을 쓰면 위쪽만 살짝 누런 띠처럼 보인다. 순백으로 둔다.
+
+    ⚠️ manifest의 theme_color와 같은 값이어야 한다. 어긋나면 기기·브라우저마다
+    다른 쪽을 읽어서 상태바 색이 왔다 갔다 한다.
+  */
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
