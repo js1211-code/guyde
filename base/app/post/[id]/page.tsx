@@ -542,7 +542,8 @@ function Comments({
     // busy(state)만으로는 못 막는다. 같은 프레임에 두 번 불리면 둘 다 옛 값을
     // 읽어서 통과한다. 한글 IME는 Enter로 조합을 확정할 때 keydown을 두 번
     // 쏘기 때문에 실제로 댓글이 두 개 달렸다. ref는 즉시 반영되므로 여기서 막는다.
-    if (submitting.current || !draft.trim()) return;
+    // 사진만 올려도 된다 — 둘 다 없을 때만 막는다.
+    if (submitting.current || (!draft.trim() && !photo)) return;
     submitting.current = true;
     setBusy(true);
     await addComment(postId, draft.trim(), replyTo?.id, photo).catch(() => {});
@@ -701,7 +702,8 @@ function Comments({
           <button
             type="button"
             onClick={submit}
-            disabled={busy || !draft.trim()}
+            // 사진만 올려도 된다. 둘 다 없을 때만 잠근다.
+            disabled={busy || (!draft.trim() && !photo)}
             className="cond text-[14px] font-bold text-brand disabled:text-neutral-400"
           >
             등록
@@ -743,9 +745,15 @@ function CommentRow({
           {c.is_mine && <MineBadge />}
         </div>
 
-        <p className={`leading-relaxed ${compact ? "text-[14.5px]" : "text-[15px]"}`}>
-          {c.body}
-        </p>
+        {/* 사진만 남긴 댓글은 본문이 빈 문자열이다. 빈 <p>를 그리면
+            그만큼 줄 간격이 벌어져 사진이 아래로 떠 보인다. */}
+        {c.body.trim() && (
+          <p
+            className={`leading-relaxed ${compact ? "text-[14.5px]" : "text-[15px]"}`}
+          >
+            {c.body}
+          </p>
+        )}
 
         {/*
           댓글 사진은 작게. 댓글은 대답이라 사진이 본문보다 커지면 누가
