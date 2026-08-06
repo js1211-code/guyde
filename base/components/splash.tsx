@@ -19,6 +19,10 @@ import { LogoMark } from "@/components/logo";
  * 팔레트고, 우리 마크는 헤더에서 브라운으로 놓인다. 금색을 여기 쓰면
  * 고수 뱃지 색과 겹쳐서 "금색 = 고수"라는 뜻이 흐려진다.
  *
+ * 밝기는 앱과 **반대**다. 브라운 바탕에 크림 마크 — 앱 아이콘과 같은 조합이라
+ * 아이콘을 누른 손이 그 화면으로 이어진다. 흰색 대신 크림(`brand-tint`)을
+ * 쓴 것도 그래서다. 아이콘 마크가 크림인데 여기만 순백이면 미세하게 어긋난다.
+ *
  * 화면 전환(클라이언트 라우팅)에서는 레이아웃이 다시 만들어지지 않으므로
  * 다시 뜨지 않는다. 앱을 새로 열 때만 보인다.
  */
@@ -29,29 +33,29 @@ export function Splash() {
       // fixed inset-0 — 셸(max-w-430px)보다 위에 있어야 기기 화면을 꽉 채운다.
       // 안전 영역 여백을 주지 않는다: 노치 밑까지 같은 색으로 이어져야
       // 화면이 잘린 것처럼 보이지 않는다.
-      className="splash fixed inset-0 z-[200] flex flex-col items-center justify-center bg-paper"
+      className="splash fixed inset-0 z-[200] flex flex-col items-center justify-center bg-brand"
     >
       {/*
         크기를 화면에 맞춘다. 작은 기기(SE)에서 120px 고정이면 크고, 큰
         기기에서는 작다. vmin은 짧은 변 기준이라 어느 쪽이 모자라도 넘치지 않는다.
       */}
-      <span className="splash-mark text-brand" style={{ width: "min(120px, 26vmin)" }}>
+      <span className="splash-mark text-brand-tint" style={{ width: "min(120px, 26vmin)" }}>
         {/* size는 viewBox만 정하고 실제 크기는 CSS가 잡는다(h-full w-full).
             획은 디자인의 스플래시처럼 조금 굵게 — 크게 놓으면 가는 획이 흐려 보인다. */}
         <LogoMark size={120} className="h-full w-full" strokeWidth={4.5} />
       </span>
 
       <span
-        className="splash-word cond mt-6 leading-none font-bold tracking-[0.1em] text-ink"
+        className="splash-word cond mt-6 leading-none font-bold tracking-[0.1em] text-brand-tint"
         style={{ fontSize: "min(44px, 11vmin)" }}
       >
         GUYDE
       </span>
 
       <span className="mt-8 flex gap-2">
-        <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
-        <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
-        <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
+        <span className="splash-dot h-2 w-2 rounded-full bg-brand-tint" />
+        <span className="splash-dot h-2 w-2 rounded-full bg-brand-tint" />
+        <span className="splash-dot h-2 w-2 rounded-full bg-brand-tint" />
       </span>
     </div>
   );
