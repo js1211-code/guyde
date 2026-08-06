@@ -8,6 +8,7 @@ import {
   NANHAN_PICK_MIN_VOTES,
   NANHAN_PICK_PERCENT,
 } from "@/lib/constants";
+import { Logo } from "@/components/logo";
 import { AppShell, Kicker, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
@@ -38,11 +39,14 @@ export default function LibraryPage() {
   return (
     <AppShell>
       {/*
-        제목을 적지 않는다. 하단 탭에 '도서관'이 이미 켜져 있어서 같은 말을
-        두 번 하는 셈이고, 그 자리를 비우면 서가가 화면 위로 올라온다.
-        대신 검색 입구를 오른쪽에 둔다 — 커뮤니티와 같은 자리다.
+        '도서관'이라는 제목은 적지 않는다 — 하단 탭에 이미 켜져 있어서 같은 말을
+        두 번 하는 셈이다. 대신 커뮤니티와 같은 머리(왼쪽 로고 · 오른쪽 검색)를
+        둬서 탭을 옮겨도 화면 윗줄이 제자리에 있는 것처럼 보이게 한다.
       */}
-      <div className="flex items-center justify-end px-4 pt-3 pb-1">
+      {/* 커뮤니티는 로고 밑에 태그라인이 있어 items-start로 위를 맞춘다.
+          여기도 같은 정렬을 써야 탭을 옮길 때 로고가 위아래로 튀지 않는다. */}
+      <header className="flex items-start justify-between px-4 pt-3 pb-2.5">
+        <Logo size={24} />
         <Link
           href="/search"
           aria-label="글 검색"
@@ -50,7 +54,7 @@ export default function LibraryPage() {
         >
           <SearchIcon size={21} />
         </Link>
-      </div>
+      </header>
 
       <div className="flex gap-4 border-b border-neutral-400 px-4">
         {SHELVES.map((s) => (
