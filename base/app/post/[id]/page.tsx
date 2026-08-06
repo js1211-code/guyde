@@ -147,12 +147,18 @@ export default function PostPage({
             </p>
           )}
 
+          {/*
+            9:16 세로. 이 앱에 올라오는 사진은 대부분 전신 착장이라 가로로
+            납작하게 잘라두면(예전 160px 고정) 신발이나 머리가 날아가서
+            정작 판정할 부분이 안 보였다.
+            잘리는 건 여전하지만 눌러서 원본 비율로 크게 볼 수 있다.
+          */}
           {post.images.map((img) => (
             <ZoomablePhoto
               key={img.id}
               src={img.url}
               alt=""
-              className="mt-3 h-[160px]"
+              className="mt-3 aspect-[9/16] w-full"
               iconSize={24}
             />
           ))}
