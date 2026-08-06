@@ -169,14 +169,14 @@ export function FeedCard({ item }: { item: FeedItem }) {
     <Link
       href={`/post/${item.id}`}
       /*
-        카드는 흰 바탕, 사이는 비운다. 바깥(셸)이 종이색이라 그 틈으로
-        종이색 띠가 지나가면서 글이 나뉜다 — 점선을 그리지 않아도 구분된다.
+        글 사이를 크림색 띠로 나눈다. 앱 바탕이 흰색이라 틈을 비워두면
+        아무것도 안 보이므로, 구분선이 자기 색을 직접 들고 있어야 한다.
 
-        선 대신 여백으로 나누는 이유: 점선은 글 하나하나에 테두리를 두른 것처럼
-        보여서 목록이 촘촘해 보이고, 사진이 있는 카드와 없는 카드의 높이 차이가
+        선 대신 두꺼운 띠인 이유: 얇은 선은 글 하나하나에 테두리를 두른 것처럼
+        보여 목록이 촘촘해지고, 사진 있는 카드와 없는 카드의 높이 차이가
         선 때문에 더 도드라진다.
       */
-      className="mb-2 block bg-white px-4 py-3.5"
+      className="block border-b-8 border-band bg-white px-4 py-3.5"
     >
       <div className="mb-1.5 flex items-center gap-1.5">
         <CategoryBadge>{item.category}</CategoryBadge>
