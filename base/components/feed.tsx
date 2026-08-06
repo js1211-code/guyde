@@ -176,7 +176,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
         보여 목록이 촘촘해지고, 사진 있는 카드와 없는 카드의 높이 차이가
         선 때문에 더 도드라진다.
       */
-      className="block border-b-8 border-band bg-white px-4 py-3.5"
+      className="block border-b-[5px] border-band bg-white px-4 py-3.5"
     >
       <div className="mb-1.5 flex items-center gap-1.5">
         <CategoryBadge>{item.category}</CategoryBadge>

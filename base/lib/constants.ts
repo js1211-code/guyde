@@ -8,7 +8,15 @@
  * 여기를 고치면 db/patch_v2_3.sql의 CHECK 제약도 같이 고쳐야 한다 —
  * DB가 거부하면 화면에만 탭이 생기고 글은 안 올라간다.
  */
-export const CATEGORIES = ["헤어", "옷", "스킨케어", "바디&향수", "자유"] as const;
+/**
+ * 카테고리. **이 배열의 순서가 곧 화면에 보이는 순서다** — 피드 탭, 검색 칩,
+ * 글쓰기 카테고리 고르기가 전부 이걸 그대로 편다.
+ *
+ * '옷'이 맨 앞이다. 이 앱에 제일 많이 올라오고 컨설팅도 옷 하나만 연다.
+ * DB의 CHECK 제약은 집합이라 순서와 무관하다 — 순서만 바꿀 땐 SQL을
+ * 건드릴 필요가 없다.
+ */
+export const CATEGORIES = ["옷", "헤어", "스킨케어", "바디&향수", "자유"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 /**
