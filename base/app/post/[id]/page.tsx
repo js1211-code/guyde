@@ -439,8 +439,13 @@ function Nanhan({
   }
 
   return (
-    <>
-      <p className="mt-4 text-center">
+    /*
+      판정 묶음을 얇은 테두리로 따로 떼어낸다. 본문 바로 밑에 붙여두면
+      숫자와 두 버튼이 글의 일부처럼 읽혀서 "여기서 눌러야 한다"가 안 보인다.
+      본문과의 간격도 넉넉히 둔다 — 붙어 있으면 떼어낸 티가 안 난다.
+    */
+    <div className="mt-7 rounded-2xl border border-neutral-400 px-4 pt-4 pb-4">
+      <p className="text-center">
         <span className="cond text-[45.5px] leading-none font-bold text-brand">
           {!nanhan.revealed
             ? "무난함 판정"
@@ -500,7 +505,7 @@ function Nanhan({
           판정하면 결과를 볼 수 있어요
         </p>
       )}
-    </>
+    </div>
   );
 }
 
