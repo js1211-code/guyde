@@ -64,22 +64,34 @@ export function Feed() {
         rail: scroll-area(overflow-y:auto)를 쓰면 가로 탭 줄에 세로 스크롤까지
         붙어 손가락이 위아래로 밀린다. 가로만 흐르게 하고 세로는 잠근다.
       */}
-      <div className="rail sticky top-0 z-10 flex gap-4 border-b border-neutral-400 bg-paper px-4">
-        {FEED_TABS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            aria-current={tab === t ? "page" : undefined}
-            className={`-mb-px shrink-0 pt-1 pb-2 text-[15px] whitespace-nowrap ${
-              tab === t
-                ? "border-b-2 border-brand font-bold text-ink"
-                : "text-neutral-600"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+      {/*
+        ⚠️ 회색 밑줄은 **스크롤 영역 바깥**(이 감싸개)에 둔다.
+        .rail은 세로를 잘라내는데(overflow: auto hidden), 선택 표시를
+        음수 마진으로 회색 선 위에 겹치려 하면 그 1px이 잘려 나가서
+        도서관 탭보다 얇아 보인다. 실제로 그렇게 어긋나 있었다.
+
+        대신 선택 표시는 스크롤 영역 안에서 온전한 2px로 그리고, 회색 선은
+        그 밑에 따로 깐다. 도서관도 같은 구조라 두 화면이 똑같이 보인다.
+      */}
+      <div className="sticky top-0 z-10 border-b border-neutral-400 bg-paper">
+        <div className="rail flex gap-4 px-4">
+          {FEED_TABS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              aria-current={tab === t ? "page" : undefined}
+              // 안 고른 탭에도 같은 두께의 투명 밑줄을 둬야 높이가 안 튄다.
+              className={`shrink-0 border-b-2 pt-1 pb-2 text-[15px] whitespace-nowrap ${
+                tab === t
+                  ? "border-brand font-bold text-ink"
+                  : "border-transparent text-neutral-600"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/*

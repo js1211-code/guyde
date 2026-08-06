@@ -57,22 +57,25 @@ export default function LibraryPage() {
         </Link>
       </header>
 
-      <div className="flex gap-4 border-b border-neutral-400 px-4">
-        {SHELVES.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setShelf(s)}
-            aria-current={shelf === s ? "page" : undefined}
-            className={`-mb-px shrink-0 pt-1 pb-2 text-[15px] ${
-              shelf === s
-                ? "border-b-2 border-brand font-bold text-ink"
-                : "text-neutral-600"
-            }`}
-          >
-            {s}
-          </button>
-        ))}
+      {/* 커뮤니티 탭 줄과 같은 구조 — 회색 선은 감싸개, 선택 표시는 안쪽 2px. */}
+      <div className="border-b border-neutral-400">
+        <div className="flex gap-4 px-4">
+          {SHELVES.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setShelf(s)}
+              aria-current={shelf === s ? "page" : undefined}
+              className={`shrink-0 border-b-2 pt-1 pb-2 text-[15px] ${
+                shelf === s
+                  ? "border-brand font-bold text-ink"
+                  : "border-transparent text-neutral-600"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
       </div>
 
       <ScreenBody>
