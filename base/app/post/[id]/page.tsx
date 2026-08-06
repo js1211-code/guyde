@@ -14,6 +14,7 @@ import {
 import {
   CheckIcon,
   HeartIcon,
+  ImageIcon,
   MoreIcon,
   PencilIcon,
   SirenIcon,
@@ -24,6 +25,7 @@ import { Temperature } from "@/components/temperature";
 import { timeAgo, timeLeft } from "@/lib/format";
 import {
   addComment,
+  uploadImage,
   castNanhanVote,
   clearNanhanVote,
   castPollVote,
@@ -513,6 +515,9 @@ function Comments({
   onDone: () => void;
 }) {
   const [draft, setDraft] = useState("");
+  // 댓글에 붙일 사진 한 장. 올린 주소만 들고 있는다(업로드는 고를 때 끝난다).
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
   // 답글을 달 대상. null이면 새 댓글.
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
@@ -540,8 +545,9 @@ function Comments({
     if (submitting.current || !draft.trim()) return;
     submitting.current = true;
     setBusy(true);
-    await addComment(postId, draft.trim(), replyTo?.id).catch(() => {});
+    await addComment(postId, draft.trim(), replyTo?.id, photo).catch(() => {});
     setDraft("");
+    setPhoto(null);
     // 답글을 달면 그 묶음을 펼쳐둔다. 접혀 있으면 방금 쓴 게 안 보인다.
     if (replyTo) setOpened((prev) => new Set(prev).add(replyTo.id));
     setReplyTo(null);
@@ -633,7 +639,52 @@ function Comments({
             </button>
           </div>
         )}
+        {/* 고른 사진 미리보기. 작게 둔다 — 입력줄이 사진에 밀리면 안 된다. */}
+        {photo && (
+          <div className="px-4 pt-2">
+            <span className="relative inline-block">
+              <PhotoBox src={photo} alt="" className="h-[56px] w-[56px]" />
+              <button
+                type="button"
+                aria-label="사진 빼기"
+                onClick={() => setPhoto(null)}
+                className="absolute -top-1.5 -right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[11px] leading-none text-white"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 px-4 py-2">
+          {/* 사진 한 장까지. 파일 선택창은 감춰두고 라벨로 감싼다. */}
+          <label
+            aria-label="사진 넣기"
+            className={`flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md border border-neutral-400 text-neutral-500 ${
+              uploading || photo ? "opacity-40" : ""
+            }`}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading || photo !== null}
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";        // 같은 파일을 다시 고를 수 있게
+                if (!file) return;
+                setUploading(true);
+                try {
+                  setPhoto(await uploadImage(file));
+                } catch {
+                  alert("사진을 올리지 못했어요.");
+                }
+                setUploading(false);
+              }}
+            />
+            <ImageIcon size={17} />
+          </label>
+
           <input
             ref={inputRef}
             value={draft}
@@ -695,6 +746,21 @@ function CommentRow({
         <p className={`leading-relaxed ${compact ? "text-[14.5px]" : "text-[15px]"}`}>
           {c.body}
         </p>
+
+        {/*
+          댓글 사진은 작게. 댓글은 대답이라 사진이 본문보다 커지면 누가
+          무슨 말을 했는지가 사진에 묻힌다. 답글은 한 단계 더 작게 둔다.
+          누르면 원본 비율로 크게 볼 수 있다.
+        */}
+        {c.image_url && (
+          <ZoomablePhoto
+            src={c.image_url}
+            alt=""
+            className={`mt-1.5 ${compact ? "w-[112px]" : "w-[136px]"}`}
+            iconSize={16}
+            natural
+          />
+        )}
 
         <div className="mt-1.5 flex items-center gap-3 text-[12.5px] text-neutral-500">
           {c.likes > 0 && <span>좋아요 {c.likes}개</span>}

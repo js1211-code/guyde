@@ -79,6 +79,8 @@ export type Comment = {
   is_expert: boolean;
   /** 답글이면 부모 댓글 id. 최상위 댓글이면 null. */
   parent_id: string | null;
+  /** 댓글에 붙인 사진 한 장. 없으면 null. */
+  image_url: string | null;
   liked_by_me: boolean;
   is_mine: boolean;
 };
@@ -230,11 +232,16 @@ export async function addComment(
   postId: string,
   body: string,
   parentId?: string,
+  imageUrl?: string | null,
 ) {
   return json(
     await apiFetch(`/api/posts/${postId}/comments`, {
       method: "POST",
-      body: JSON.stringify({ body, parent_id: parentId }),
+      body: JSON.stringify({
+        body,
+        parent_id: parentId,
+        image_url: imageUrl ?? undefined,
+      }),
     }),
   );
 }
