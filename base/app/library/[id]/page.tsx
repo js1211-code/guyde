@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
 import { ChevronLeftIcon } from "@/components/icons";
 import { AppShell, Kicker, ScreenBody } from "@/components/shell";
-import { getArticle, getArticleIds } from "@/lib/mock";
+import { ARTICLE_FIGURE, getArticle, getArticleIds } from "@/lib/mock";
 
 export function generateStaticParams() {
   return getArticleIds().map((id) => ({ id }));
@@ -63,9 +63,20 @@ export default async function ArticlePage({
             <p className="text-[14.5px] leading-relaxed text-neutral-700">
               {s.body}
             </p>
-            {/* 본문 삽화는 아직 없다. 표지를 또 쓰면 같은 사진이 두 번 나온다. */}
+            {/* 본문 삽화. 표지와 다른 사진을 쓴다 — 같은 사진이 한 화면에
+                두 번 나오면 글이 짧아 보인다. */}
             {s.has_image && (
-              <PhotoBox className="mt-3 h-[130px]" iconSize={20} />
+              <figure className="mt-3">
+                <PhotoBox
+                  src={ARTICLE_FIGURE.url}
+                  alt=""
+                  className="h-[150px]"
+                  iconSize={20}
+                />
+                <figcaption className="mt-1 text-[11.5px] text-neutral-500">
+                  Photo by {ARTICLE_FIGURE.by} · Unsplash
+                </figcaption>
+              </figure>
             )}
           </section>
         ))}

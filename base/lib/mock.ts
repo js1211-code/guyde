@@ -15,6 +15,18 @@ import type { Category } from "@/lib/constants";
 // 도서관 — articles / quizzes / quiz_results
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * 본문 삽화. has_image가 켜진 문단에 이 사진이 붙는다.
+ *
+ * 표지를 다시 쓰지 않는다 — 같은 사진이 한 화면에 두 번 나오면 글이 짧아
+ * 보인다. 검정·흰 반팔이 겹쳐 개어진 컷이라 "무채색 두세 벌 로테이션"
+ * 문단과 내용이 맞물린다.
+ */
+export const ARTICLE_FIGURE = {
+  url: "https://images.unsplash.com/photo-1716541425064-b07b68f436de?auto=format&fit=crop&crop=entropy&w=900&h=600&q=70",
+  by: "TuanAnh Blue",
+} as const;
+
 export type Article = {
   id: string;
   title: string;
@@ -42,8 +54,8 @@ export type Article = {
 const articles: Article[] = [
   {
     id: "a-oversize",
-    cover_url: "https://images.unsplash.com/photo-1574180566232-aaad1b5b8450?auto=format&fit=crop&crop=faces,entropy&w=900&h=600&q=70",
-    cover_by: "Brando Makes Branding",
+    cover_url: "https://images.unsplash.com/photo-1622445275463-afa2ab738c34?auto=format&fit=crop&crop=entropy&w=900&h=600&q=70",
+    cover_by: "Mediamodifier",
     title: "올여름 남자 반팔, 오버핏은 이제 끝났나",
     lead: "체형 상관없이 통했던 오버핏 유행이 저물면서 실루엣이 다시 좁아지고 있다. 무난하게 갈아탈 라인을 정리했다.",
     category: "옷",

@@ -371,6 +371,9 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
   - URL에 `crop=faces,entropy&w=900&h=600`을 붙인다. 세로 사진을 CSS로만 자르면 얼굴이 날아가고 몸통 여백만 남아 빈 화면처럼 보인다 — CDN이 잘라낼 지점을 고르게 맡긴다.
   - ⚠️ `PhotoBox`에 `absolute inset-0`을 주지 말 것. PhotoBox가 이미 `relative`인데 Tailwind에서 `relative`가 `absolute`보다 뒤에 정의돼 이겨버리고, 높이가 0이 되어 사진이 통째로 사라진다. 부모 높이를 채우려면 `h-full w-full`을 쓴다.
   - 촬영자를 상세 화면에 표기한다. Unsplash 라이선스상 의무는 없지만 남의 사진을 쓰면서 안 밝히는 건 예의가 아니다.
+  - **본문 삽화(`ARTICLE_FIGURE`)는 표지와 다른 사진을 쓴다.** 같은 사진이 한 화면에 두 번 나오면 글이 짧아 보인다.
+  - ⚠️ Unsplash 페이지 주소의 짧은 ID(`ogmenj2NGho`)는 이미지 파일명과 다르다. `unsplash.com/napi/photos/<id>`를 **브라우저에서** 열어 `urls.raw`를 받아야 한다 — 서버에서 fetch하면 401이 온다.
+  - 인물 사진이 아니면 `crop=faces`를 빼고 `crop=entropy`만 쓴다. 옷만 찍힌 컷에 얼굴 기준을 주면 엉뚱한 데를 잘라낸다.
 
 4. 도서관 — 서가 3개. **'무난템'·'정보 공유' 서가는 실제 posts 연결 완료 ✅ / '아티클'과 테스트는 아직 `lib/mock.ts`**
    - 옛 이름은 '매거진'. 라우트도 `/magazine` → `/library`로 옮겼다. DB 테이블은 `articles`·`quizzes` 그대로다.
