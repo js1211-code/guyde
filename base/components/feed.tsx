@@ -71,7 +71,7 @@ export function Feed() {
             type="button"
             onClick={() => setTab(t)}
             aria-current={tab === t ? "page" : undefined}
-            className={`-mb-px shrink-0 pt-1 pb-2 text-[14px] whitespace-nowrap ${
+            className={`-mb-px shrink-0 pt-1 pb-2 text-[15px] whitespace-nowrap ${
               tab === t
                 ? "border-b-2 border-brand font-bold text-ink"
                 : "text-neutral-600"
@@ -94,7 +94,7 @@ export function Feed() {
             key={s}
             type="button"
             onClick={() => setSort(s)}
-            className={`text-[12.5px] ${
+            className={`text-[13.5px] ${
               sort === s ? "font-bold text-brand" : "text-neutral-500"
             }`}
           >
@@ -105,12 +105,12 @@ export function Feed() {
 
       <div>
         {visible === null && (
-          <p className="px-4 py-10 text-center text-[13px] text-neutral-500">
+          <p className="px-4 py-10 text-center text-[14px] text-neutral-500">
             불러오는 중…
           </p>
         )}
         {visible?.length === 0 && (
-          <p className="px-4 py-10 text-center text-[13px] leading-relaxed text-neutral-600">
+          <p className="px-4 py-10 text-center text-[14px] leading-relaxed text-neutral-600">
             아직 글이 없어요.
             <br />
             오른쪽 아래 + 버튼으로 첫 글을 남겨보세요.
@@ -134,7 +134,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
   const showPreview = !hasPhoto && item.body.trim().length > 0;
 
   const meta = (
-    <div className="mt-2 flex items-center gap-3 text-[11.5px] text-neutral-600">
+    <div className="mt-2 flex items-center gap-3 text-[12.5px] text-neutral-600">
       {/* 영문 라벨 대신 모양으로 보여준다. 하트=좋아요, 투표함=투표.
           숫자 옆에 뭐가 붙었는지 읽지 않고도 구분돼야 한다. */}
       {item.post_type === "선택지투표" && (
@@ -160,7 +160,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
 
   const author = (
     <div className="mt-2 flex items-center gap-1.5">
-      <span className="text-[12px] font-semibold">{item.nickname}</span>
+      <span className="text-[13px] font-semibold">{item.nickname}</span>
       <Temperature value={item.temperature} />
     </div>
   );
@@ -176,7 +176,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
           postType={item.post_type}
           nanhanPercent={item.nanhan_percent}
         />
-        <span className="ml-auto text-[11px] text-neutral-600">
+        <span className="ml-auto text-[12px] text-neutral-600">
           {timeAgo(item.created_at)}
         </span>
       </div>
@@ -184,7 +184,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
       {hasPhoto ? (
         <div className="flex gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[15px] leading-snug font-medium">{item.title}</p>
+            <p className="text-[16px] leading-snug font-medium">{item.title}</p>
             {meta}
             {author}
           </div>
@@ -196,9 +196,9 @@ export function FeedCard({ item }: { item: FeedItem }) {
         </div>
       ) : (
         <>
-          <p className="text-[15px] leading-snug font-medium">{item.title}</p>
+          <p className="text-[16px] leading-snug font-medium">{item.title}</p>
           {showPreview && (
-            <p className="line-clamp-2 mt-1 text-[13px] leading-relaxed text-neutral-600">
+            <p className="line-clamp-2 mt-1 text-[14px] leading-relaxed text-neutral-600">
               {item.body}
             </p>
           )}

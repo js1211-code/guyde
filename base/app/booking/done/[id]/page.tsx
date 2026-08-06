@@ -60,7 +60,7 @@ export default function BookingDetailPage({
       <AppShell>
         <TopBar backHref="/me/bookings" title="내 컨설팅" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-600">
+          <p className="text-center text-[14px] text-neutral-600">
             컨설팅을 찾을 수 없어요
           </p>
         </ScreenBody>
@@ -73,7 +73,7 @@ export default function BookingDetailPage({
       <AppShell>
         <TopBar backHref="/me/bookings" title="내 컨설팅" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-500">불러오는 중…</p>
+          <p className="text-center text-[14px] text-neutral-500">불러오는 중…</p>
         </ScreenBody>
       </AppShell>
     );
@@ -106,13 +106,13 @@ export default function BookingDetailPage({
         {booking.status === "신청 접수" && (
           <section className="flex flex-col items-center px-4 pt-6 pb-1 text-center">
             <SubmittedMark />
-            <p className="mt-4 text-[17px] font-bold">
+            <p className="mt-4 text-[18.5px] font-bold">
               {booking.is_expert ? "답변을 기다리고 있어요" : "신청이 접수됐어요"}
             </p>
-            <p className="mt-1.5 text-[13px] text-neutral-600">
+            <p className="mt-1.5 text-[14px] text-neutral-600">
               {CONSULTING_SLA_HOURS}시간 안에 1회차 답변이 도착해요
             </p>
-            <p className="cond mt-1 text-[13px] font-bold text-brand">
+            <p className="cond mt-1 text-[14px] font-bold text-brand">
               {booking.due_label}
             </p>
           </section>
@@ -126,15 +126,15 @@ export default function BookingDetailPage({
 
         {booking.status === "수정 요청됨" && (
           <section className="mx-4 mt-4 rounded-2xl bg-danger-tint p-4">
-            <p className="text-[13px] font-bold text-danger">
+            <p className="text-[14px] font-bold text-danger">
               {booking.is_expert ? "수정 요청이 왔어요" : "수정을 요청했어요"}
             </p>
             {booking.revision_reason && (
-              <p className="mt-2 border-l-[3px] border-danger-line pl-2.5 text-[13px] leading-relaxed">
+              <p className="mt-2 border-l-[3px] border-danger-line pl-2.5 text-[14px] leading-relaxed">
                 {booking.revision_reason}
               </p>
             )}
-            <p className="mt-2.5 text-[11.5px] text-neutral-600">
+            <p className="mt-2.5 text-[12.5px] text-neutral-600">
               {booking.is_expert
                 ? "이 내용을 반영해 확정안을 만들어주세요 · 수정은 1회뿐이라 다음이 마지막이에요"
                 : "고수가 확정안을 다시 만드는 중이에요 · 수정 요청은 1회 가능해요"}
@@ -145,21 +145,21 @@ export default function BookingDetailPage({
         {answer && (
           <section className="px-4 pt-5">
             <div className="mb-3 flex items-center justify-between">
-              <p className="cond text-[13px] font-semibold tracking-wide text-neutral-600">
+              <p className="cond text-[14px] font-semibold tracking-wide text-neutral-600">
                 {answer.round}회차 {answer.round === 2 ? "확정안" : "답변"}
               </p>
               {booking.answers.length > 1 && (
-                <span className="text-[11.5px] text-neutral-500">
+                <span className="text-[12.5px] text-neutral-500">
                   총 {booking.answers.length}회차
                 </span>
               )}
             </div>
             {answer.feedback?.kind === "수정요청" && answer.feedback.reason && (
               <div className="mb-3 rounded-lg bg-danger-tint px-3 py-2.5">
-                <p className="text-[11.5px] font-bold text-danger">
+                <p className="text-[12.5px] font-bold text-danger">
                   이 답변에 요청된 수정
                 </p>
-                <p className="mt-1 text-[12.5px] leading-relaxed">
+                <p className="mt-1 text-[13.5px] leading-relaxed">
                   {answer.feedback.reason}
                 </p>
               </div>
@@ -170,22 +170,22 @@ export default function BookingDetailPage({
 
         {booking.status === "완료" && (
           <section className="mx-4 mb-4 rounded-2xl bg-ok-tint p-4">
-            <p className="flex items-center gap-1.5 text-[13px] font-bold text-ok">
+            <p className="flex items-center gap-1.5 text-[14px] font-bold text-ok">
               <CheckIcon size={14} />
               컨설팅이 끝났어요
             </p>
-            <p className="mt-1.5 text-[12.5px] leading-relaxed text-neutral-700">
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-neutral-700">
               링크는 계속 열어둘게요. 사이즈가 애매하면 착장 카드의 이유를 다시
               읽어보세요.
             </p>
 
             {booking.review ? (
               <div className="mt-3 rounded-lg bg-white p-3">
-                <p className="cond text-[13px] font-semibold text-brand">
+                <p className="cond text-[14px] font-semibold text-brand">
                   {"★".repeat(booking.review.rating)}
                 </p>
                 {booking.review.body && (
-                  <p className="mt-1 text-[13px] leading-relaxed">
+                  <p className="mt-1 text-[14px] leading-relaxed">
                     {booking.review.body}
                   </p>
                 )}
@@ -194,7 +194,7 @@ export default function BookingDetailPage({
               booking.is_owner && (
                 <Link
                   href={`/booking/done/${booking.id}/review`}
-                  className="mt-3 block rounded-md bg-brand py-2.5 text-center text-[13px] font-bold text-white"
+                  className="mt-3 block rounded-md bg-brand py-2.5 text-center text-[14px] font-bold text-white"
                 >
                   후기 남기기
                 </Link>
@@ -204,7 +204,7 @@ export default function BookingDetailPage({
         )}
 
         {error && (
-          <p className="mx-4 mb-3 rounded-md bg-danger-tint px-3 py-2.5 text-[12.5px] text-danger">
+          <p className="mx-4 mb-3 rounded-md bg-danger-tint px-3 py-2.5 text-[13.5px] text-danger">
             {error}
           </p>
         )}
@@ -216,7 +216,7 @@ export default function BookingDetailPage({
           <BottomBar>
             <Link
               href={`/consulting/${booking.id}/answer`}
-              className="cond block w-full rounded-md bg-brand py-3.5 text-center text-[15px] font-bold text-white"
+              className="cond block w-full rounded-md bg-brand py-3.5 text-center text-[16px] font-bold text-white"
             >
               {booking.status === "수정 요청됨" ? "확정안 작성하기" : "답변 작성하기"}
             </Link>
@@ -226,7 +226,7 @@ export default function BookingDetailPage({
       {/* 신청자가 답변을 받아본 상태 */}
       {booking.is_owner && booking.status === "답변 도착" && (
         <BottomBar>
-          <p className="mb-2 text-center text-[12px] text-neutral-600">
+          <p className="mb-2 text-center text-[13px] text-neutral-600">
             이 답변으로 확정할까요?
           </p>
           <div className="flex gap-2">
@@ -234,7 +234,7 @@ export default function BookingDetailPage({
               type="button"
               disabled={busy || booking.revision_count > 0}
               onClick={() => router.push(`/booking/done/${booking.id}/revise`)}
-              className="flex-1 rounded-md border border-neutral-300 py-3.5 text-[14px] font-semibold text-neutral-700 disabled:opacity-45"
+              className="flex-1 rounded-md border border-neutral-300 py-3.5 text-[15px] font-semibold text-neutral-700 disabled:opacity-45"
             >
               수정을 요청해요
             </button>
@@ -242,12 +242,12 @@ export default function BookingDetailPage({
               type="button"
               disabled={busy}
               onClick={accept}
-              className="flex-1 rounded-md bg-brand py-3.5 text-[14px] font-bold text-white disabled:bg-neutral-300"
+              className="flex-1 rounded-md bg-brand py-3.5 text-[15px] font-bold text-white disabled:bg-neutral-300"
             >
               이대로 좋아요
             </button>
           </div>
-          <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+          <p className="mt-2 text-center text-[12.5px] text-neutral-500">
             {booking.revision_count > 0
               ? "수정 요청은 이미 사용했어요 · 불만족 시 100% 환불"
               : "수정 요청은 1회 가능해요 · 불만족 시 100% 환불"}
@@ -259,7 +259,7 @@ export default function BookingDetailPage({
         <BottomBar>
           <Link
             href="/me/bookings"
-            className="cond block w-full rounded-md bg-brand py-3.5 text-center text-[15px] font-bold text-white"
+            className="cond block w-full rounded-md bg-brand py-3.5 text-center text-[16px] font-bold text-white"
           >
             내 컨설팅 보기
           </Link>
@@ -289,10 +289,10 @@ function SurveySummary({ booking }: { booking: BookingDetail }) {
             i > 0 ? "border-t border-dashed border-neutral-300" : ""
           }`}
         >
-          <span className="shrink-0 text-[12.5px] text-neutral-500">{k}</span>
+          <span className="shrink-0 text-[13.5px] text-neutral-500">{k}</span>
           {/* 값은 오른쪽 끝에 붙인다 — 라벨 폭이 제각각이라
               왼쪽 정렬하면 값이 들쭉날쭉해서 훑기 어렵다. */}
-          <span className="flex-1 text-right text-[13px] leading-relaxed font-semibold">
+          <span className="flex-1 text-right text-[14px] leading-relaxed font-semibold">
             {v}
           </span>
         </div>
@@ -308,7 +308,7 @@ function SurveySummary({ booking }: { booking: BookingDetail }) {
             key={kind}
             className="border-t border-dashed border-neutral-300 py-3"
           >
-            <p className="mb-2 text-[12.5px] text-neutral-500">
+            <p className="mb-2 text-[13.5px] text-neutral-500">
               {kind === "전신" ? "전신 사진" : "자주 입는 옷"}
             </p>
             <div className="flex flex-wrap gap-2">

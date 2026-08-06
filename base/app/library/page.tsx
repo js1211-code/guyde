@@ -46,7 +46,7 @@ export default function LibraryPage() {
             type="button"
             onClick={() => setShelf(s)}
             aria-current={shelf === s ? "page" : undefined}
-            className={`-mb-px shrink-0 pt-1 pb-2 text-[14px] ${
+            className={`-mb-px shrink-0 pt-1 pb-2 text-[15px] ${
               shelf === s
                 ? "border-b-2 border-brand font-bold text-ink"
                 : "text-neutral-600"
@@ -79,8 +79,8 @@ function Articles() {
         <span className="mt-2.5 inline-block">
           <CategoryBadge>{hero.category}</CategoryBadge>
         </span>
-        <p className="mt-1.5 text-[17px] leading-snug font-bold">{hero.title}</p>
-        <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">
+        <p className="mt-1.5 text-[18.5px] leading-snug font-bold">{hero.title}</p>
+        <p className="mt-1 text-[14px] leading-relaxed text-neutral-600">
           {hero.lead}
         </p>
       </Link>
@@ -99,8 +99,8 @@ function Articles() {
             iconSize={16}
           />
           <div className="min-w-0 flex-1">
-            <p className="text-[14px] leading-snug font-semibold">{a.title}</p>
-            <p className="mt-1 flex items-center gap-1.5 text-[11px] text-neutral-600">
+            <p className="text-[15px] leading-snug font-semibold">{a.title}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-[12px] text-neutral-600">
               <span>{a.category}</span>
               <span>· {a.read_minutes}분</span>
             </p>
@@ -116,8 +116,8 @@ function Articles() {
             href={`/library/quiz/${q.slug}`}
             className="min-w-[128px] flex-1 rounded-xl border border-neutral-400 p-3"
           >
-            <p className="text-[13.5px] leading-snug font-bold">{q.title}</p>
-            <p className="cond mt-2 text-[11px] text-neutral-600">
+            <p className="text-[14.5px] leading-snug font-bold">{q.title}</p>
+            <p className="cond mt-2 text-[12px] text-neutral-600">
               {q.taker_count.toLocaleString("ko-KR")}명 참여
             </p>
           </Link>
@@ -155,23 +155,23 @@ function Picks() {
 
   return (
     <>
-      <p className="px-4 pt-3 pb-2 text-[12.5px] leading-relaxed text-neutral-600">
+      <p className="px-4 pt-3 pb-2 text-[13.5px] leading-relaxed text-neutral-600">
         판정이 끝난 글 중 {NANHAN_PICK_MIN_VOTES}표 이상 모여{" "}
         {NANHAN_PICK_PERCENT}% 넘게 무난하다고 나온 것만 모았어요.
       </p>
 
       {failed && (
-        <p className="px-4 py-10 text-center text-[13px] text-neutral-600">
+        <p className="px-4 py-10 text-center text-[14px] text-neutral-600">
           불러오지 못했어요
         </p>
       )}
       {!failed && items === null && (
-        <p className="px-4 py-10 text-center text-[13px] text-neutral-500">
+        <p className="px-4 py-10 text-center text-[14px] text-neutral-500">
           불러오는 중…
         </p>
       )}
       {items?.length === 0 && (
-        <p className="px-4 py-10 text-center text-[13px] leading-relaxed text-neutral-600">
+        <p className="px-4 py-10 text-center text-[14px] leading-relaxed text-neutral-600">
           아직 조건을 채운 글이 없어요.
           <br />
           판정이 끝나고 {NANHAN_PICK_MIN_VOTES}표를 넘겨야 올라와요.
@@ -193,12 +193,12 @@ function Picks() {
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center gap-1.5">
               <CategoryBadge>{item.category}</CategoryBadge>
-              <span className="rounded-xs border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+              <span className="rounded-xs border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[11.5px] font-bold text-brand-dark">
                 무난함 {item.nanhan_percent}%
               </span>
             </div>
-            <p className="text-[14px] leading-snug font-semibold">{item.title}</p>
-            <p className="mt-1 text-[11.5px] text-neutral-500">
+            <p className="text-[15px] leading-snug font-semibold">{item.title}</p>
+            <p className="mt-1 text-[12.5px] text-neutral-500">
               {item.reaction_count}명 판정
             </p>
           </div>
@@ -224,22 +224,22 @@ function Guides() {
 
   return (
     <>
-      <p className="px-4 pt-3 pb-2 text-[12.5px] leading-relaxed text-neutral-600">
+      <p className="px-4 pt-3 pb-2 text-[13.5px] leading-relaxed text-neutral-600">
         커뮤니티가 쌓은 정보 글이에요. 도움된 순으로 모아뒀어요.
       </p>
 
       {failed && (
-        <p className="px-4 py-10 text-center text-[13px] text-neutral-600">
+        <p className="px-4 py-10 text-center text-[14px] text-neutral-600">
           불러오지 못했어요
         </p>
       )}
       {!failed && items === null && (
-        <p className="px-4 py-10 text-center text-[13px] text-neutral-500">
+        <p className="px-4 py-10 text-center text-[14px] text-neutral-500">
           불러오는 중…
         </p>
       )}
       {items?.length === 0 && (
-        <p className="px-4 py-10 text-center text-[13px] leading-relaxed text-neutral-600">
+        <p className="px-4 py-10 text-center text-[14px] leading-relaxed text-neutral-600">
           아직 정보 글이 없어요.
           <br />
           커뮤니티에서 &lsquo;정보 공유&rsquo;로 첫 글을 남겨보세요.
@@ -255,27 +255,27 @@ function Guides() {
           <div className="mb-1.5 flex items-center gap-2">
             <CategoryBadge>{item.category}</CategoryBadge>
             {item.reaction_count > 0 && (
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-brand">
+              <span className="flex items-center gap-1 text-[12px] font-semibold text-brand">
                 <HeartIcon size={11} className="text-brand" />
                 {item.reaction_count}
               </span>
             )}
             {item.comment_count > 0 && (
-              <span className="flex items-center gap-1 text-[11px] text-neutral-600">
+              <span className="flex items-center gap-1 text-[12px] text-neutral-600">
                 <MessageIcon size={11} />
                 {item.comment_count}
               </span>
             )}
           </div>
 
-          <p className="text-[15px] leading-snug font-semibold">{item.title}</p>
+          <p className="text-[16px] leading-snug font-semibold">{item.title}</p>
           {item.body.trim() && (
-            <p className="line-clamp-2 mt-1 text-[13px] leading-relaxed text-neutral-600">
+            <p className="line-clamp-2 mt-1 text-[14px] leading-relaxed text-neutral-600">
               {item.body}
             </p>
           )}
           <div className="mt-2 flex items-center gap-1.5">
-            <span className="text-[12px] font-semibold">{item.nickname}</span>
+            <span className="text-[13px] font-semibold">{item.nickname}</span>
             <Temperature value={item.temperature} />
           </div>
         </Link>

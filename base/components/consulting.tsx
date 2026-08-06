@@ -55,7 +55,7 @@ export function ConsultStepper({ status }: { status: BookingStatus }) {
                 {reached && <CheckIcon size={14} strokeWidth={2.4} />}
               </span>
               <span
-                className={`text-center text-[10.5px] leading-tight ${
+                className={`text-center text-[11.5px] leading-tight ${
                   i === current ? "font-bold text-ink" : "text-neutral-500"
                 }`}
               >
@@ -105,13 +105,13 @@ export function BudgetBadge({
   return (
     <div className={`flex items-center justify-between rounded-2xl p-4 ${tone.box}`}>
       <div>
-        <p className={`text-[11.5px] font-semibold ${tone.label}`}>합계</p>
-        <p className={`cond mt-1 text-[25px] leading-none font-bold ${tone.num}`}>
+        <p className={`text-[12.5px] font-semibold ${tone.label}`}>합계</p>
+        <p className={`cond mt-1 text-[27px] leading-none font-bold ${tone.num}`}>
           {total.toLocaleString("ko-KR")}원
         </p>
       </div>
       <span
-        className={`rounded-full bg-white px-2.5 py-1.5 text-[12px] font-bold ${tone.label}`}
+        className={`rounded-full bg-white px-2.5 py-1.5 text-[13px] font-bold ${tone.label}`}
       >
         예산 {budget.toLocaleString("ko-KR")}원의 {pct}%
       </span>
@@ -141,7 +141,7 @@ export function SlotLabel({
   return (
     <span className="flex items-center gap-1.5">
       {Icon && <Icon size={size} />}
-      <span className="text-[15px] font-bold">{slot}</span>
+      <span className="text-[16px] font-bold">{slot}</span>
     </span>
   );
 }
@@ -157,7 +157,7 @@ export function AnswerView({
   return (
     <div>
       <Section title="① 진단">
-        <p className="text-[13.5px] leading-relaxed">{answer.diagnosis}</p>
+        <p className="text-[14.5px] leading-relaxed">{answer.diagnosis}</p>
       </Section>
 
       <Section title="② 피해야 할 것">
@@ -165,7 +165,7 @@ export function AnswerView({
           {answer.avoid.map((a) => (
             <span
               key={a}
-              className="rounded-full border border-danger-line bg-danger-tint px-2.5 py-1 text-[12px] font-semibold text-danger"
+              className="rounded-full border border-danger-line bg-danger-tint px-2.5 py-1 text-[13px] font-semibold text-danger"
             >
               {a}
             </span>
@@ -180,13 +180,13 @@ export function AnswerView({
             <div key={item.slot} className="card mb-3 rounded-3xl p-4">
               <div className="mb-2.5 flex items-center gap-1.5">
                 <SlotLabel slot={item.slot} />
-                <span className="cond ml-auto text-[14px] font-bold">
+                <span className="cond ml-auto text-[15px] font-bold">
                   {item.price.toLocaleString("ko-KR")}원
                 </span>
               </div>
 
-              <p className="text-[13px] font-bold">{item.name}</p>
-              <p className="mt-0.5 text-[11px] text-neutral-500">{item.brand}</p>
+              <p className="text-[14px] font-bold">{item.name}</p>
+              <p className="mt-0.5 text-[12px] text-neutral-500">{item.brand}</p>
 
               {/* 링크 밑에 미리보기. 읽히는 사이트에서만 뜨고, 29cm·쿠팡처럼
                   상품을 자바스크립트로 그리는 곳은 아무것도 안 그린다. */}
@@ -199,11 +199,11 @@ export function AnswerView({
                 </>
               )}
 
-              <p className="mt-3 mb-1 text-[12px] font-semibold text-neutral-600">
+              <p className="mt-3 mb-1 text-[13px] font-semibold text-neutral-600">
                 왜 이 아이템인가요?
               </p>
               <div className="rounded-r-md border-l-[3px] border-brand bg-brand-tint py-2.5 pr-3 pl-3">
-                <p className="text-[12.5px] leading-relaxed">{item.reason}</p>
+                <p className="text-[13.5px] leading-relaxed">{item.reason}</p>
               </div>
             </div>
           ))}
@@ -235,11 +235,11 @@ function ShopLink({ url, alt = false }: { url: string; alt?: boolean }) {
       className="mt-2 flex items-center gap-2 rounded-md bg-brand-tint px-3 py-2.5"
     >
       {alt && (
-        <span className="rounded-xs bg-neutral-300 px-1.5 py-0.5 text-[10px] font-bold text-neutral-700">
+        <span className="rounded-xs bg-neutral-300 px-1.5 py-0.5 text-[11px] font-bold text-neutral-700">
           대체
         </span>
       )}
-      <span className="flex-1 truncate text-[12.5px] text-brand-dark underline underline-offset-2">
+      <span className="flex-1 truncate text-[13.5px] text-brand-dark underline underline-offset-2">
         {url}
       </span>
       <ArrowUpRightIcon size={14} className="shrink-0 text-brand-dark" />
@@ -256,7 +256,7 @@ function Section({
 }) {
   return (
     <section className="mb-5">
-      <p className="mb-2 text-[13.5px] font-bold">{title}</p>
+      <p className="mb-2 text-[14.5px] font-bold">{title}</p>
       {children}
     </section>
   );
@@ -270,14 +270,14 @@ export function BookingCard({ booking }: { booking: BookingListItem }) {
       className="card mb-3 block rounded-2xl p-4"
     >
       <div className="flex items-center gap-2">
-        <span className="text-[14px] font-bold">{booking.expert.nickname}</span>
+        <span className="text-[15px] font-bold">{booking.expert.nickname}</span>
         <StatusPill status={booking.status} />
       </div>
-      <p className="mt-1.5 text-[12.5px] text-neutral-600">
+      <p className="mt-1.5 text-[13.5px] text-neutral-600">
         {booking.purpose} · 예산 {(booking.budget / 10000).toFixed(0)}만원 ·{" "}
         {booking.created_label} 신청
       </p>
-      <p className="mt-1 text-[11.5px] text-neutral-500">{booking.due_label}</p>
+      <p className="mt-1 text-[12.5px] text-neutral-500">{booking.due_label}</p>
     </Link>
   );
 }
@@ -292,7 +292,7 @@ export function StatusPill({ status }: { status: BookingStatus }) {
           ? "bg-brand text-white"
           : "bg-neutral-200 text-neutral-600";
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[10.5px] font-bold ${tone}`}>
+    <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-bold ${tone}`}>
       {status}
     </span>
   );

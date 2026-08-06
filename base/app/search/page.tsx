@@ -87,7 +87,7 @@ export default function SearchPage() {
             autoFocus
             enterKeyHint="search"
             placeholder="제목·내용으로 찾기"
-            className="min-w-0 flex-1 text-[14px]"
+            className="min-w-0 flex-1 text-[15px]"
           />
           {term && (
             <button
@@ -97,7 +97,7 @@ export default function SearchPage() {
                 setTerm("");
                 inputRef.current?.focus();
               }}
-              className="shrink-0 text-[15px] leading-none text-neutral-500"
+              className="shrink-0 text-[16px] leading-none text-neutral-500"
             >
               ×
             </button>
@@ -119,7 +119,7 @@ export default function SearchPage() {
                 aria-pressed={on}
                 // 선택은 테두리를 유지한 채 연하게 채운다. 꽉 찬 색으로 바꾸면
                 // 박스 선이 사라져 뭐가 골라졌는지 흐려진다.
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-[12.5px] whitespace-nowrap ${
+                className={`shrink-0 rounded-full border px-3 py-1.5 text-[13.5px] whitespace-nowrap ${
                   on
                     ? "border-brand bg-brand/15 font-bold text-brand-dark"
                     : "border-neutral-400 text-neutral-600"
@@ -134,7 +134,7 @@ export default function SearchPage() {
 
       <ScreenBody>
         {!trimmed && (
-          <p className="px-4 py-12 text-center text-[13px] leading-relaxed text-neutral-500">
+          <p className="px-4 py-12 text-center text-[14px] leading-relaxed text-neutral-500">
             찾고 싶은 말을 적어보세요.
             <br />
             제목과 내용에서 함께 찾아요.
@@ -142,26 +142,26 @@ export default function SearchPage() {
         )}
 
         {trimmed && results === null && !failed && (
-          <p className="px-4 py-12 text-center text-[13px] text-neutral-500">
+          <p className="px-4 py-12 text-center text-[14px] text-neutral-500">
             찾는 중…
           </p>
         )}
 
         {failed && (
-          <p className="px-4 py-12 text-center text-[13px] text-neutral-600">
+          <p className="px-4 py-12 text-center text-[14px] text-neutral-600">
             검색하지 못했어요. 잠시 후 다시 시도해주세요.
           </p>
         )}
 
         {results?.length === 0 && (
           <div className="px-4 py-12 text-center">
-            <p className="text-[13px] leading-relaxed text-neutral-600">
+            <p className="text-[14px] leading-relaxed text-neutral-600">
               <b>{trimmed}</b> 에 대한 글이 없어요.
               {board !== "전체" && (
                 // 게시판을 좁혀놓고 못 찾은 건지 원래 없는 건지 구분돼야 한다.
                 <>
                   <br />
-                  <span className="text-[12px] text-neutral-500">
+                  <span className="text-[13px] text-neutral-500">
                     지금은 <b>{board}</b> 게시판에서만 찾고 있어요.
                   </span>
                 </>
@@ -171,7 +171,7 @@ export default function SearchPage() {
                 안 물어봤다는 뜻이라, 그 자리에서 물어보게 하는 게 맞다. */}
             <Link
               href="/write"
-              className="mt-4 inline-block rounded-md bg-brand px-4 py-2.5 text-[13px] font-bold text-white"
+              className="mt-4 inline-block rounded-md bg-brand px-4 py-2.5 text-[14px] font-bold text-white"
             >
               직접 물어보기
             </Link>
@@ -180,7 +180,7 @@ export default function SearchPage() {
 
         {results && results.length > 0 && (
           <>
-            <p className="px-4 pt-2.5 pb-1 text-[12px] text-neutral-600">
+            <p className="px-4 pt-2.5 pb-1 text-[13px] text-neutral-600">
               {results.length}건
             </p>
             {results.map((item) => (

@@ -37,16 +37,16 @@ export default function ExpertConsolePage() {
       <AppShell>
         <PageTitle>고수 콘솔</PageTitle>
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13.5px] leading-relaxed text-neutral-600">
+          <p className="text-center text-[14.5px] leading-relaxed text-neutral-600">
             이 기기는 고수로 등록되어 있지 않아요.
             <br />
-            <span className="text-[12.5px] text-neutral-500">
+            <span className="text-[13.5px] text-neutral-500">
               고수는 온도 42.0℃ 이상인 사람 중에서만 정해져요.
             </span>
           </p>
           <Link
             href="/experts"
-            className="mt-6 block text-center text-[13px] font-bold text-brand"
+            className="mt-6 block text-center text-[14px] font-bold text-brand"
           >
             컨설팅 둘러보기
           </Link>
@@ -67,20 +67,20 @@ export default function ExpertConsolePage() {
 
       <ScreenBody className="px-4 pt-4">
         {items === null && (
-          <p className="py-10 text-center text-[13px] text-neutral-500">
+          <p className="py-10 text-center text-[14px] text-neutral-500">
             불러오는 중…
           </p>
         )}
 
         {items?.length === 0 && (
-          <p className="py-10 text-center text-[13px] text-neutral-600">
+          <p className="py-10 text-center text-[14px] text-neutral-600">
             아직 들어온 신청이 없어요
           </p>
         )}
 
         {pending.length > 0 && (
           <>
-            <p className="cond mb-2 text-[13px] font-semibold tracking-wide text-brand">
+            <p className="cond mb-2 text-[14px] font-semibold tracking-wide text-brand">
               답변 대기 {pending.length}건
             </p>
             {pending.map((b) => (
@@ -91,7 +91,7 @@ export default function ExpertConsolePage() {
 
         {done.length > 0 && (
           <>
-            <p className="cond mt-5 mb-2 text-[13px] font-semibold tracking-wide text-neutral-600">
+            <p className="cond mt-5 mb-2 text-[14px] font-semibold tracking-wide text-neutral-600">
               지난 컨설팅 {done.length}건
             </p>
             {done.map((b) => (
@@ -115,8 +115,8 @@ function InboxCard({ booking }: { booking: ExpertInboxItem }) {
       className="card mb-3 block rounded-2xl p-4"
     >
       <div className="flex items-center gap-2">
-        <span className="text-[14px] font-bold">{booking.purpose}</span>
-        <span className="cond text-[13px] font-bold text-brand">
+        <span className="text-[15px] font-bold">{booking.purpose}</span>
+        <span className="cond text-[14px] font-bold text-brand">
           {booking.budget / 10000}만원
         </span>
         <span className="ml-auto">
@@ -124,11 +124,11 @@ function InboxCard({ booking }: { booking: ExpertInboxItem }) {
         </span>
       </div>
       {booking.concerns.length > 0 && (
-        <p className="mt-1.5 text-[12.5px] text-neutral-600">
+        <p className="mt-1.5 text-[13.5px] text-neutral-600">
           {booking.concerns.join(" · ")}
         </p>
       )}
-      <p className="mt-1 text-[11.5px] text-neutral-500">
+      <p className="mt-1 text-[12.5px] text-neutral-500">
         {booking.created_label} 신청 · {booking.due_label}
       </p>
     </Link>

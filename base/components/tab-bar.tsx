@@ -124,7 +124,7 @@ export function TabBar() {
                 }`}
               />
               <span
-                className={`text-[10px] transition-all duration-200 ${
+                className={`text-[11px] transition-all duration-200 ${
                   active ? "font-bold" : "opacity-80"
                 }`}
               >

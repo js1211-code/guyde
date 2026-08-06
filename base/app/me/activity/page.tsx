@@ -49,7 +49,7 @@ export default function ActivityPage() {
             key={key}
             type="button"
             onClick={() => setTab(key)}
-            className={`-mb-px pr-6 pb-2.5 text-[14px] ${
+            className={`-mb-px pr-6 pb-2.5 text-[15px] ${
               tab === key
                 ? "border-b-2 border-brand font-bold text-ink"
                 : "text-neutral-500"
@@ -89,12 +89,12 @@ function PostList({ items }: { items: FeedItem[] | null }) {
           <div className="mb-1 flex items-center gap-1.5">
             <CategoryBadge>{p.category}</CategoryBadge>
             <PostTypeBadge postType={p.post_type} nanhanPercent={p.nanhan_percent} />
-            <span className="ml-auto text-[11px] text-neutral-600">
+            <span className="ml-auto text-[12px] text-neutral-600">
               {timeAgo(p.created_at)}
             </span>
           </div>
-          <p className="text-[14.5px] leading-snug font-medium">{p.title}</p>
-          <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-600">
+          <p className="text-[15.5px] leading-snug font-medium">{p.title}</p>
+          <div className="mt-1.5 flex items-center gap-3 text-[12.5px] text-neutral-600">
             {p.post_type === "선택지투표" && (
               <span className="flex items-center gap-1">
                 <VoteIcon size={12} />
@@ -122,11 +122,11 @@ function CommentList({ items }: { items: MyComment[] | null }) {
           className="block border-b border-dashed border-neutral-400 py-3"
         >
           {/* 어느 글에 단 댓글인지 먼저 보여야 맥락이 산다 */}
-          <p className="mb-1 text-[11.5px] text-neutral-600">
+          <p className="mb-1 text-[12.5px] text-neutral-600">
             {c.post?.title ?? "삭제된 글"}
           </p>
-          <p className="text-[14px] leading-relaxed">{c.body}</p>
-          <span className="mt-1.5 flex items-center gap-1 text-[11.5px] text-neutral-500">
+          <p className="text-[15px] leading-relaxed">{c.body}</p>
+          <span className="mt-1.5 flex items-center gap-1 text-[12.5px] text-neutral-500">
             <ThumbsUpIcon size={13} />
             <span className="font-bold">{c.likes}</span>
           </span>
@@ -138,12 +138,12 @@ function CommentList({ items }: { items: MyComment[] | null }) {
 
 function Loading() {
   return (
-    <p className="py-10 text-center text-[13px] text-neutral-500">불러오는 중…</p>
+    <p className="py-10 text-center text-[14px] text-neutral-500">불러오는 중…</p>
   );
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <p className="py-10 text-center text-[13px] text-neutral-600">{children}</p>
+    <p className="py-10 text-center text-[14px] text-neutral-600">{children}</p>
   );
 }

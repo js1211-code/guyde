@@ -43,7 +43,7 @@ export default function ExpertPage({
       <AppShell>
         <TopBar backHref="/experts" title="고수" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-600">
+          <p className="text-center text-[14px] text-neutral-600">
             고수를 찾을 수 없어요
           </p>
         </ScreenBody>
@@ -56,7 +56,7 @@ export default function ExpertPage({
       <AppShell>
         <TopBar backHref="/experts" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-500">불러오는 중…</p>
+          <p className="text-center text-[14px] text-neutral-500">불러오는 중…</p>
         </ScreenBody>
       </AppShell>
     );
@@ -69,13 +69,13 @@ export default function ExpertPage({
       <ScreenBody>
         <section className="px-4 pt-2 pb-4">
           <div className="flex items-center gap-2">
-            <h1 className="text-[19px] font-bold">{expert.nickname}</h1>
+            <h1 className="text-[20.5px] font-bold">{expert.nickname}</h1>
             <Temperature value={expert.temperature} size={15} />
           </div>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-neutral-700">
+          <p className="mt-2 text-[14.5px] leading-relaxed text-neutral-700">
             {expert.intro}
           </p>
-          <div className="mt-3 flex items-center gap-3 text-[12.5px] text-neutral-600">
+          <div className="mt-3 flex items-center gap-3 text-[13.5px] text-neutral-600">
             {expert.rating !== null && (
               <span className="flex items-center gap-1 font-semibold text-ink">
                 <StarIcon />
@@ -88,7 +88,7 @@ export default function ExpertPage({
 
         {expert.highlights.length > 0 && (
           <section className="border-b-8 border-neutral-200 px-4 pt-4 pb-4">
-            <p className="cond mb-3 text-[13px] font-semibold tracking-wide text-brand">
+            <p className="cond mb-3 text-[14px] font-semibold tracking-wide text-brand">
               커뮤니티 대표 답변 {expert.highlights.length}개
             </p>
             {expert.highlights.map((h) => (
@@ -97,9 +97,9 @@ export default function ExpertPage({
                 href={`/post/${h.post_id}`}
                 className="mb-2.5 block rounded-lg border border-brand-tint-b bg-brand-tint p-3 last:mb-0"
               >
-                <p className="text-[14px] leading-relaxed">“{h.body}”</p>
+                <p className="text-[15px] leading-relaxed">“{h.body}”</p>
                 <span className="mt-2 flex items-center justify-between">
-                  <span className="text-[11.5px] text-neutral-600">
+                  <span className="text-[12.5px] text-neutral-600">
                     {h.post_title}
                     {h.likes > 0 && ` · 추천 ${h.likes}`}
                   </span>
@@ -118,10 +118,10 @@ export default function ExpertPage({
                 key={i}
                 className="border-t border-dashed border-neutral-400 py-2"
               >
-                <span className="cond text-[12.5px] font-semibold text-brand">
+                <span className="cond text-[13.5px] font-semibold text-brand">
                   {"★".repeat(r.rating)}
                 </span>
-                <p className="mt-1 text-[13.5px]">{r.body}</p>
+                <p className="mt-1 text-[14.5px]">{r.body}</p>
               </div>
             ))}
           </section>
@@ -130,15 +130,15 @@ export default function ExpertPage({
 
       <BottomBar>
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-[12.5px] text-neutral-600">컨설팅비</span>
-          <span className="cond text-[19px] font-bold">
+          <span className="text-[13.5px] text-neutral-600">컨설팅비</span>
+          <span className="cond text-[20.5px] font-bold">
             ₩{expert.price.toLocaleString("ko-KR")}
           </span>
         </div>
         <PrimaryButton href={`/booking/${expert.id}`}>
           컨설팅 신청하기
         </PrimaryButton>
-        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+        <p className="mt-2 text-center text-[12.5px] text-neutral-500">
           {CONSULTING_SLA_HOURS}시간 안에 답변 · 불만족 시 100% 환불
         </p>
       </BottomBar>

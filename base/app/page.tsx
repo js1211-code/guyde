@@ -19,7 +19,7 @@ export default function CommunityPage() {
           {/* 마크 + 워드마크. 예전엔 GUYDE+ 였는데 '+'는 로고가 정해지기 전
               임시 강조였다. 이제 마크가 그 자리를 대신한다. */}
           <Logo size={24} />
-          <p className="mt-1 text-[10px] tracking-wide text-neutral-600">
+          <p className="mt-1 text-[11px] tracking-wide text-neutral-600">
             GUY를 위한 GUIDE.
           </p>
         </div>

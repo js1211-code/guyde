@@ -31,17 +31,17 @@ export default function MyBookingsPage() {
 
       <ScreenBody className="px-4 pt-4">
         {failed && (
-          <p className="py-10 text-center text-[13px] text-neutral-600">
+          <p className="py-10 text-center text-[14px] text-neutral-600">
             목록을 불러오지 못했어요
           </p>
         )}
         {!failed && bookings === null && (
-          <p className="py-10 text-center text-[13px] text-neutral-500">
+          <p className="py-10 text-center text-[14px] text-neutral-500">
             불러오는 중…
           </p>
         )}
         {bookings?.length === 0 && (
-          <p className="py-10 text-center text-[13px] text-neutral-600">
+          <p className="py-10 text-center text-[14px] text-neutral-600">
             신청한 컨설팅이 없어요
           </p>
         )}

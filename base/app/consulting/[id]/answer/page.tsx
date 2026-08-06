@@ -138,7 +138,7 @@ export default function AnswerWritePage({
       <AppShell>
         <TopBar backHref="/consulting" title="답변 작성" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] leading-relaxed text-neutral-600">
+          <p className="text-center text-[14px] leading-relaxed text-neutral-600">
             이 컨설팅의 담당 고수가 아니에요
           </p>
         </ScreenBody>
@@ -151,7 +151,7 @@ export default function AnswerWritePage({
       <AppShell>
         <TopBar backHref="/consulting" title="답변 작성" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-500">불러오는 중…</p>
+          <p className="text-center text-[14px] text-neutral-500">불러오는 중…</p>
         </ScreenBody>
       </AppShell>
     );
@@ -175,13 +175,13 @@ export default function AnswerWritePage({
         */}
         {round === 2 && (
           <section className="mb-5 rounded-2xl border-2 border-danger-line bg-danger-tint p-4">
-            <p className="text-[13px] font-bold text-danger">
+            <p className="text-[14px] font-bold text-danger">
               이 점을 고쳐달라고 했어요
             </p>
-            <p className="mt-2 text-[14px] leading-relaxed">
+            <p className="mt-2 text-[15px] leading-relaxed">
               {booking.revision_reason ?? "사유가 기록되지 않았어요"}
             </p>
-            <p className="mt-2.5 text-[11.5px] text-neutral-600">
+            <p className="mt-2.5 text-[12.5px] text-neutral-600">
               수정은 1회뿐이라 이번이 확정안이에요.
             </p>
           </section>
@@ -190,15 +190,15 @@ export default function AnswerWritePage({
         {/* 지난 회차에서 무엇을 냈는지 — 같은 걸 또 내지 않으려면 필요하다 */}
         {round === 2 && lastAnswer && (
           <details className="mb-5 rounded-2xl bg-neutral-100 p-4">
-            <summary className="cursor-pointer text-[12.5px] font-semibold text-neutral-600">
+            <summary className="cursor-pointer text-[13.5px] font-semibold text-neutral-600">
               1회차에 보낸 답변 다시 보기
             </summary>
-            <p className="mt-3 text-[12.5px] leading-relaxed text-neutral-700">
+            <p className="mt-3 text-[13.5px] leading-relaxed text-neutral-700">
               {lastAnswer.diagnosis}
             </p>
             <ul className="mt-3 space-y-1">
               {lastAnswer.items.map((i) => (
-                <li key={i.slot} className="text-[12.5px] text-neutral-700">
+                <li key={i.slot} className="text-[13.5px] text-neutral-700">
                   · {i.slot} — {i.name} ({i.price.toLocaleString("ko-KR")}원)
                 </li>
               ))}
@@ -208,7 +208,7 @@ export default function AnswerWritePage({
 
         {/* 신청 내용 — 답을 쓰는 내내 보여야 한다 */}
         <section className="mb-5 rounded-2xl bg-neutral-100 p-4">
-          <p className="mb-2 text-[12px] font-semibold text-neutral-500">
+          <p className="mb-2 text-[13px] font-semibold text-neutral-500">
             신청 내용
           </p>
           <Row k="목적" v={booking.purpose} />
@@ -243,7 +243,7 @@ export default function AnswerWritePage({
             onChange={(e) => setDiagnosis(e.target.value)}
             rows={4}
             placeholder="체형과 사진을 보고 무엇이 문제인지, 어떤 방향으로 가야 하는지 적어주세요"
-            className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[14px] leading-relaxed"
           />
           <Counter len={diagnosis.trim().length} min={OUTFIT_REASON_MIN} />
         </Step>
@@ -262,12 +262,12 @@ export default function AnswerWritePage({
                 addAvoid();
               }}
               placeholder="예) 오버핏 후드"
-              className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-[13px]"
+              className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-[14px]"
             />
             <button
               type="button"
               onClick={addAvoid}
-              className="rounded-md border border-brand px-3 text-[13px] font-bold text-brand"
+              className="rounded-md border border-brand px-3 text-[14px] font-bold text-brand"
             >
               추가
             </button>
@@ -279,7 +279,7 @@ export default function AnswerWritePage({
                   key={a}
                   type="button"
                   onClick={() => setAvoid((prev) => prev.filter((x) => x !== a))}
-                  className="rounded-full border border-danger-line bg-danger-tint px-2.5 py-1 text-[12px] font-semibold text-danger"
+                  className="rounded-full border border-danger-line bg-danger-tint px-2.5 py-1 text-[13px] font-semibold text-danger"
                 >
                   {a} ×
                 </button>
@@ -296,7 +296,7 @@ export default function AnswerWritePage({
           hint="세 칸 모두"
         >
           <BudgetBadge total={total} budget={booking.budget} />
-          <p className="mt-2 mb-4 text-[11px] leading-relaxed text-neutral-500">
+          <p className="mt-2 mb-4 text-[12px] leading-relaxed text-neutral-500">
             합계가 예산의 80~100%면 초록 배지가 돼요. 벗어나면 주황·빨강으로 바뀝니다.
           </p>
 
@@ -305,7 +305,7 @@ export default function AnswerWritePage({
               <div className="mb-3 flex items-center gap-1.5">
                 <SlotLabel slot={slot} />
                 {slotDone(slot) ? (
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-ok">
+                  <span className="flex items-center gap-1 text-[12px] font-bold text-ok">
                     <CheckIcon size={12} /> 완료
                   </span>
                 ) : (
@@ -366,11 +366,11 @@ export default function AnswerWritePage({
               />
 
               <div className="mt-3 mb-1 flex items-center gap-1">
-                <p className="text-[12px] font-semibold text-neutral-600">
+                <p className="text-[13px] font-semibold text-neutral-600">
                   왜 이 아이템인가요?
                 </p>
                 <Required />
-                <span className="text-[11px] text-neutral-500">
+                <span className="text-[12px] text-neutral-500">
                   최소 {OUTFIT_REASON_MIN}자
                 </span>
               </div>
@@ -379,7 +379,7 @@ export default function AnswerWritePage({
                 onChange={(e) => patch(slot, "reason", e.target.value)}
                 rows={3}
                 placeholder="이 사람의 체형·목적과 이 아이템이 어떻게 맞는지 적어주세요"
-                className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+                className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[14px] leading-relaxed"
               />
               <Counter
                 len={items[slot].reason.trim().length}
@@ -390,7 +390,7 @@ export default function AnswerWritePage({
         </Step>
 
         {error && (
-          <p className="mb-3 rounded-md bg-danger-tint px-3 py-2.5 text-[12.5px] text-danger">
+          <p className="mb-3 rounded-md bg-danger-tint px-3 py-2.5 text-[13.5px] text-danger">
             {error}
           </p>
         )}
@@ -404,7 +404,7 @@ export default function AnswerWritePage({
               ? "확정안 보내기"
               : "답변 보내기"}
         </PrimaryButton>
-        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+        <p className="mt-2 text-center text-[12.5px] text-neutral-500">
           {canSubmit
             ? round === 2
               ? "확정안은 수정할 수 없어요"
@@ -418,7 +418,7 @@ export default function AnswerWritePage({
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="flex gap-3 py-1 text-[12.5px]">
+    <div className="flex gap-3 py-1 text-[13.5px]">
       <span className="w-[90px] shrink-0 text-neutral-500">{k}</span>
       <span className="flex-1 leading-relaxed">{v}</span>
     </div>
@@ -447,12 +447,12 @@ function Step({
 }) {
   return (
     <section className="mb-6">
-      <p className="mb-2 flex items-center gap-1.5 text-[14px] font-bold">
+      <p className="mb-2 flex items-center gap-1.5 text-[15px] font-bold">
         <span className={done ? "text-ok" : "text-brand"}>{n}</span>
         {title}
         {done ? <CheckIcon size={14} className="text-ok" /> : <Required />}
         {!done && hint && (
-          <span className="text-[11.5px] font-normal text-neutral-500">
+          <span className="text-[12.5px] font-normal text-neutral-500">
             {hint}
           </span>
         )}
@@ -470,7 +470,7 @@ function Label({
   optional?: boolean;
 }) {
   return (
-    <p className="mt-3 mb-1.5 flex items-center gap-1 text-[11.5px] font-semibold text-neutral-500 first:mt-0">
+    <p className="mt-3 mb-1.5 flex items-center gap-1 text-[12.5px] font-semibold text-neutral-500 first:mt-0">
       {children}
       {optional ? <span className="font-normal">· 선택</span> : <Required />}
     </p>
@@ -485,7 +485,7 @@ function Label({
  */
 function Required() {
   return (
-    <span className="text-required text-[13px] leading-none" aria-label="필수">
+    <span className="text-required text-[14px] leading-none" aria-label="필수">
       *
     </span>
   );
@@ -510,7 +510,7 @@ function Input({
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       inputMode={inputMode}
-      className={`w-full rounded-md border px-3 py-2.5 text-[13px] ${
+      className={`w-full rounded-md border px-3 py-2.5 text-[14px] ${
         invalid && value !== ""
           ? "border-danger-line bg-danger-tint"
           : "border-neutral-300"
@@ -522,7 +522,7 @@ function Input({
 function Counter({ len, min }: { len: number; min: number }) {
   return (
     <p
-      className={`mt-1 text-right text-[11px] ${
+      className={`mt-1 text-right text-[12px] ${
         len >= min ? "text-neutral-500" : "text-danger"
       }`}
     >

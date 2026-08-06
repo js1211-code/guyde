@@ -67,7 +67,7 @@ export default function PostPage({
     return (
       <AppShell>
         <TopBar backHref="/" title="GUYDE" />
-        <p className="px-4 py-16 text-center text-[13px] text-neutral-600">
+        <p className="px-4 py-16 text-center text-[14px] text-neutral-600">
           없는 글이에요
         </p>
       </AppShell>
@@ -78,7 +78,7 @@ export default function PostPage({
     return (
       <AppShell>
         <TopBar backHref="/" title="GUYDE" />
-        <p className="px-4 py-16 text-center text-[13px] text-neutral-500">
+        <p className="px-4 py-16 text-center text-[14px] text-neutral-500">
           불러오는 중…
         </p>
       </AppShell>
@@ -112,7 +112,7 @@ export default function PostPage({
           <div className="mb-2 flex items-center gap-1.5">
             <CategoryBadge>{post.category}</CategoryBadge>
             {post.post_type === "무난함판정" ? (
-              <span className="border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+              <span className="border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[11.5px] font-bold text-brand-dark">
                 무난함 판정
               </span>
             ) : (
@@ -120,29 +120,29 @@ export default function PostPage({
             )}
             {votable &&
               (closed ? (
-                <span className="rounded-xs bg-neutral-300 px-1.5 py-px text-[10.5px] font-bold text-neutral-700">
+                <span className="rounded-xs bg-neutral-300 px-1.5 py-px text-[11.5px] font-bold text-neutral-700">
                   종료
                 </span>
               ) : (
                 // 언제까지 열려 있는지 알아야 "지금 눌러야 하나"가 정해진다.
-                <span className="rounded-xs bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+                <span className="rounded-xs bg-brand-tint px-1.5 py-px text-[11.5px] font-bold text-brand-dark">
                   {timeLeft(post.closes_at) ?? "곧 종료"}
                 </span>
               ))}
-            <span className="ml-auto text-[11px] text-neutral-600">
+            <span className="ml-auto text-[12px] text-neutral-600">
               {timeAgo(post.created_at)}
             </span>
           </div>
 
           <div className="mb-2 flex items-center gap-1.5">
-            <span className="text-[12.5px] font-semibold">{post.nickname}</span>
+            <span className="text-[13.5px] font-semibold">{post.nickname}</span>
             <Temperature value={post.temperature} size={11.5} />
             {post.is_mine && <MineBadge />}
           </div>
 
-          <h1 className="text-[17px] leading-snug font-semibold">{post.title}</h1>
+          <h1 className="text-[18.5px] leading-snug font-semibold">{post.title}</h1>
           {post.body && (
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-neutral-600">
+            <p className="mt-1.5 text-[14.5px] leading-relaxed text-neutral-600">
               {post.body}
             </p>
           )}
@@ -222,11 +222,11 @@ function Likes({
   if (isMine) {
     return (
       <div className="mt-4 flex flex-col items-center gap-1.5">
-        <span className="flex items-center gap-2 text-[14px] font-bold text-neutral-600">
+        <span className="flex items-center gap-2 text-[15px] font-bold text-neutral-600">
           <HeartIcon size={16} className="text-neutral-500" />
           {likes.count > 0 ? `${likes.count}명이 도움받았어요` : "아직 반응이 없어요"}
         </span>
-        <p className="text-[11.5px] text-neutral-500">
+        <p className="text-[12.5px] text-neutral-500">
           받은 좋아요는 내 온도에 쌓여요
         </p>
       </div>
@@ -240,7 +240,7 @@ function Likes({
         onClick={toggle}
         disabled={busy}
         aria-pressed={likes.liked_by_me}
-        className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-[14px] font-bold transition-colors ${
+        className={`flex items-center gap-2 rounded-full border px-5 py-2.5 text-[15px] font-bold transition-colors ${
           likes.liked_by_me
             ? "border-brand bg-brand/15 text-brand-dark"
             : "border-neutral-400 text-neutral-700"
@@ -252,10 +252,10 @@ function Likes({
         />
         도움돼요
         {likes.count > 0 && (
-          <span className="cond text-[15px]">{likes.count}</span>
+          <span className="cond text-[16px]">{likes.count}</span>
         )}
       </button>
-      <p className="text-[11.5px] text-neutral-500">
+      <p className="text-[12.5px] text-neutral-500">
         받은 좋아요는 글쓴이 온도에 쌓여요
       </p>
     </div>
@@ -305,7 +305,7 @@ function Poll({
               type="button"
               disabled={busy || closed}
               onClick={() => vote(o.id)}
-              className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3 text-left text-[14.5px] font-semibold"
+              className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3 text-left text-[15.5px] font-semibold"
             >
               {withPhotos && (
                 // 사진을 눌러도 확대가 아니라 투표다 — 고르는 화면이라
@@ -321,7 +321,7 @@ function Poll({
             </button>
           ))}
         </div>
-        <p className="mt-2.5 text-center text-[12px] text-neutral-600">
+        <p className="mt-2.5 text-center text-[13px] text-neutral-600">
           투표하면 결과를 볼 수 있어요
         </p>
       </>
@@ -366,7 +366,7 @@ function Poll({
                 }`}
                 style={{ width: `${pct}%` }}
               />
-              <span className="relative flex w-full items-center justify-between gap-2 px-3 text-[13px]">
+              <span className="relative flex w-full items-center justify-between gap-2 px-3 text-[14px]">
                 <span className="flex min-w-0 items-center gap-2.5">
                   {withPhotos && (
                     <PhotoBox
@@ -393,7 +393,7 @@ function Poll({
           );
         })}
       </div>
-      <p className="mt-2.5 text-center text-[12px] text-neutral-600">
+      <p className="mt-2.5 text-center text-[13px] text-neutral-600">
         총 {poll.total_votes}표 · 다른 선택지를 누르면 표가 옮겨가요
       </p>
     </>
@@ -433,7 +433,7 @@ function Nanhan({
   return (
     <>
       <p className="mt-4 text-center">
-        <span className="cond text-[42px] leading-none font-bold text-brand">
+        <span className="cond text-[45.5px] leading-none font-bold text-brand">
           {!nanhan.revealed
             ? "무난함 판정"
             : nanhan.percent === null
@@ -465,7 +465,7 @@ function Nanhan({
                 />
               )}
               <span
-                className={`text-[14px] font-bold ${
+                className={`text-[15px] font-bold ${
                   picked ? "text-brand-dark" : "text-neutral-600"
                 }`}
               >
@@ -475,7 +475,7 @@ function Nanhan({
                   짐작하게 되어 감춘 의미가 없다. */}
               {nanhan.revealed && (
                 <span
-                  className={`cond text-[13px] font-semibold ${
+                  className={`cond text-[14px] font-semibold ${
                     picked ? "text-brand-dark" : "text-neutral-600"
                   }`}
                 >
@@ -488,7 +488,7 @@ function Nanhan({
       </div>
 
       {!nanhan.revealed && (
-        <p className="mt-2.5 text-center text-[12px] text-neutral-600">
+        <p className="mt-2.5 text-center text-[13px] text-neutral-600">
           판정하면 결과를 볼 수 있어요
         </p>
       )}
@@ -559,9 +559,9 @@ function Comments({
   return (
     <>
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
-        <Kicker className="text-[12.5px]">COMMENTS {data.comments.length}</Kicker>
+        <Kicker className="text-[13.5px]">COMMENTS {data.comments.length}</Kicker>
         {roots.length > 0 && (
-          <span className="text-[12px] font-bold text-brand">추천순</span>
+          <span className="text-[13px] font-bold text-brand">추천순</span>
         )}
       </div>
 
@@ -589,7 +589,7 @@ function Comments({
                       return next;
                     })
                   }
-                  className="flex items-center gap-2 py-1.5 text-[12px] font-semibold text-neutral-500"
+                  className="flex items-center gap-2 py-1.5 text-[13px] font-semibold text-neutral-500"
                 >
                   <span className="h-px w-5 bg-neutral-400" />
                   {isOpen ? "답글 숨기기" : `답글 ${replies.length}개 보기`}
@@ -615,13 +615,13 @@ function Comments({
       <div className="border-t border-neutral-400">
         {replyTo && (
           <div className="flex items-center gap-2 bg-neutral-100 px-4 py-1.5">
-            <span className="flex-1 truncate text-[12px] text-neutral-600">
+            <span className="flex-1 truncate text-[13px] text-neutral-600">
               {replyTo.nickname}님에게 답글 다는 중
             </span>
             <button
               type="button"
               onClick={() => setReplyTo(null)}
-              className="text-[12px] font-bold text-neutral-500"
+              className="text-[13px] font-bold text-neutral-500"
             >
               취소
             </button>
@@ -639,13 +639,13 @@ function Comments({
               submit();
             }}
             placeholder={replyTo ? "답글을 남겨보세요" : "댓글을 남겨보세요"}
-            className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[13.5px]"
+            className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[14.5px]"
           />
           <button
             type="button"
             onClick={submit}
             disabled={busy || !draft.trim()}
-            className="cond text-[13px] font-bold text-brand disabled:text-neutral-400"
+            className="cond text-[14px] font-bold text-brand disabled:text-neutral-400"
           >
             등록
           </button>
@@ -681,16 +681,16 @@ function CommentRow({
         <div className="mb-1 flex flex-wrap items-center gap-1.5">
           {/* 고수 뱃지는 닉네임 왼쪽. 온도가 아니라 experts 소속으로 판별한다. */}
           {c.is_expert && <ExpertBadge />}
-          <span className="text-[12.5px] font-semibold">{c.nickname}</span>
+          <span className="text-[13.5px] font-semibold">{c.nickname}</span>
           <Temperature value={c.temperature} />
           {c.is_mine && <MineBadge />}
         </div>
 
-        <p className={`leading-relaxed ${compact ? "text-[13.5px]" : "text-[14px]"}`}>
+        <p className={`leading-relaxed ${compact ? "text-[14.5px]" : "text-[15px]"}`}>
           {c.body}
         </p>
 
-        <div className="mt-1.5 flex items-center gap-3 text-[11.5px] text-neutral-500">
+        <div className="mt-1.5 flex items-center gap-3 text-[12.5px] text-neutral-500">
           {c.likes > 0 && <span>좋아요 {c.likes}개</span>}
           <button type="button" onClick={onReply} className="font-semibold">
             답글 달기
@@ -712,7 +712,7 @@ function CommentRow({
           }`}
         >
           <HeartIcon size={15} strokeWidth={c.liked_by_me ? 2.2 : 1.5} />
-          {c.likes > 0 && <span className="cond text-[11px]">{c.likes}</span>}
+          {c.likes > 0 && <span className="cond text-[12px]">{c.likes}</span>}
         </button>
       )}
     </div>
@@ -832,7 +832,7 @@ function PostMenu({
             className="fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] rounded-t-2xl bg-bg p-3 pb-[max(1.25rem,var(--safe-bottom))]"
           >
             {done ? (
-              <p className="py-4 text-center text-[14px] font-bold text-brand">
+              <p className="py-4 text-center text-[15px] font-bold text-brand">
                 신고가 접수됐어요
               </p>
             ) : isMine ? (
@@ -843,7 +843,7 @@ function PostMenu({
                     role="menuitem"
                     disabled={busy}
                     onClick={close}
-                    className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold disabled:opacity-50"
+                    className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[16px] font-semibold disabled:opacity-50"
                   >
                     <CheckIcon size={19} />
                     투표 종료하기
@@ -852,7 +852,7 @@ function PostMenu({
                 <Link
                   href={`/post/${postId}/edit`}
                   role="menuitem"
-                  className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[16px] font-semibold"
                 >
                   <PencilIcon size={19} />
                   글 수정하기
@@ -862,7 +862,7 @@ function PostMenu({
                   role="menuitem"
                   disabled={busy}
                   onClick={remove}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold text-danger disabled:opacity-50"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[16px] font-semibold text-danger disabled:opacity-50"
                 >
                   <TrashIcon size={19} />
                   글 삭제하기
@@ -874,7 +874,7 @@ function PostMenu({
                 role="menuitem"
                 disabled={busy}
                 onClick={report}
-                className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold text-danger disabled:opacity-50"
+                className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[16px] font-semibold text-danger disabled:opacity-50"
               >
                 <SirenIcon size={19} />
                 글 신고하기
@@ -884,7 +884,7 @@ function PostMenu({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="mt-1 w-full rounded-lg px-4 py-3 text-[14px] font-semibold text-neutral-600"
+              className="mt-1 w-full rounded-lg px-4 py-3 text-[15px] font-semibold text-neutral-600"
             >
               닫기
             </button>

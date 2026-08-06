@@ -232,7 +232,7 @@ function Overlay({
         type="button"
         onClick={close}
         aria-label="닫기"
-        className="absolute top-[max(0.75rem,var(--safe-top))] right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-[20px] leading-none text-white"
+        className="absolute top-[max(0.75rem,var(--safe-top))] right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-[21.5px] leading-none text-white"
       >
         ×
       </button>

@@ -71,7 +71,7 @@ export default function ReviewPage({
       <AppShell>
         <TopBar backHref="/me/bookings" title="후기" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-600">
+          <p className="text-center text-[14px] text-neutral-600">
             컨설팅을 찾을 수 없어요
           </p>
         </ScreenBody>
@@ -84,7 +84,7 @@ export default function ReviewPage({
       <AppShell>
         <TopBar backHref={`/booking/done/${id}`} title="후기" />
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-500">불러오는 중…</p>
+          <p className="text-center text-[14px] text-neutral-500">불러오는 중…</p>
         </ScreenBody>
       </AppShell>
     );
@@ -96,12 +96,12 @@ export default function ReviewPage({
       <AppShell>
         <TopBar backHref={`/booking/done/${id}`} title="후기" />
         <ScreenBody className="px-4 pt-10 text-center">
-          <p className="text-[14px] font-bold">이미 후기를 남겼어요</p>
-          <p className="cond mt-3 text-[15px] text-brand">
+          <p className="text-[15px] font-bold">이미 후기를 남겼어요</p>
+          <p className="cond mt-3 text-[16px] text-brand">
             {"★".repeat(booking.review.rating)}
           </p>
           {booking.review.body && (
-            <p className="mt-2 text-[13.5px] leading-relaxed text-neutral-700">
+            <p className="mt-2 text-[14.5px] leading-relaxed text-neutral-700">
               {booking.review.body}
             </p>
           )}
@@ -121,8 +121,8 @@ export default function ReviewPage({
 
       <ScreenBody className="px-4 pt-6">
         <div className="text-center">
-          <p className="text-[17px] font-bold">컨설팅은 어땠나요?</p>
-          <p className="mt-1.5 flex items-center justify-center gap-1.5 text-[13px] text-neutral-600">
+          <p className="text-[18.5px] font-bold">컨설팅은 어땠나요?</p>
+          <p className="mt-1.5 flex items-center justify-center gap-1.5 text-[14px] text-neutral-600">
             {booking.expert.nickname}
             <Temperature value={booking.expert.temperature} size={12} />
           </p>
@@ -146,13 +146,13 @@ export default function ReviewPage({
             </button>
           ))}
         </div>
-        <p className="mt-2 text-center text-[12px] text-neutral-500">
+        <p className="mt-2 text-center text-[13px] text-neutral-500">
           {rating === 0 ? "별점을 골라주세요" : `${rating}점`}
         </p>
 
-        <p className="mt-6 mb-2 text-[13.5px] font-bold">
+        <p className="mt-6 mb-2 text-[14.5px] font-bold">
           어떤 점이 좋았나요?
-          <span className="ml-1 text-[11.5px] font-normal text-neutral-500">
+          <span className="ml-1 text-[12.5px] font-normal text-neutral-500">
             선택
           </span>
         </p>
@@ -161,11 +161,11 @@ export default function ReviewPage({
           onChange={(e) => setBody(e.target.value)}
           rows={5}
           placeholder="다음 사람이 이 고수를 고를 때 도움이 될 만한 점을 적어주세요"
-          className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13.5px] leading-relaxed"
+          className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[14.5px] leading-relaxed"
         />
 
         {error && (
-          <p className="mt-3 rounded-md bg-danger-tint px-3 py-2.5 text-[12.5px] text-danger">
+          <p className="mt-3 rounded-md bg-danger-tint px-3 py-2.5 text-[13.5px] text-danger">
             {error}
           </p>
         )}
@@ -175,7 +175,7 @@ export default function ReviewPage({
         <PrimaryButton disabled={rating === 0 || busy} onClick={submit}>
           {busy ? "남기는 중…" : "후기 남기기"}
         </PrimaryButton>
-        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+        <p className="mt-2 text-center text-[12.5px] text-neutral-500">
           {rating === 0
             ? "별점을 골라야 남길 수 있어요"
             : "후기는 다음 사람이 고수를 고르는 유일한 단서예요"}

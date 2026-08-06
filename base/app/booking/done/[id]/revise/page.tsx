@@ -50,16 +50,16 @@ export default function RevisePage({
 
       <ScreenBody className="px-4 pt-4">
         <div className="rounded-2xl bg-danger-tint p-4">
-          <p className="text-[13px] font-bold text-danger">
+          <p className="text-[14px] font-bold text-danger">
             수정 요청은 1회만 가능해요
           </p>
-          <p className="mt-1.5 text-[12.5px] leading-relaxed text-neutral-700">
+          <p className="mt-1.5 text-[13.5px] leading-relaxed text-neutral-700">
             다음 답변이 확정안이 돼요. 어떤 점이 안 맞았는지 구체적으로 적을수록
             정확한 답이 옵니다.
           </p>
         </div>
 
-        <p className="mt-5 mb-2 text-[13.5px] font-bold">
+        <p className="mt-5 mb-2 text-[14.5px] font-bold">
           무엇이 안 맞았나요?
         </p>
         <textarea
@@ -68,10 +68,10 @@ export default function RevisePage({
           rows={6}
           autoFocus
           placeholder="예) 상의 색이 제 피부톤과 안 맞는 것 같아요. 조금 더 어두운 색이면 좋겠어요."
-          className="w-full rounded-md border border-neutral-300 px-3 py-3 text-[13.5px] leading-relaxed"
+          className="w-full rounded-md border border-neutral-300 px-3 py-3 text-[14.5px] leading-relaxed"
         />
         <p
-          className={`mt-1.5 text-right text-[11.5px] ${
+          className={`mt-1.5 text-right text-[12.5px] ${
             enough ? "text-neutral-500" : "text-danger"
           }`}
         >
@@ -79,7 +79,7 @@ export default function RevisePage({
         </p>
 
         {error && (
-          <p className="mt-3 rounded-md bg-danger-tint px-3 py-2.5 text-[12.5px] text-danger">
+          <p className="mt-3 rounded-md bg-danger-tint px-3 py-2.5 text-[13.5px] text-danger">
             {error}
           </p>
         )}

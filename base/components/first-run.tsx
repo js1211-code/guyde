@@ -26,15 +26,15 @@ export function FirstRun({
       <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
 
         <Logo size={30} className="mb-8" />
-        <p className="text-[13px] text-neutral-600">
+        <p className="text-[14px] text-neutral-600">
           이 기기에 새 닉네임을 발급했어요
         </p>
 
         <div className="mt-5 w-full rounded-xl border border-neutral-400 px-6 py-6">
-          <p className="text-[21px] font-bold">{nickname}</p>
+          <p className="text-[22.5px] font-bold">{nickname}</p>
           <p className="mt-2.5 flex items-center justify-center gap-1.5">
 
-            <span className="text-[12px] text-neutral-600">시작 온도</span>
+            <span className="text-[13px] text-neutral-600">시작 온도</span>
             <Temperature value={TEMP_START} size={16} />
           </p>
         </div>
@@ -45,10 +45,10 @@ export function FirstRun({
           className="mt-3 flex items-center justify-center gap-1 text-brand"
         >
           <RefreshIcon size={14} />
-          <span className="cond text-[13px] font-bold">닉네임 다시 뽑기</span>
+          <span className="cond text-[14px] font-bold">닉네임 다시 뽑기</span>
         </button>
 
-        <p className="mt-4 text-[12.5px] leading-relaxed text-neutral-600">
+        <p className="mt-4 text-[13.5px] leading-relaxed text-neutral-600">
           글도 댓글도 이 닉네임과 온도로 표시돼요.
           <br />
           다른 사람에게는 닉네임 뒤 숫자로만 구분됩니다.

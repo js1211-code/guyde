@@ -49,7 +49,7 @@ function DemoRibbon() {
   return (
     // 절대 배치는 padding box 기준이라 그냥 두면 노치 밑으로 들어간다.
     <div className="pointer-events-none absolute top-[var(--safe-top)] right-0 z-50">
-      <span className="block rounded-bl-lg bg-temp-hot px-2.5 py-1 text-[10px] font-bold text-brand-dark">
+      <span className="block rounded-bl-lg bg-temp-hot px-2.5 py-1 text-[11px] font-bold text-brand-dark">
         {label}
       </span>
     </div>
@@ -104,8 +104,8 @@ export function TopBar({
         <span
           className={
             cond
-              ? "cond text-[16px] font-semibold tracking-[0.1em]"
-              : "text-[16px] font-semibold"
+              ? "cond text-[17.5px] font-semibold tracking-[0.1em]"
+              : "text-[17.5px] font-semibold"
           }
         >
           {title}
@@ -122,7 +122,7 @@ export function TopBar({
 export function PageTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="px-4 pt-3 pb-2.5">
-      <h1 className="cond text-[22px] leading-none font-bold tracking-[0.1em]">
+      <h1 className="cond text-[24px] leading-none font-bold tracking-[0.1em]">
         {children}
       </h1>
     </div>
@@ -163,7 +163,7 @@ export function PrimaryButton({
   disabled?: boolean;
   type?: "button" | "submit";
 }) {
-  const cls = `cond block w-full rounded-md py-3.5 text-center text-[15px] font-bold ${
+  const cls = `cond block w-full rounded-md py-3.5 text-center text-[16px] font-bold ${
     disabled ? "bg-neutral-300 text-neutral-500" : "bg-brand text-white"
   }`;
 
@@ -196,7 +196,7 @@ export function Kicker({
 }) {
   return (
     <p
-      className={`cond text-[12px] font-semibold tracking-wide text-neutral-600 ${className}`}
+      className={`cond text-[13px] font-semibold tracking-wide text-neutral-600 ${className}`}
     >
       {children}
     </p>
@@ -206,7 +206,7 @@ export function Kicker({
 /** 브랜드 틴트 안내 띠 */
 export function NoticeBar({ children }: { children: React.ReactNode }) {
   return (
-    <p className="border-y border-brand-tint-b bg-brand-tint px-4 py-2.5 text-[12.5px] text-brand-dark">
+    <p className="border-y border-brand-tint-b bg-brand-tint px-4 py-2.5 text-[13.5px] text-brand-dark">
       {children}
     </p>
   );

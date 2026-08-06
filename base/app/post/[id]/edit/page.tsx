@@ -79,7 +79,7 @@ export default function EditPostPage({
 
       {loaded === null ? (
         <ScreenBody className="px-4 pt-10">
-          <p className="text-center text-[13px] text-neutral-500">
+          <p className="text-center text-[14px] text-neutral-500">
             {error ?? "불러오는 중…"}
           </p>
         </ScreenBody>
@@ -90,7 +90,7 @@ export default function EditPostPage({
             <div className="mb-3 flex items-center gap-1.5">
               <CategoryBadge>{loaded.category}</CategoryBadge>
               <PostTypeBadge postType={loaded.post_type} />
-              <span className="text-[11.5px] text-neutral-500">
+              <span className="text-[12.5px] text-neutral-500">
                 유형·카테고리는 바꿀 수 없어요
               </span>
             </div>
@@ -99,17 +99,17 @@ export default function EditPostPage({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="제목을 적어주세요"
-              className="w-full border-b border-neutral-400 pb-2 text-[15px] font-medium"
+              className="w-full border-b border-neutral-400 pb-2 text-[16px] font-medium"
             />
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="내용을 적어주세요"
-              className="mt-2 h-[180px] w-full resize-none text-[13px] leading-relaxed"
+              className="mt-2 h-[180px] w-full resize-none text-[14px] leading-relaxed"
             />
 
             {error && (
-              <p className="mt-3 text-[12.5px] text-danger">{error}</p>
+              <p className="mt-3 text-[13.5px] text-danger">{error}</p>
             )}
           </ScreenBody>
 

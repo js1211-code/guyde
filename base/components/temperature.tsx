@@ -38,7 +38,7 @@ export function TemperatureProgress({ value }: { value: number }) {
 
   return (
     <div className="mt-2.5">
-      <p className="mb-1.5 text-[12px] text-neutral-600">
+      <p className="mb-1.5 text-[13px] text-neutral-600">
         {remaining > 0
           ? `고수 자격까지 ${remaining.toFixed(1)}도 남았어요`
           : "고수 자격을 갖췄어요"}

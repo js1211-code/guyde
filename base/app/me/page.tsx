@@ -49,13 +49,13 @@ export default function MePage() {
             <input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[15px] font-bold"
+              className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[16px] font-bold"
               autoFocus
             />
             <button
               type="button"
               onClick={save}
-              className="cond text-[13px] font-bold text-brand"
+              className="cond text-[14px] font-bold text-brand"
             >
               저장
             </button>
@@ -63,7 +63,7 @@ export default function MePage() {
         ) : (
           <div className="flex items-center gap-1.5">
 
-            <span className="text-[18px] font-bold">{me?.nickname ?? "…"}</span>
+            <span className="text-[19.5px] font-bold">{me?.nickname ?? "…"}</span>
             <button
               type="button"
               aria-label="닉네임 변경"
@@ -76,7 +76,7 @@ export default function MePage() {
             </button>
           </div>
         )}
-        {error && <p className="mt-1 text-[12px] text-temp">{error}</p>}
+        {error && <p className="mt-1 text-[13px] text-temp">{error}</p>}
 
         <div className="mt-1.5">
 
@@ -96,7 +96,7 @@ export default function MePage() {
         */}
         {me?.is_expert ? (
           <div className="mt-4 flex items-center justify-center gap-2 rounded-md border border-temp-hot bg-temp-hot/15 py-3">
-            <span className="text-[14px] font-bold text-brand-dark">
+            <span className="text-[15px] font-bold text-brand-dark">
               고수로 활동 중이에요
             </span>
           </div>
@@ -110,7 +110,7 @@ export default function MePage() {
           >
             {!qualified && <LockIcon size={16} className="text-neutral-600" />}
             <span
-              className={`text-[14px] font-bold ${
+              className={`text-[15px] font-bold ${
                 qualified ? "text-brand-dark" : "text-neutral-600"
               }`}
             >
@@ -131,7 +131,7 @@ export default function MePage() {
                   : "border-t border-dashed border-neutral-400"
               } ${i === MENU.length - 1 ? "border-b border-neutral-400" : ""}`}
             >
-              <span className="text-[14px] font-medium">{item.label}</span>
+              <span className="text-[15px] font-medium">{item.label}</span>
               <ChevronRightIcon size={16} className="text-neutral-500" />
             </Link>
           ))}

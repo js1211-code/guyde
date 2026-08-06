@@ -105,7 +105,7 @@ export function LinkPreviewCard({
 
   if (loading) {
     return (
-      <p className="mt-1.5 text-[11.5px] text-neutral-500">
+      <p className="mt-1.5 text-[12.5px] text-neutral-500">
         링크 확인하는 중…
       </p>
     );
@@ -135,11 +135,11 @@ export function LinkPreviewCard({
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[12.5px] font-semibold text-brand-dark">
+        <span className="block truncate text-[13.5px] font-semibold text-brand-dark">
           {data.title}
         </span>
         {data.site && (
-          <span className="block truncate text-[11px] text-neutral-600">
+          <span className="block truncate text-[12px] text-neutral-600">
             {data.site}
           </span>
         )}
@@ -149,7 +149,7 @@ export function LinkPreviewCard({
         <button
           type="button"
           onClick={() => onUseTitle(toProductName(data.title!))}
-          className="shrink-0 rounded-md border border-brand px-2 py-1.5 text-[11px] font-bold text-brand"
+          className="shrink-0 rounded-md border border-brand px-2 py-1.5 text-[12px] font-bold text-brand"
         >
           상품명에 넣기
         </button>

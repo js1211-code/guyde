@@ -40,7 +40,7 @@ export function QuizRunner({
         <ScreenBody className="px-4 pt-5">
           <div className="flex items-center justify-between">
             <Kicker>{quiz.title}</Kicker>
-            <span className="cond text-[12px] font-semibold text-neutral-600">
+            <span className="cond text-[13px] font-semibold text-neutral-600">
               {step + 1} / {quiz.questions.length}
             </span>
           </div>
@@ -52,7 +52,7 @@ export function QuizRunner({
             />
           </div>
 
-          <p className="mt-6 text-[17px] leading-snug font-bold">{q.q}</p>
+          <p className="mt-6 text-[18.5px] leading-snug font-bold">{q.q}</p>
 
           <div className="mt-4 flex flex-col gap-2.5">
             {q.options.map((opt, i) => (
@@ -60,7 +60,7 @@ export function QuizRunner({
                 key={opt.text}
                 type="button"
                 onClick={() => setPicks([...picks, i])}
-                className="rounded-xl border border-neutral-400 px-4 py-3.5 text-left text-[14px] transition-colors active:bg-brand/15"
+                className="rounded-xl border border-neutral-400 px-4 py-3.5 text-left text-[15px] transition-colors active:bg-brand/15"
               >
                 {opt.text}
               </button>
@@ -72,7 +72,7 @@ export function QuizRunner({
           {step === 0 ? (
             <Link
               href="/library"
-              className="block py-2 text-center text-[13px] text-neutral-600"
+              className="block py-2 text-center text-[14px] text-neutral-600"
             >
               그만두기
             </Link>
@@ -80,7 +80,7 @@ export function QuizRunner({
             <button
               type="button"
               onClick={() => setPicks(picks.slice(0, -1))}
-              className="w-full py-2 text-center text-[13px] text-neutral-600"
+              className="w-full py-2 text-center text-[14px] text-neutral-600"
             >
               이전 문항
             </button>
@@ -100,16 +100,16 @@ export function QuizRunner({
         <Kicker>{result.quiz_title}</Kicker>
 
         <div className="mt-3 rounded-xl border border-neutral-400 px-4 py-6">
-          <p className="cond text-[30px] leading-tight font-bold text-brand">
+          <p className="cond text-[32.5px] leading-tight font-bold text-brand">
             {result.result_type}
           </p>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-neutral-700">
+          <p className="mt-2 text-[14.5px] leading-relaxed text-neutral-700">
             {result.description}
           </p>
         </div>
 
         <div className="mt-5 text-left">
-          <div className="mb-1.5 flex items-center justify-between text-[12px] font-semibold">
+          <div className="mb-1.5 flex items-center justify-between text-[13px] font-semibold">
             <span className="text-neutral-600">같은 결과</span>
             <span className="text-brand">상위 {result.top_percent}%</span>
           </div>
@@ -122,7 +122,7 @@ export function QuizRunner({
         </div>
 
         <div className="mt-5 text-left">
-          <Kicker className="mb-2 text-[11px]">RECOMMENDED</Kicker>
+          <Kicker className="mb-2 text-[12px]">RECOMMENDED</Kicker>
           {result.recommendations.map((r, i) => (
             <p
               key={r}
@@ -132,10 +132,10 @@ export function QuizRunner({
                   : ""
               }`}
             >
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs bg-brand text-[11px] font-bold text-white">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs bg-brand text-[12px] font-bold text-white">
                 {i + 1}
               </span>
-              <span className="text-[13.5px]">{r}</span>
+              <span className="text-[14.5px]">{r}</span>
             </p>
           ))}
         </div>
@@ -146,13 +146,13 @@ export function QuizRunner({
           <button
             type="button"
             onClick={() => setPicks([])}
-            className="rounded-md border border-neutral-400 py-3 text-center text-[14px] font-bold"
+            className="rounded-md border border-neutral-400 py-3 text-center text-[15px] font-bold"
           >
             다시 하기
           </button>
           <Link
             href="/write"
-            className="rounded-md bg-brand py-3 text-center text-[14px] font-bold text-white"
+            className="rounded-md bg-brand py-3 text-center text-[15px] font-bold text-white"
           >
             커뮤니티에서 검증받기
           </Link>

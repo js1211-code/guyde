@@ -147,7 +147,7 @@ export default function BookingSurveyPage({
               }
               autoFocus
               placeholder="어떤 자리인지 적어주세요 (예: 사촌 결혼식 사회)"
-              className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px]"
+              className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[14px]"
             />
           )}
         </Field>
@@ -160,7 +160,7 @@ export default function BookingSurveyPage({
               </Chip>
             ))}
           </div>
-          <p className="mt-2 text-[11.5px] text-neutral-500">
+          <p className="mt-2 text-[12.5px] text-neutral-500">
             현재 {CONSULT_BUDGETS[0] / 10000}~
             {CONSULT_BUDGETS[CONSULT_BUDGETS.length - 1] / 10000}만원 예산만
             지원해요.
@@ -171,7 +171,7 @@ export default function BookingSurveyPage({
             {CONSULT_BUDGET_NOTES.map((note) => (
               <li
                 key={note}
-                className="text-[11.5px] leading-relaxed text-neutral-500"
+                className="text-[12.5px] leading-relaxed text-neutral-500"
               >
                 {`· ${note}`}
               </li>
@@ -180,7 +180,7 @@ export default function BookingSurveyPage({
         </Field>
 
         <Field label="전신 사진" required>
-          <p className="mb-2 text-[11.5px] leading-relaxed text-neutral-500">
+          <p className="mb-2 text-[12.5px] leading-relaxed text-neutral-500">
             체형 판단과 최종 확정안 사이즈 산정에 쓰여요 · 최대{" "}
             {BOOKING_PHOTO_MAX}장
             <br />
@@ -195,7 +195,7 @@ export default function BookingSurveyPage({
         </Field>
 
         <Field label="자주 입는 옷 사진" required>
-          <p className="mb-2 text-[11.5px] text-neutral-500">
+          <p className="mb-2 text-[12.5px] text-neutral-500">
             지금 뭘 갖고 있는지 알아야 이미 있는 것과 겹치지 않게 골라드릴 수 있어요
           </p>
           <PhotoRow
@@ -238,7 +238,7 @@ export default function BookingSurveyPage({
               rows={2}
               autoFocus
               placeholder="어떤 부분이 신경 쓰이는지 적어주세요"
-              className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+              className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[14px] leading-relaxed"
             />
           )}
         </Field>
@@ -249,12 +249,12 @@ export default function BookingSurveyPage({
             onChange={(e) => setStyleNote(e.target.value)}
             rows={3}
             placeholder="그 외에 고수에게 전하고 싶은 정보를 적어주세요"
-            className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[13px] leading-relaxed"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2.5 text-[14px] leading-relaxed"
           />
         </Field>
 
         {error && (
-          <p className="mb-3 rounded-md bg-danger-tint px-3 py-2.5 text-[12.5px] text-danger">
+          <p className="mb-3 rounded-md bg-danger-tint px-3 py-2.5 text-[13.5px] text-danger">
             {error}
           </p>
         )}
@@ -262,8 +262,8 @@ export default function BookingSurveyPage({
 
       <BottomBar>
         <div className="mb-2 flex items-baseline justify-between">
-          <span className="text-[12.5px] text-neutral-600">컨설팅비</span>
-          <span className="cond text-[19px] font-bold">
+          <span className="text-[13.5px] text-neutral-600">컨설팅비</span>
+          <span className="cond text-[20.5px] font-bold">
             ₩{(expert?.price ?? 0).toLocaleString("ko-KR")}
           </span>
         </div>
@@ -272,7 +272,7 @@ export default function BookingSurveyPage({
             ? "신청하는 중…"
             : `₩${(expert?.price ?? 0).toLocaleString("ko-KR")} 결제하고 제출`}
         </PrimaryButton>
-        <p className="mt-2 text-center text-[11.5px] text-neutral-500">
+        <p className="mt-2 text-center text-[12.5px] text-neutral-500">
           {canSubmit
             ? `${CONSULTING_SLA_HOURS}시간 안에 답변 · 불만족 시 100% 환불`
             : "자리·예산·사진을 채우면 신청할 수 있어요"}
@@ -317,7 +317,7 @@ function Field({
 }) {
   return (
     <section className="mb-5">
-      <p className="mb-2 text-[13.5px] font-bold">
+      <p className="mb-2 text-[14.5px] font-bold">
         {label}
         {required && (
           // 뱃지 대신 별표 하나. 필수 항목이 다섯 개나 되는 화면이라
