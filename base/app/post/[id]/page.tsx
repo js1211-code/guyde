@@ -148,17 +148,16 @@ export default function PostPage({
           )}
 
           {/*
-            9:16 세로. 이 앱에 올라오는 사진은 대부분 전신 착장이라 가로로
-            납작하게 잘라두면(예전 160px 고정) 신발이나 머리가 날아가서
-            정작 판정할 부분이 안 보였다.
-            잘리는 건 여전하지만 눌러서 원본 비율로 크게 볼 수 있다.
+            16:9 가로. 높이 160px 고정이던 걸 화면 폭에 맞춰 늘렸다 —
+            비율이 정해져 있으면 사진마다 카드 높이가 들쭉날쭉하지 않다.
+            잘리는 건 여전하므로 눌러서 원본 비율로 크게 볼 수 있게 둔다.
           */}
           {post.images.map((img) => (
             <ZoomablePhoto
               key={img.id}
               src={img.url}
               alt=""
-              className="mt-3 aspect-[9/16] w-full"
+              className="mt-3 aspect-[16/9] w-full"
               iconSize={24}
             />
           ))}
