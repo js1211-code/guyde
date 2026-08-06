@@ -53,9 +53,18 @@ export function Feed() {
 
   return (
     <>
-            {/* scroll-area(overflow-y:auto)를 쓰면 가로 탭 줄에 세로 스크롤까지 붙어
-          손가락이 위아래로 밀린다. 가로만 흐르게 하고 세로는 잠근다. */}
-      <div className="rail flex gap-4 border-b border-neutral-400 px-4">
+      {/*
+        게시판 줄은 목록과 같이 스크롤되지 않고 위에 붙어 있는다.
+        옷 게시판을 한참 내려보다 헤어로 가려면 맨 위까지 다시 올려야 했다.
+
+        sticky의 기준은 가장 가까운 스크롤 조상(ScreenBody)이라 top-0이면
+        목록 위에 정확히 붙는다. 배경색을 꼭 줘야 한다 — 투명하면 밑을 지나가는
+        글이 탭 글자에 겹쳐 보인다.
+
+        rail: scroll-area(overflow-y:auto)를 쓰면 가로 탭 줄에 세로 스크롤까지
+        붙어 손가락이 위아래로 밀린다. 가로만 흐르게 하고 세로는 잠근다.
+      */}
+      <div className="rail sticky top-0 z-10 flex gap-4 border-b border-neutral-400 bg-paper px-4">
         {FEED_TABS.map((t) => (
           <button
             key={t}
