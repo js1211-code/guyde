@@ -753,13 +753,11 @@ function CommentRow({
           누르면 원본 비율로 크게 볼 수 있다.
         */}
         {c.image_url && (
-          <ZoomablePhoto
-            src={c.image_url}
-            alt=""
-            className={`mt-1.5 ${compact ? "w-[112px]" : "w-[136px]"}`}
-            iconSize={16}
-            natural
-          />
+          // 폭은 감싸개가 정한다. ZoomablePhoto 안쪽 버튼이 w-full이라
+          // className으로 폭을 주면 둘이 부딪혀서 전체 폭으로 퍼진다.
+          <span className={`mt-1.5 block ${compact ? "w-[112px]" : "w-[136px]"}`}>
+            <ZoomablePhoto src={c.image_url} alt="" iconSize={16} natural />
+          </span>
         )}
 
         <div className="mt-1.5 flex items-center gap-3 text-[12.5px] text-neutral-500">
