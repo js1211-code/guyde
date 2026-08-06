@@ -103,6 +103,38 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * 도서관 무난템 카드.
+ *
+ * `vouch_count`·`nanhan_percent`는 저장값이 아니라 매인 판정글의 표를 그대로
+ * 센 값이다. 카드가 들고 있는 건 사람이 정리한 부분(이름·가격대·왜 무난한가)뿐.
+ */
+export type PickItem = {
+  id: string;
+  /** 판정의 근거가 된 글. 카드를 누르면 여기로 간다 */
+  post_id: string;
+  name: string;
+  price_band: string;
+  one_liner: string;
+  why: string;
+  thumb_url: string;
+  tags: string[];
+  category: Category;
+  post_title: string;
+  vouch_count: number;
+  vote_count: number;
+  nanhan_percent: number;
+};
+
+export async function fetchPicks(params: { category?: Category; limit?: number } = {}) {
+  const q = new URLSearchParams();
+  if (params.category) q.set("category", params.category);
+  if (params.limit) q.set("limit", String(params.limit));
+  const res = await apiFetch(`/api/picks?${q}`);
+  const { items } = await json<{ items: PickItem[] }>(res);
+  return items;
+}
+
 export async function fetchFeed(params: {
   category?: Category;
   post_type?: PostType;

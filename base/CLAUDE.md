@@ -50,7 +50,7 @@
     | | URL | Vercel 프로젝트 | 특징 |
     |---|---|---|---|
     | 일반 ver. | https://guyde.vercel.app | `guyde` | 방문자마다 새 UUID |
-    | 고수 ver. | https://guyde-expert.vercel.app | `guyde-expert` | 정갈한 여우 #4192로 고정 |
+    | 고수 ver. | https://guyde-expert.vercel.app | `guyde-expert` | 고수 1번(팩폭하는편)으로 고정 |
 
     도메인이 다르면 `localStorage`도 따로라 두 창을 나란히 띄워도 신원이 섞이지 않는다. 데모 중에 기기를 전환할 필요가 없다.
   - 고수 ver.만 갖는 변수: `NEXT_PUBLIC_DEMO_DEVICE_ID`(고정할 계정) · `NEXT_PUBLIC_DEMO_LABEL`(우상단 표시). **`NEXT_PUBLIC_`은 빌드 시점에 박히므로 배포마다 다시 빌드된다.**
@@ -94,7 +94,7 @@
 - 환경변수(.env.local): `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`(서버 전용, `NEXT_PUBLIC_` 접두사 절대 금지)
 - 환경변수 **이름을 바꾸면 3곳을 함께 바꾼다**: `.env.local` · `lib/supabase/*.ts` · 이 문서(+ Notion). 그리고 **dev 서버 재시작**(HMR로 반영 안 됨).
 
-## 데이터베이스 (22 테이블 + 뷰 3)
+## 데이터베이스 (23 테이블 + 뷰 4)
 SQL은 `db/`에 있고 **이 순서로** 실행한다.
 
 | 파일 | 내용 |
@@ -110,8 +110,10 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 | `patch_v3_5.sql` | **투표 종료** — 72시간 자동 + 손 종료(`posts.closed_at`), 뷰에 `closes_at`·`is_closed`, 닫힌 글에 표를 막는 트리거 |
 | `patch_v3_6.sql` | **댓글 사진**(`comments.image_url`) · `comments_view`에 노출 |
 | `patch_v3_7.sql` | **사진만 있는 댓글 허용** — `comments` CHECK를 "본문이나 사진 중 하나"로 |
-| `seed.sql` | 데모용 커뮤니티 데이터 (사용자 20 · 글 20 · 댓글 28 · 정보공유 글 4) |
-| `seed_consulting.sql` | 고수 4명 + 고수가 쓴 글 3 + 고수가 누른 정보공유 좋아요 (**반드시 `seed.sql` 다음에**) |
+| `patch_v3_8.sql` | **무난템 카드** — `nanhan_picks` 테이블 + `nanhan_picks_view` |
+| `seed.sql` | 커뮤니티 (등장인물 20 · 배경 유저 800 · 글 34 · 댓글 45) |
+| `seed_consulting.sql` | 고수 4명 + 대표 답변 + 고수 글 3 (**반드시 `seed.sql` 다음에**) |
+| `seed_picks.sql` | 무난템 판정글 14 + 카드 17 (**seed_consulting.sql 다음에**) |
 | `test_v2_1.sql` | 검증 23종 (검증 전용 DB에서만 실행) |
 | `test_v3.sql` | 컨설팅 제약 검증 17종 (검증 전용 DB에서만 실행) |
 | `test_v3_2.sql` | 답글 깊이·고수 판별 검증 11종 (검증 전용 DB에서만 실행) |
@@ -121,8 +123,8 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 > 눌러둔 추천도 FK로 같이 날아간다. 순서가 뒤바뀌면 고수 온도가 36.5로 떨어져
 > 고수 목록이 통째로 빈다(42.0 미만은 목록에서 걸러진다).
 
-테이블: `users` `posts` `post_images` `poll_options` `poll_votes` `nanhan_votes` `post_likes` `comments` `comment_likes` `articles` `quizzes` `quiz_results` `experts` `reviews` `bookings` `booking_images` `consulting_answers` `outfit_items` `feedbacks` `refunds` `heart_transactions` `reports`
-뷰: `posts_feed`(피드 카드 집계) · `comments_view`(댓글 + 작성자 온도 + `is_expert`) · `outfit_totals`(착장 합계 + 예산 대비 %)
+테이블: `users` `posts` `post_images` `poll_options` `poll_votes` `nanhan_votes` `post_likes` `comments` `comment_likes` `nanhan_picks` `articles` `quizzes` `quiz_results` `experts` `reviews` `bookings` `booking_images` `consulting_answers` `outfit_items` `feedbacks` `refunds` `heart_transactions` `reports`
+뷰: `posts_feed`(피드 카드 집계) · `comments_view`(댓글 + 작성자 온도 + `is_expert`) · `outfit_totals`(착장 합계 + 예산 대비 %) · `nanhan_picks_view`(무난템 카드 + 실제 판정 결과)
 
 > `expert_slots`는 patch_v3에서 폐기됐다. 달력·시간 슬롯 예약은 더 이상 없다.
 함수: `create_post` `cast_poll_vote` `cast_nanhan_vote` `calc_temperature` + 트리거 3종
@@ -298,6 +300,7 @@ POST   /api/posts/[id]/comments       댓글 작성
 POST|DELETE /api/comments/[id]/like   댓글 추천
 POST   /api/uploads                   사진 업로드
 GET    /api/link-preview?url=        링크 OG 미리보기 (못 읽으면 found:false)
+GET    /api/picks                     도서관 무난템 카드 (조건은 서버가 건다)
 
 GET    /api/experts                   고수 목록 (42도 미만 제외)
 GET    /api/experts/[id]              프로필 + 대표 답변(실제 댓글) + 후기
@@ -338,8 +341,11 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
 - 착장 슬롯은 이름 옆에 모양을 붙인다(`SlotLabel`) — 상의 티셔츠 / 하의 바지 / 신발 스니커즈. 글자만 있으면 세 칸이 같은 덩어리로 보인다. 작성 화면과 열람 화면이 **같은 컴포넌트**를 써야 두 쪽이 어긋나지 않는다.
 - ⚠️ **선택 상태는 "테두리 유지 + `bg-brand/15` 연한 채움"으로 통일한다.** 꽉 찬 색으로 바꾸면 박스 선이 사라져 뭐가 선택됐는지 흐려진다. 틴트(`bg-brand-tint`)는 배경과 거의 같아서 선택 표시로는 쓰지 말 것.
 - **무난함 판정 제목 왼쪽에 판사봉을 둔다.** 판정 전에는 들려 있고(`GavelUpIcon`) 판정하면 내려친 모양(`GavelDownIcon`)으로 바뀐다 — 글자만으로도 알 수 있지만 모양이 같이 바뀌면 눌린 게 더 확실해진다.
-  - 망치머리·자루·받침대를 **윤곽선 사각형**으로 그린다. 굵은 선 하나로 그렸더니 화살표처럼 보여서 다시 그렸다.
-  - ⚠️ 자루의 위쪽 끝이 망치머리 **중심에 정확히 닿아야** 한다. 어긋나면 떨어진 막대 두 개로 보인다 — 실제로 그렇게 어긋나 있었다. 좌표를 바꿀 땐 SVG 변환 행렬로 끝점을 계산해 확인할 것.
+  - 망치머리·자루·받침대를 **윤곽선**으로 그린다. 굵은 선 하나로 그렸더니 화살표처럼 보여서 다시 그렸다.
+  - **두 상태는 같은 물체다.** 머리통(사각형) + 위아래 마구리(스타디움) + 자루를 똑같이 그려놓고 `<g transform="rotate(...)">`의 각도와 중심만 바꾼다 — 판정 전 `rotate(45)`(머리축이 왼쪽 아래, 자루는 오른쪽 아래), 판정 후 `rotate(-18)`(머리가 받침대 위로 내려와 서고 자루는 오른쪽 위). 상태별로 좌표를 따로 손으로 찍으면 두 그림이 다른 물건이 된다.
+  - ⚠️ **자루는 머리축과 직각**이다(실제 판사봉이 그렇다). 이 관계가 깨지면 각도를 아무리 맞춰도 같은 물체로 안 읽힌다.
+  - ⚠️ 조각끼리 **겹치지 말고 변을 맞댈 것.** 겹치면 안 보여야 할 선이 비쳐서 막대 여러 개로 보인다 — 실제로 그랬다. 세 가지를 지킨다: ①마구리 안쪽 변 = 머리통 끝 변 ②머리통 좌우 변은 마구리의 **곧은 구간 안**(둥근 모서리 반경만큼 여유) ③자루는 닫힌 사각형이 아니라 **ㄷ자 열린 path**이고 두 끝이 머리통 오른쪽 변에 닿는다.
+  - ⚠️ **머리와 받침대 사이 틈은 3.3**(viewBox 24 기준). 선 두께 1.5가 양쪽에서 0.75씩 먹으므로 2 밑으로 줄이면 30px에서 한 덩어리로 붙어 보인다.
 - **무난함 판정 묶음은 얇은 테두리 박스로 떼어낸다**(`rounded-2xl` + `border-neutral-400`, 본문에서 `mt-7`). 본문 바로 밑에 붙여두면 숫자와 두 버튼이 글의 일부처럼 읽혀서 "여기서 눌러야 한다"가 안 보인다.
 - 투표 결과 막대: 채움은 **배경 띠로만** 두고 라벨은 막대 전체에 올린다. 라벨을 채움 안에 넣으면 0%·100%에서 글자가 밖으로 샌다.
 - 탭바 모션은 CSS만 쓴다(애니메이션 라이브러리 없음). 누르면 `active:scale-90`으로 즉시 눌린 티가 나고 — 화면 전환은 네트워크를 타서 몇백 ms 걸리는데 그동안 반응이 없으면 안 눌린 줄 안다 — 선택 표시(알약)가 탭 사이를 **미끄러진다**.
