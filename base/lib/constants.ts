@@ -11,6 +11,25 @@
 export const CATEGORIES = ["헤어", "옷", "스킨케어", "바디&향수", "자유"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
+/**
+ * 게시판 탭 — 피드와 검색이 **같은 목록을 쓴다.**
+ *
+ * '무난무난'과 '정보공유'는 카테고리가 아니라 글 유형 필터다(F-10·F-12).
+ * 나머지는 전부 카테고리. 두 축이 한 줄에 섞여 있으니 분기할 때 헷갈리지 말 것.
+ *
+ * 두 화면에서 따로 정의하면 반드시 어긋난다 — 한쪽에만 탭이 생기고
+ * 다른 쪽은 그 게시판을 못 찾는 상태가 된다.
+ */
+export const TYPE_TABS = {
+  무난무난: "무난함판정",
+  정보공유: "정보공유",
+} as const satisfies Record<string, PostType>;
+
+export const FEED_TABS = ["전체", ...Object.keys(TYPE_TABS), ...CATEGORIES] as const;
+export type FeedTab = (typeof FEED_TABS)[number];
+
+export const isTypeTab = (t: string): t is keyof typeof TYPE_TABS => t in TYPE_TABS;
+
 /** 온도가 쌓이는 카테고리. '자유'는 잡담방이라 제외된다(F-06). */
 export const TEMP_CATEGORIES = CATEGORIES.filter((c) => c !== "자유");
 

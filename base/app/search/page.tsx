@@ -6,6 +6,20 @@ import { FeedCard } from "@/components/feed";
 import { SearchIcon } from "@/components/icons";
 import { AppShell, ScreenBody, TopBar } from "@/components/shell";
 import { fetchFeed, type FeedItem } from "@/lib/api";
+import {
+  FEED_TABS,
+  isTypeTab,
+  TYPE_TABS,
+  type Category,
+  type FeedTab,
+} from "@/lib/constants";
+
+/** 고른 게시판을 API 조건으로 옮긴다. 두 축(카테고리·유형)이 섞여 있다. */
+function boardFilter(board: FeedTab) {
+  if (board === "전체") return {};
+  if (isTypeTab(board)) return { post_type: TYPE_TABS[board] };
+  return { category: board as Category };
+}
 
 /**
  * 글 검색 — 제목과 본문에서 찾는다.
@@ -19,6 +33,8 @@ import { fetchFeed, type FeedItem } from "@/lib/api";
  */
 export default function SearchPage() {
   const [term, setTerm] = useState("");
+  // 어느 게시판에서 찾을지. '전체'면 게시판을 안 가린다.
+  const [board, setBoard] = useState<FeedTab>("전체");
   const [items, setItems] = useState<FeedItem[] | null>(null);
   const [failed, setFailed] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +48,7 @@ export default function SearchPage() {
     // 한 글자 칠 때마다 부르면 "무난한가요"에 요청이 여섯 번 나간다.
     // 한글은 조합 중에도 input 이벤트가 계속 뜨므로 더 심하다.
     const timer = setTimeout(() => {
-      fetchFeed({ q: trimmed, limit: 50 })
+      fetchFeed({ q: trimmed, limit: 50, ...boardFilter(board) })
         .then((r) => {
           if (!alive) return;
           setItems(r);
@@ -45,10 +61,16 @@ export default function SearchPage() {
       alive = false;
       clearTimeout(timer);
     };
-  }, [trimmed]);
+  }, [trimmed, board]);
 
   // 검색어를 지우면 결과도 지운다. 안 그러면 빈 검색창 밑에 옛 결과가 남는다.
   const results = trimmed ? items : null;
+
+  function pickBoard(next: FeedTab) {
+    // 같은 칩을 다시 누르면 해제된다 — 끄는 방법이 따로 없으면 갇힌다.
+    setBoard((prev) => (prev === next ? "전체" : next));
+    setItems(null);
+  }
 
   return (
     <AppShell>
@@ -81,6 +103,33 @@ export default function SearchPage() {
             </button>
           )}
         </div>
+
+        {/*
+          게시판 고르기. 가로로만 스크롤한다(.rail) — 세로로 밀리면 검색창이
+          같이 움직여서 입력하다 말고 손이 미끄러진다.
+        */}
+        <div className="rail mt-2.5 flex gap-1.5">
+          {FEED_TABS.map((t) => {
+            const on = board === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => pickBoard(t)}
+                aria-pressed={on}
+                // 선택은 테두리를 유지한 채 연하게 채운다. 꽉 찬 색으로 바꾸면
+                // 박스 선이 사라져 뭐가 골라졌는지 흐려진다.
+                className={`shrink-0 rounded-full border px-3 py-1.5 text-[12.5px] whitespace-nowrap ${
+                  on
+                    ? "border-brand bg-brand/15 font-bold text-brand-dark"
+                    : "border-neutral-400 text-neutral-600"
+                }`}
+              >
+                {t}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <ScreenBody>
@@ -108,6 +157,15 @@ export default function SearchPage() {
           <div className="px-4 py-12 text-center">
             <p className="text-[13px] leading-relaxed text-neutral-600">
               <b>{trimmed}</b> 에 대한 글이 없어요.
+              {board !== "전체" && (
+                // 게시판을 좁혀놓고 못 찾은 건지 원래 없는 건지 구분돼야 한다.
+                <>
+                  <br />
+                  <span className="text-[12px] text-neutral-500">
+                    지금은 <b>{board}</b> 게시판에서만 찾고 있어요.
+                  </span>
+                </>
+              )}
             </p>
             {/* 빈 결과에서 그냥 돌려보내지 않는다 — 못 찾았다는 건 아직 아무도
                 안 물어봤다는 뜻이라, 그 자리에서 물어보게 하는 게 맞다. */}

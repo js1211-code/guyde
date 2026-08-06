@@ -7,30 +7,22 @@ import { HeartIcon, MessageIcon, VoteIcon } from "@/components/icons";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
-import { CATEGORIES, type Category, type PostType } from "@/lib/constants";
-
-/**
- * 탭 — '무난무난'과 '정보공유'는 카테고리가 아니라 글 유형 필터다(F-10·F-12).
- * 나머지는 전부 카테고리. 두 축이 한 줄에 섞여 있으니 아래 분기에서 헷갈리지 말 것.
- */
-const TYPE_TABS = {
-  무난무난: "무난함판정",
-  정보공유: "정보공유",
-} as const satisfies Record<string, PostType>;
-
-const TABS = ["전체", ...Object.keys(TYPE_TABS), ...CATEGORIES] as const;
-type Tab = (typeof TABS)[number];
-
-const isTypeTab = (t: Tab): t is keyof typeof TYPE_TABS => t in TYPE_TABS;
+import {
+  FEED_TABS,
+  isTypeTab,
+  TYPE_TABS,
+  type Category,
+  type FeedTab,
+} from "@/lib/constants";
 
 type Sort = "최신순" | "인기순";
 
 export function Feed() {
-  const [tab, setTab] = useState<Tab>("전체");
+  const [tab, setTab] = useState<FeedTab>("전체");
   const [sort, setSort] = useState<Sort>("최신순");
   // 어느 탭의 결과인지 같이 들고 있는다. 탭이 바뀌면 그 자체가 로딩 신호라
   // 이펙트 안에서 상태를 한 번 더 비울 필요가 없다.
-  const [loaded, setLoaded] = useState<{ tab: Tab; rows: FeedItem[] } | null>(null);
+  const [loaded, setLoaded] = useState<{ tab: FeedTab; rows: FeedItem[] } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -64,7 +56,7 @@ export function Feed() {
             {/* scroll-area(overflow-y:auto)를 쓰면 가로 탭 줄에 세로 스크롤까지 붙어
           손가락이 위아래로 밀린다. 가로만 흐르게 하고 세로는 잠근다. */}
       <div className="rail flex gap-4 border-b border-neutral-400 px-4">
-        {TABS.map((t) => (
+        {FEED_TABS.map((t) => (
           <button
             key={t}
             type="button"
