@@ -26,16 +26,19 @@ export async function GET(
   const deviceId = getDeviceId(req);
   const db = createAdminClient();
 
-  const { data: post, error } = await db
-    .from("posts_feed")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  /*
+    ⚠️ 순서대로 await 하지 말 것.
 
-  if (error) return fail("DB_ERROR", 500, error.message);
-  if (!post) return fail("POST_NOT_FOUND", 404);
+    이 핸들러는 Supabase에 여러 번 물어본다. 그런데 함수가 도는 지역과 DB가
+    멀면 한 번 왕복에 수백 ms가 든다 — 네 번 줄세우면 그게 그대로 더해져서
+    글 하나 여는 데 2초가 걸린다(실제로 배포본에서 1.8~3.1초였다).
 
-  const [images, comments] = await Promise.all([
+    서로 의존하지 않는 질의는 같은 묶음으로 보낸다. 지금은 두 묶음이다:
+      ① 글 · 사진 · 댓글            (서로 독립)
+      ② 내가 누른 댓글추천 · 유형별 위젯 (①의 결과가 있어야 한다)
+  */
+  const [postRes, images, comments] = await Promise.all([
+    db.from("posts_feed").select("*").eq("id", id).maybeSingle(),
     db
       .from("post_images")
       .select("id, url, sort_order")
@@ -52,18 +55,35 @@ export async function GET(
       .order("created_at", { ascending: false }),
   ]);
 
+  const { data: post, error } = postRes;
+  if (error) return fail("DB_ERROR", 500, error.message);
+  if (!post) return fail("POST_NOT_FOUND", 404);
+
   // 닫힌 글은 결과가 공개다. 투표 여부와 무관하게 열린다.
   // 손으로 닫았든 72시간이 지났든 뷰의 is_closed 하나만 본다.
   const closed = post.is_closed === true;
 
   const commentIds = (comments.data ?? []).map((c) => c.id);
-  const myCommentLikes = deviceId && commentIds.length
-    ? await db
-        .from("comment_likes")
-        .select("comment_id")
-        .eq("device_id", deviceId)
-        .in("comment_id", commentIds)
-    : { data: [] };
+
+  // ② 묶음. 유형별 위젯은 셋 중 하나만 도므로 실제로는 두 질의가 나란히 간다.
+  const [myCommentLikes, poll, nanhan, likes] = await Promise.all([
+    deviceId && commentIds.length
+      ? db
+          .from("comment_likes")
+          .select("comment_id")
+          .eq("device_id", deviceId)
+          .in("comment_id", commentIds)
+      : Promise.resolve({ data: [] as { comment_id: string }[] }),
+    post.post_type === "선택지투표"
+      ? loadPoll(db, id, deviceId, closed)
+      : Promise.resolve(null),
+    post.post_type === "무난함판정"
+      ? loadNanhan(db, id, deviceId, closed)
+      : Promise.resolve(null),
+    post.post_type === "정보공유"
+      ? loadLikes(db, id, deviceId)
+      : Promise.resolve(null),
+  ]);
 
   const likedComments = new Set(
     (myCommentLikes.data ?? []).map((r) => r.comment_id),
@@ -74,16 +94,9 @@ export async function GET(
       ...stripDevice(post, deviceId),
       images: images.data ?? [],
     },
-    poll:
-      post.post_type === "선택지투표"
-        ? await loadPoll(db, id, deviceId, closed)
-        : null,
-    nanhan:
-      post.post_type === "무난함판정"
-        ? await loadNanhan(db, id, deviceId, closed)
-        : null,
-    likes:
-      post.post_type === "정보공유" ? await loadLikes(db, id, deviceId) : null,
+    poll,
+    nanhan,
+    likes,
     // is_mine으로 자기 댓글 추천 버튼을 비활성한다 (F-42).
     // device_id 자체는 내보내지 않는다 — 그게 곧 신원이라서.
     comments: (comments.data ?? []).map((c) => ({
