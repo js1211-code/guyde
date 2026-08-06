@@ -52,6 +52,9 @@ export async function GET(
       .order("created_at", { ascending: false }),
   ]);
 
+  // 종료된 글은 결과가 공개다. 투표 여부와 무관하게 열린다.
+  const closed = post.closed_at !== null;
+
   const commentIds = (comments.data ?? []).map((c) => c.id);
   const myCommentLikes = deviceId && commentIds.length
     ? await db
@@ -70,9 +73,14 @@ export async function GET(
       ...stripDevice(post, deviceId),
       images: images.data ?? [],
     },
-    poll: post.post_type === "선택지투표" ? await loadPoll(db, id, deviceId) : null,
+    poll:
+      post.post_type === "선택지투표"
+        ? await loadPoll(db, id, deviceId, closed)
+        : null,
     nanhan:
-      post.post_type === "무난함판정" ? await loadNanhan(db, id, deviceId) : null,
+      post.post_type === "무난함판정"
+        ? await loadNanhan(db, id, deviceId, closed)
+        : null,
     likes:
       post.post_type === "정보공유" ? await loadLikes(db, id, deviceId) : null,
     // is_mine으로 자기 댓글 추천 버튼을 비활성한다 (F-42).
@@ -177,8 +185,13 @@ export async function DELETE(
 
 type Db = ReturnType<typeof createAdminClient>;
 
-/** F-32 선택지별 득표수 + 내 표. 투표 전에는 결과를 감춘다. */
-async function loadPoll(db: Db, postId: string, deviceId: string | null) {
+/** F-32 선택지별 득표수 + 내 표. 투표 전에는 결과를 감춘다(종료되면 공개). */
+async function loadPoll(
+  db: Db,
+  postId: string,
+  deviceId: string | null,
+  closed: boolean,
+) {
   const [options, votes, mine] = await Promise.all([
     db
       .from("poll_options")
@@ -206,15 +219,17 @@ async function loadPoll(db: Db, postId: string, deviceId: string | null) {
   const counts = rows.map((o) => tally.get(o.id) ?? 0);
   const percents = toPercents(counts, total);
 
+  // 투표해야 결과가 공개된다 (F-32). 종료된 글은 그 시점 숫자가 결론이라 공개.
+  const revealed = closed || myOptionId !== null;
+
   return {
     total_votes: total,
     my_option_id: myOptionId,
-    // 투표해야 결과가 공개된다 (F-32)
-    revealed: myOptionId !== null,
+    revealed,
     options: rows.map((o, i) => ({
       ...o,
-      vote_count: myOptionId ? counts[i] : null,
-      percent: myOptionId && total > 0 ? percents[i] : null,
+      vote_count: revealed ? counts[i] : null,
+      percent: revealed && total > 0 ? percents[i] : null,
     })),
   };
 }
@@ -242,8 +257,21 @@ function toPercents(counts: number[], total: number): number[] {
   return out;
 }
 
-/** F-34·35 무난해요/애매해요 카운트 + 내 선택 */
-async function loadNanhan(db: Db, postId: string, deviceId: string | null) {
+/**
+ * F-34·35 무난해요/애매해요 카운트 + 내 선택.
+ *
+ * 선택지투표와 같은 규칙이다 — **판정하기 전에는 결과를 안 준다.**
+ * 서버에서부터 null로 내려야 클라이언트를 뜯어봐도 안 보인다.
+ *
+ * 종료된 글은 누구에게나 공개한다. 종료 시점의 숫자가 결론이라서, 그때부터는
+ * 감출 이유가 없다 — 도서관 무난템 서가도 종료된 글만 올린다.
+ */
+async function loadNanhan(
+  db: Db,
+  postId: string,
+  deviceId: string | null,
+  closed: boolean,
+) {
   const [votes, mine] = await Promise.all([
     db.from("nanhan_votes").select("choice").eq("post_id", postId),
     deviceId
@@ -259,14 +287,21 @@ async function loadNanhan(db: Db, postId: string, deviceId: string | null) {
   const rows = votes.data ?? [];
   const nanhan = rows.filter((r) => r.choice === "무난해요").length;
   const ambiguous = rows.length - nanhan;
+  const myChoice = mine.data?.choice ?? null;
+  const revealed = closed || myChoice !== null;
 
   return {
-    무난해요: nanhan,
-    애매해요: ambiguous,
-    total_votes: rows.length,
-    my_choice: mine.data?.choice ?? null,
+    무난해요: revealed ? nanhan : null,
+    애매해요: revealed ? ambiguous : null,
+    // 총 표수도 감춘다. 남겨두면 "몇 명이 봤나"로 결과를 짐작하게 된다.
+    total_votes: revealed ? rows.length : null,
+    my_choice: myChoice,
+    revealed,
     // 0표면 배지에서 %를 뺀다 — 뷰가 계산한 값과 같은 값 (F-35)
-    percent: rows.length === 0 ? null : Math.round((nanhan / rows.length) * 100),
+    percent:
+      revealed && rows.length > 0
+        ? Math.round((nanhan / rows.length) * 100)
+        : null,
   };
 }
 

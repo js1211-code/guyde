@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
 import { HeartIcon, MessageIcon } from "@/components/icons";
-import { NANHAN_PICK_PERCENT } from "@/lib/constants";
+import {
+  NANHAN_PICK_MIN_VOTES,
+  NANHAN_PICK_PERCENT,
+} from "@/lib/constants";
 import { AppShell, Kicker, PageTitle, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
@@ -139,6 +142,10 @@ function Picks() {
     fetchFeed({
       post_type: "무난함판정",
       min_nanhan: NANHAN_PICK_PERCENT,
+      // 아직 표가 들어오는 중인 글을 "무난한 것"으로 실으면 다음에 봤을 때
+      // 숫자가 달라져 있다. 결론이 난 글만 싣는다.
+      closed: true,
+      min_votes: NANHAN_PICK_MIN_VOTES,
       sort: "reactions",
       limit: 50,
     })
@@ -149,7 +156,8 @@ function Picks() {
   return (
     <>
       <p className="px-4 pt-3 pb-2 text-[12.5px] leading-relaxed text-neutral-600">
-        대중이 {NANHAN_PICK_PERCENT}% 이상 무난하다고 판정한 것만 모았어요.
+        판정이 끝난 글 중 {NANHAN_PICK_MIN_VOTES}표 이상 모여{" "}
+        {NANHAN_PICK_PERCENT}% 넘게 무난하다고 나온 것만 모았어요.
       </p>
 
       {failed && (
@@ -164,9 +172,9 @@ function Picks() {
       )}
       {items?.length === 0 && (
         <p className="px-4 py-10 text-center text-[13px] leading-relaxed text-neutral-600">
-          아직 {NANHAN_PICK_PERCENT}%를 넘긴 글이 없어요.
+          아직 조건을 채운 글이 없어요.
           <br />
-          커뮤니티에서 무난함 판정에 참여해보세요.
+          판정이 끝나고 {NANHAN_PICK_MIN_VOTES}표를 넘겨야 올라와요.
         </p>
       )}
 

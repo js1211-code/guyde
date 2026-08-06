@@ -28,6 +28,7 @@ import {
   clearNanhanVote,
   castPollVote,
   clearPollVote,
+  closePost,
   fetchPost,
   deletePost,
   reportPost,
@@ -85,13 +86,26 @@ export default function PostPage({
   }
 
   const { post } = data;
+  const closed = post.closed_at !== null;
 
   return (
     <AppShell>
       <TopBar
         backHref="/"
         title="GUYDE"
-        right={<PostMenu postId={post.id} isMine={post.is_mine} />}
+        right={
+          <PostMenu
+            postId={post.id}
+            isMine={post.is_mine}
+            // 표를 받는 글만 종료할 수 있다. 이미 닫혔으면 항목을 감춘다.
+            canClose={
+              post.is_mine &&
+              !closed &&
+              (post.post_type === "선택지투표" || post.post_type === "무난함판정")
+            }
+            onDone={reload}
+          />
+        }
       />
 
       <ScreenBody>
@@ -104,6 +118,11 @@ export default function PostPage({
               </span>
             ) : (
               <PostTypeBadge postType={post.post_type} />
+            )}
+            {closed && (
+              <span className="rounded-xs bg-neutral-300 px-1.5 py-px text-[10.5px] font-bold text-neutral-700">
+                종료
+              </span>
             )}
             <span className="ml-auto text-[11px] text-neutral-600">
               {timeAgo(post.created_at)}
@@ -133,9 +152,21 @@ export default function PostPage({
             />
           ))}
 
-          {data.poll && <Poll postId={post.id} poll={data.poll} onDone={reload} />}
+          {data.poll && (
+            <Poll
+              postId={post.id}
+              poll={data.poll}
+              closed={closed}
+              onDone={reload}
+            />
+          )}
           {data.nanhan && (
-            <Nanhan postId={post.id} nanhan={data.nanhan} onDone={reload} />
+            <Nanhan
+              postId={post.id}
+              nanhan={data.nanhan}
+              closed={closed}
+              onDone={reload}
+            />
           )}
           {data.likes && (
             <Likes
@@ -230,10 +261,12 @@ function Likes({
 function Poll({
   postId,
   poll,
+  closed,
   onDone,
 }: {
   postId: string;
   poll: NonNullable<PostDetail["poll"]>;
+  closed: boolean;
   onDone: () => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -265,7 +298,7 @@ function Poll({
             <button
               key={o.id}
               type="button"
-              disabled={busy}
+              disabled={busy || closed}
               onClick={() => vote(o.id)}
               className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3 text-left text-[14.5px] font-semibold"
             >
@@ -304,7 +337,7 @@ function Poll({
             <button
               key={o.id}
               type="button"
-              disabled={busy}
+              disabled={busy || closed}
               // mine이어도 막지 않는다 — 그게 취소하는 유일한 방법이다.
               onClick={() => vote(o.id)}
               className={`relative flex items-center overflow-hidden rounded-lg border text-left ${
@@ -366,10 +399,12 @@ function Poll({
 function Nanhan({
   postId,
   nanhan,
+  closed,
   onDone,
 }: {
   postId: string;
   nanhan: NonNullable<PostDetail["nanhan"]>;
+  closed: boolean;
   onDone: () => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -394,7 +429,11 @@ function Nanhan({
     <>
       <p className="mt-4 text-center">
         <span className="cond text-[42px] leading-none font-bold text-brand">
-          {nanhan.percent === null ? "아직 판정 전" : `무난함 ${nanhan.percent}%`}
+          {!nanhan.revealed
+            ? "무난함 판정"
+            : nanhan.percent === null
+              ? "아직 판정 전"
+              : `무난함 ${nanhan.percent}%`}
         </span>
       </p>
       <div className="mt-3 flex gap-2">
@@ -404,7 +443,9 @@ function Nanhan({
             <button
               key={choice}
               type="button"
-              disabled={busy}
+              // 종료된 글은 더 받지 않는다. DB도 막지만, 눌리는 것처럼
+              // 보였다가 실패하면 고장으로 읽힌다.
+              disabled={busy || closed}
               onClick={() => vote(choice)}
               className={`relative flex flex-1 flex-col items-center gap-0.5 py-3 ${
                 picked
@@ -425,17 +466,27 @@ function Nanhan({
               >
                 {choice}
               </span>
-              <span
-                className={`cond text-[13px] font-semibold ${
-                  picked ? "text-brand-dark" : "text-neutral-600"
-                }`}
-              >
-                {nanhan[choice]}
-              </span>
+              {/* 판정 전에는 표수도 안 보여준다. 남겨두면 그 숫자로 결과를
+                  짐작하게 되어 감춘 의미가 없다. */}
+              {nanhan.revealed && (
+                <span
+                  className={`cond text-[13px] font-semibold ${
+                    picked ? "text-brand-dark" : "text-neutral-600"
+                  }`}
+                >
+                  {nanhan[choice]}
+                </span>
+              )}
             </button>
           );
         })}
       </div>
+
+      {!nanhan.revealed && (
+        <p className="mt-2.5 text-center text-[12px] text-neutral-600">
+          판정하면 결과를 볼 수 있어요
+        </p>
+      )}
     </>
   );
 }
@@ -693,11 +744,35 @@ function Avatar({ nickname, size = 30 }: { nickname: string; size?: number }) {
  * 내 글을 신고하거나 남의 글을 지우는 건 애초에 불가능해서,
  * 눌리지 않는 항목을 늘어놓을 이유가 없다.
  */
-function PostMenu({ postId, isMine }: { postId: string; isMine: boolean }) {
+function PostMenu({
+  postId,
+  isMine,
+  canClose,
+  onDone,
+}: {
+  postId: string;
+  isMine: boolean;
+  canClose: boolean;
+  onDone: () => void;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+
+  async function close() {
+    // 되돌릴 수 없다. 지우기와 같은 무게라 한 번 더 묻는다.
+    if (!confirm("투표를 종료할까요? 결과가 공개되고 다시 열 수 없어요.")) return;
+    setBusy(true);
+    try {
+      await closePost(postId);
+      setOpen(false);
+      await onDone();
+    } catch {
+      alert("종료하지 못했어요. 잠시 후 다시 시도해주세요.");
+    }
+    setBusy(false);
+  }
 
   async function remove() {
     // 지우면 되돌릴 수 없다. 한 번 더 묻는다.
@@ -757,6 +832,18 @@ function PostMenu({ postId, isMine }: { postId: string; isMine: boolean }) {
               </p>
             ) : isMine ? (
               <>
+                {canClose && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    disabled={busy}
+                    onClick={close}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-4 py-3.5 text-[15px] font-semibold disabled:opacity-50"
+                  >
+                    <CheckIcon size={19} />
+                    투표 종료하기
+                  </button>
+                )}
                 <Link
                   href={`/post/${postId}/edit`}
                   role="menuitem"

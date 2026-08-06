@@ -84,6 +84,13 @@ export const TEMP_EXPERT_GATE = 42.0;
  * 곳이고, 여기는 판정이 끝난 것만 모으는 곳이라 역할이 다르다.
  */
 export const NANHAN_PICK_PERCENT = 60;
+/**
+ * 무난템 서가에 오르려면 표가 이만큼은 모여야 한다.
+ *
+ * %만 보면 표가 적을수록 극단값이 나온다 — 2표 중 2표가 무난해요면 100%지만
+ * 그건 대중의 판정이 아니다. 하한이 없으면 오히려 그런 글이 위로 올라온다.
+ */
+export const NANHAN_PICK_MIN_VOTES = 10;
 
 export const POLL_OPTION_MIN = 2;
 export const POLL_OPTION_MAX = 5;

@@ -18,6 +18,8 @@ import { CATEGORIES, POST_TYPES, type Category, type PostType } from "@/lib/cons
  * - ?post_type=무난함판정 → 무난무난 탭 (카테고리를 가로지른다)
  * - ?sort=reactions     → 반응 많은 순 (도서관의 정보공유 서가)
  * - ?min_nanhan=60      → 무난함 60% 이상만 (도서관의 무난템 서가)
+ * - ?closed=true        → 종료된 투표만
+ * - ?min_votes=10       → 표가 이만큼 이상 모인 글만
  * - ?q=후드            → 제목·본문 검색
  *
  * 피드의 정렬은 최신순 고정이다(F-13). sort는 도서관용으로 열어둔 것 —
@@ -32,6 +34,8 @@ export async function GET(req: Request) {
   const sort = url.searchParams.get("sort");
   const minNanhan = url.searchParams.get("min_nanhan");
   const q = url.searchParams.get("q")?.trim() ?? "";
+  const closedOnly = url.searchParams.get("closed") === "true";
+  const minVotes = url.searchParams.get("min_votes");
   const limit = Math.min(Number(url.searchParams.get("limit") ?? 30), 100);
   const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
@@ -64,6 +68,18 @@ export async function GET(req: Request) {
   // "아직 판정 안 난 글"이 무난템에 섞이지 않는다.
   if (minNanhan) query = query.gte("nanhan_percent", Number(minNanhan));
 
+  /*
+    무난템 서가가 쓰는 두 조건.
+
+    종료: 아직 표가 들어오는 중인 글을 "무난한 것"으로 실으면, 다음에 봤을 때
+    숫자가 달라져 있다. 결론이 난 글만 싣는다.
+
+    표 수: 2표 중 2표가 무난해요면 100%지만 그건 대중의 판정이 아니다.
+    %만 보면 표가 적을수록 극단값이 나와서 오히려 위로 올라온다.
+  */
+  if (closedOnly) query = query.not("closed_at", "is", null);
+  if (minVotes) query = query.gte("reaction_count", Number(minVotes));
+
   // 검색 — 제목과 본문 둘 다 본다. 제목만 보면 "그 글 본문에 있었는데"가
   // 안 찾아지고, 이 앱의 글은 제목이 짧아서 정보 대부분이 본문에 있다.
   if (q) {
@@ -77,7 +93,41 @@ export async function GET(req: Request) {
   const { data, error } = await query;
   if (error) return fail("DB_ERROR", 500, error.message);
 
-  return ok({ items: (data ?? []).map((row) => stripDevice(row, viewer)) });
+  const rows = data ?? [];
+
+  /*
+    무난함 %는 결과다. 상세에서 감춰놓고 목록 배지에 그대로 띄우면 감춘 게
+    아무 의미가 없다 — 판정하지 않고도 카드만 보면 다 알 수 있다.
+
+    그래서 여기서도 같은 규칙을 쓴다: 종료됐거나 내가 판정한 글만 %를 준다.
+    내가 뭘 판정했는지는 한 번에 몰아서 물어본다(글마다 물으면 N+1이다).
+  */
+  const judged = new Set<string>();
+  const judgeIds = rows
+    .filter((r) => r.post_type === "무난함판정" && r.closed_at === null)
+    .map((r) => r.id);
+
+  if (viewer && judgeIds.length) {
+    const { data: mine } = await db
+      .from("nanhan_votes")
+      .select("post_id")
+      .eq("device_id", viewer)
+      .in("post_id", judgeIds);
+    for (const v of mine ?? []) judged.add(v.post_id);
+  }
+
+  return ok({
+    items: rows.map((row) => {
+      const hide =
+        row.post_type === "무난함판정" &&
+        row.closed_at === null &&
+        !judged.has(row.id);
+      return stripDevice(
+        hide ? { ...row, nanhan_percent: null } : row,
+        viewer,
+      );
+    }),
+  });
 }
 
 /**

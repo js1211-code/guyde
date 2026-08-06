@@ -25,7 +25,10 @@ export type FeedItem = {
   thumbnail_url: string | null;
   comment_count: number;
   reaction_count: number;
+  /** 판정 전에는 null. 종료됐거나 내가 판정한 글만 값이 온다. */
   nanhan_percent: number | null;
+  /** 투표가 끝난 시각. null이면 진행 중. */
+  closed_at: string | null;
   is_mine: boolean;
 };
 
@@ -49,10 +52,12 @@ export type PostDetail = {
     options: PollOption[];
   } | null;
   nanhan: {
-    무난해요: number;
-    애매해요: number;
-    total_votes: number;
+    // 판정 전에는 전부 null — 서버에서부터 감춘다(F-32와 같은 규칙).
+    무난해요: number | null;
+    애매해요: number | null;
+    total_votes: number | null;
     my_choice: "무난해요" | "애매해요" | null;
+    revealed: boolean;
     percent: number | null;
   } | null;
   likes: { count: number; liked_by_me: boolean } | null;
@@ -101,6 +106,10 @@ export async function fetchFeed(params: {
   min_nanhan?: number;
   /** 제목·본문 검색어. */
   q?: string;
+  /** 종료된 투표만 (도서관 무난템 서가). */
+  closed?: boolean;
+  /** 표가 이만큼 이상 모인 글만 (도서관 무난템 서가). */
+  min_votes?: number;
   limit?: number;
 }): Promise<FeedItem[]> {
   const q = new URLSearchParams();
@@ -109,6 +118,8 @@ export async function fetchFeed(params: {
   if (params.sort) q.set("sort", params.sort);
   if (params.min_nanhan) q.set("min_nanhan", String(params.min_nanhan));
   if (params.q) q.set("q", params.q);
+  if (params.closed) q.set("closed", "true");
+  if (params.min_votes) q.set("min_votes", String(params.min_votes));
   if (params.limit) q.set("limit", String(params.limit));
   const res = await apiFetch(`/api/posts?${q}`);
   const { items } = await json<{ items: FeedItem[] }>(res);
@@ -237,6 +248,16 @@ export async function updatePost(
       method: "PATCH",
       body: JSON.stringify(patch),
     }),
+  );
+}
+
+/**
+ * 투표 종료 — 글쓴이만. 되돌릴 수 없다.
+ * 종료하면 결과가 모두에게 공개되고 표는 더 받지 않는다.
+ */
+export async function closePost(postId: string) {
+  return json<{ id: string; closed_at: string }>(
+    await apiFetch(`/api/posts/${postId}/close`, { method: "POST" }),
   );
 }
 
