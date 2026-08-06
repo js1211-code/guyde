@@ -19,14 +19,13 @@ import { LogoMark } from "@/components/logo";
  * 팔레트고, 우리 마크는 헤더에서 브라운으로 놓인다. 금색을 여기 쓰면
  * 고수 뱃지 색과 겹쳐서 "금색 = 고수"라는 뜻이 흐려진다.
  *
- * 🚨 **바탕을 어두운 색으로 채우지 말 것.**
- * 설치형 iOS는 앱을 열 때 화면 맨 위 색을 읽어 상태바를 칠한다. 스플래시가
- * 첫 화면이라 그 색이 그대로 상태바가 된다 — 바탕을 브라운으로 채웠더니
- * 상태바가 통째로 갈색이 됐고, 앱을 다 띄운 뒤에도 그대로 남았다.
+ * 바탕은 브라운, 글자는 흰색이다. 앱 아이콘과 같은 밝기 관계라 아이콘을
+ * 누른 손이 그 화면으로 이어진다.
  *
- * 대신 브라운을 **가운데 타일**로 옮겼다. 앱 아이콘과 같은 모습(브라운 타일 +
- * 크림 마크)이라 아이콘을 누른 손이 그 화면으로 이어지고, 화면 맨 위는
- * 흰색이라 상태바도 흰색으로 남는다.
+ * ⚠️ 설치형 iOS에서는 이 색이 상태바까지 물들일 수 있다. iOS가 앱을 열 때
+ * 화면 맨 위 색을 읽어 상태바를 칠하는데, 스플래시가 첫 화면이라 그 색이
+ * 잡힌다. theme_color를 흰색으로 두고 있지만 기기·버전에 따라 읽는 쪽이
+ * 다르다 — 상태바가 갈색으로 보이면 이 배경 때문이다.
  *
  * 화면 전환(클라이언트 라우팅)에서는 레이아웃이 다시 만들어지지 않으므로
  * 다시 뜨지 않는다. 앱을 새로 열 때만 보인다.
@@ -38,33 +37,29 @@ export function Splash() {
       // fixed inset-0 — 셸(max-w-430px)보다 위에 있어야 기기 화면을 꽉 채운다.
       // 안전 영역 여백을 주지 않는다: 노치 밑까지 같은 색으로 이어져야
       // 화면이 잘린 것처럼 보이지 않는다.
-      className="splash fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white"
+      className="splash fixed inset-0 z-[200] flex flex-col items-center justify-center bg-brand"
     >
       {/*
-        앱 아이콘과 같은 타일. 크기를 화면에 맞춘다 — 작은 기기(SE)에서 140px
-        고정이면 크고 큰 기기에서는 작다. vmin은 짧은 변 기준이라 어느 쪽이
-        모자라도 넘치지 않는다.
+        크기를 화면에 맞춘다. 작은 기기(SE)에서 120px 고정이면 크고, 큰
+        기기에서는 작다. vmin은 짧은 변 기준이라 어느 쪽이 모자라도 넘치지 않는다.
       */}
-      <span
-        className="splash-mark flex items-center justify-center rounded-[22%] bg-brand text-brand-tint"
-        style={{ width: "min(140px, 34vmin)", height: "min(140px, 34vmin)" }}
-      >
-        {/* size는 viewBox만 정하고 실제 크기는 CSS가 잡는다.
+      <span className="splash-mark text-white" style={{ width: "min(120px, 26vmin)" }}>
+        {/* size는 viewBox만 정하고 실제 크기는 CSS가 잡는다(h-full w-full).
             획은 조금 굵게 — 크게 놓으면 가는 획이 흐려 보인다. */}
-        <LogoMark size={120} className="h-[62%] w-[62%]" strokeWidth={4.5} />
+        <LogoMark size={120} className="h-full w-full" strokeWidth={4.5} />
       </span>
 
       <span
-        className="splash-word cond mt-6 leading-none font-bold tracking-[0.1em] text-brand"
+        className="splash-word cond mt-6 leading-none font-bold tracking-[0.1em] text-white"
         style={{ fontSize: "min(44px, 11vmin)" }}
       >
         GUYDE
       </span>
 
       <span className="mt-8 flex gap-2">
-        <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
-        <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
-        <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
+        <span className="splash-dot h-2 w-2 rounded-full bg-white" />
+        <span className="splash-dot h-2 w-2 rounded-full bg-white" />
+        <span className="splash-dot h-2 w-2 rounded-full bg-white" />
       </span>
     </div>
   );
