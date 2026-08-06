@@ -52,11 +52,15 @@ export default function ExpertsPage() {
       </NoticeBar>
 
       <ScreenBody className="px-4 pt-3">
-        <p className="mb-3 text-[13.5px] leading-relaxed text-neutral-600">
+        {/*
+          줄바꿈을 강제하지 않는다. 글자 크기를 키웠더니 첫 문장이 이미 두 줄로
+          넘치는데 <br/>이 한 줄을 더 붙여서 세 줄이 됐다. 폭에 맞춰 흐르게
+          두면 어느 크기에서든 두 줄로 떨어진다.
+          안내는 목록보다 뒤에 있어야 할 정보라 본문보다 작게 둔다.
+        */}
+        <p className="mb-3 text-[12.5px] leading-relaxed text-neutral-600">
           설문을 넣으면 {CONSULTING_SLA_HOURS}시간 안에 진단·피해야 할 것·착장
-          1세트가 도착해요.
-          <br />
-          답변이 불만족스러우면 100% 환불돼요.
+          1세트가 도착해요. 답변이 불만족스러우면 100% 환불돼요.
         </p>
 
         {failed && (
