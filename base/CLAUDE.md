@@ -132,6 +132,8 @@ Storage: **`post-images`** 버킷(공개 읽기, 5MB, 이미지 타입만). 업�
 1. 피드 조회는 **`posts_feed` 뷰**로. 무난함 %는 이 뷰에서만 계산 — 피드 배지와 상세가 같은 값을 써야 한다.
 2. 글 작성은 **`create_post()` 함수**로(하트 차감 + 글 insert + 선택지 insert가 한 트랜잭션). 하트 부족이면 `INSUFFICIENT_HEARTS`.
 3. 투표는 **`cast_poll_vote()` / `cast_nanhan_vote()`** 로(upsert — 다른 선택지를 누르면 표가 이동).
+   - **선택지투표는 같은 선택지를 다시 누르면 취소된다**(`DELETE /api/posts/[id]/poll-vote`). 취소하면 결과도 다시 감춰진다 — 표를 뺀 채로 결과를 계속 볼 수 있으면 아무거나 눌렀다 취소하는 것만으로 결과를 훔쳐볼 수 있다(F-32).
+   - 표가 이미 없어도 성공으로 돌려준다. 두 번 눌렀을 때 오류가 뜨면 사용자가 뭘 잘못한 것처럼 보이는데, 원하는 상태(표 없음)는 이미 이뤄져 있다.
 4. `comments.likes` 직접 update 금지 — 트리거가 자동 반영.
    - 답글은 `parent_id`로 붙인다. 서버는 평평한 목록을 추천순으로 주고, 화면이 부모 밑에 다시 묶으면서 답글끼리는 **오래된 순**으로 뒤집는다 — 답글은 대화라서 추천순으로 세우면 흐름이 끊긴다.
 5. **자기 글·자기 댓글에는 좋아요 버튼을 그리지 않는다.** disabled로 남겨두면 왜 안 눌리는지 알 수 없어서 고장으로 읽힌다. (자가 좋아요를 DB 트리거가 막는 건 그대로다)
@@ -246,7 +248,7 @@ GET    /api/posts                     피드 (?category= &post_type= &sort= &q=)
                                       sort=reactions 는 도서관 전용. 피드는 최신순 고정(F-13)
 POST   /api/posts                     글 작성
 GET    /api/posts/[id]                상세 (유형별 위젯 + 댓글)
-POST   /api/posts/[id]/poll-vote      선택지 투표
+POST|DELETE /api/posts/[id]/poll-vote 선택지 투표 / 취소
 POST   /api/posts/[id]/nanhan-vote    무난함 판정
 PATCH  /api/posts/[id]                글 수정 (글쓴이만, 제목·본문만)
 DELETE /api/posts/[id]                글 삭제 (글쓴이만)
