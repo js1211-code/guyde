@@ -14,18 +14,13 @@ export default function CommunityPage() {
 
   return (
     <AppShell>
+      {/* 마크 + 워드마크만. 태그라인은 스플래시로 옮겼다 — 앱을 여는 순간
+          한 번 읽히면 충분하고, 여기 달아두면 목록이 그만큼 아래로 밀린다.
+          도서관 머리와 같은 모양이라 탭을 옮겨도 윗줄이 제자리에 있다. */}
       <header className="flex items-start justify-between px-4 pt-3 pb-2.5">
-        <div>
-          {/* 마크 + 워드마크. 예전엔 GUYDE+ 였는데 '+'는 로고가 정해지기 전
-              임시 강조였다. 이제 마크가 그 자리를 대신한다. */}
-          <Logo size={24} />
-          <p className="mt-1 text-[11px] tracking-wide text-neutral-600">
-            GUY를 위한 GUIDE.
-          </p>
-        </div>
+        <Logo size={24} />
 
-        {/* 검색 입구. 커뮤니티에만 둔다 — 찾는 대상이 글이라서 여기 말고는
-            누를 이유가 없다. */}
+        {/* 검색 입구. 도서관과 같은 자리다 — 글을 찾는 두 화면에만 둔다. */}
         <Link
           href="/search"
           aria-label="글 검색"

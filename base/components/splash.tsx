@@ -56,6 +56,12 @@ export function Splash() {
         GUYDE
       </span>
 
+      {/* 태그라인은 여기에만 둔다. 앱을 여는 순간 한 번 읽히면 충분하고,
+          화면마다 머리에 달아두면 목록이 그만큼 아래로 밀린다. */}
+      <span className="mt-2.5 text-[13px] tracking-wide text-neutral-600">
+        GUY를 위한 GUIDE.
+      </span>
+
       <span className="mt-8 flex gap-2">
         <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
         <span className="splash-dot h-2 w-2 rounded-full bg-brand" />
