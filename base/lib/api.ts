@@ -99,6 +99,8 @@ export async function fetchFeed(params: {
   sort?: "latest" | "reactions";
   /** 도서관 무난템 전용 — 무난함 % 하한. */
   min_nanhan?: number;
+  /** 제목·본문 검색어. */
+  q?: string;
   limit?: number;
 }): Promise<FeedItem[]> {
   const q = new URLSearchParams();
@@ -106,6 +108,7 @@ export async function fetchFeed(params: {
   if (params.post_type) q.set("post_type", params.post_type);
   if (params.sort) q.set("sort", params.sort);
   if (params.min_nanhan) q.set("min_nanhan", String(params.min_nanhan));
+  if (params.q) q.set("q", params.q);
   if (params.limit) q.set("limit", String(params.limit));
   const res = await apiFetch(`/api/posts?${q}`);
   const { items } = await json<{ items: FeedItem[] }>(res);

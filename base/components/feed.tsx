@@ -123,7 +123,11 @@ export function Feed() {
   );
 }
 
-function FeedCard({ item }: { item: FeedItem }) {
+/**
+ * 피드 카드. 검색 결과도 이걸 쓴다 — 같은 글이 화면마다 다르게 생기면
+ * 검색이 별개의 목록처럼 읽힌다.
+ */
+export function FeedCard({ item }: { item: FeedItem }) {
   const hasPhoto = Boolean(item.thumbnail_url);
   // 썸네일이 없을 때만 본문 2줄 미리보기를 보여준다 (F-15)
   const showPreview = !hasPhoto && item.body.trim().length > 0;

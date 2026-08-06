@@ -18,6 +18,7 @@ import { CATEGORIES, POST_TYPES, type Category, type PostType } from "@/lib/cons
  * - ?post_type=무난함판정 → 무난무난 탭 (카테고리를 가로지른다)
  * - ?sort=reactions     → 반응 많은 순 (도서관의 정보공유 서가)
  * - ?min_nanhan=60      → 무난함 60% 이상만 (도서관의 무난템 서가)
+ * - ?q=후드            → 제목·본문 검색
  *
  * 피드의 정렬은 최신순 고정이다(F-13). sort는 도서관용으로 열어둔 것 —
  * 도서관은 흐름을 보는 곳이 아니라 쓸 만한 걸 찾는 곳이라 최신순이 맞지 않는다.
@@ -30,6 +31,7 @@ export async function GET(req: Request) {
   const postType = url.searchParams.get("post_type");
   const sort = url.searchParams.get("sort");
   const minNanhan = url.searchParams.get("min_nanhan");
+  const q = url.searchParams.get("q")?.trim() ?? "";
   const limit = Math.min(Number(url.searchParams.get("limit") ?? 30), 100);
   const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
@@ -62,10 +64,33 @@ export async function GET(req: Request) {
   // "아직 판정 안 난 글"이 무난템에 섞이지 않는다.
   if (minNanhan) query = query.gte("nanhan_percent", Number(minNanhan));
 
+  // 검색 — 제목과 본문 둘 다 본다. 제목만 보면 "그 글 본문에 있었는데"가
+  // 안 찾아지고, 이 앱의 글은 제목이 짧아서 정보 대부분이 본문에 있다.
+  if (q) {
+    const term = escapeForFilter(q);
+    // 걸러내고 나면 아무것도 안 남는 검색어가 있다("%"처럼). 그때 필터를
+    // 건너뛰면 전체 목록이 나오는데, 뭔가 입력했는데 전부 나오면 검색이 아니다.
+    if (!term) return ok({ items: [] });
+    query = query.or(`title.ilike.%${term}%,body.ilike.%${term}%`);
+  }
+
   const { data, error } = await query;
   if (error) return fail("DB_ERROR", 500, error.message);
 
   return ok({ items: (data ?? []).map((row) => stripDevice(row, viewer)) });
+}
+
+/**
+ * PostgREST의 or 필터는 값에 쉼표·괄호가 들어가면 문법이 깨진다.
+ * "후드,셔츠"를 그대로 넣으면 조건이 하나 더 있는 것으로 파싱된다.
+ * %와 _는 ilike의 와일드카드라 그대로 두면 아무 글이나 걸린다.
+ *
+ * 걸러내는 쪽을 택했다 — 이스케이프 규칙을 흉내 내다 틀리면 조용히 엉뚱한
+ * 결과가 나오는데, 검색어에서 이 문자들을 빼도 사람이 찾으려던 말은 남는다.
+ * 길이도 자른다. 긴 문자열은 인덱스 없이 훑는 비용만 키운다.
+ */
+function escapeForFilter(raw: string): string {
+  return raw.replace(/[,()%_"\\*]/g, " ").trim().slice(0, 40);
 }
 
 /**

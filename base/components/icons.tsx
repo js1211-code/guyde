@@ -88,6 +88,14 @@ export const ShoeIcon = (p: P) => (
   </S>
 );
 
+/** 검색 — 돋보기. */
+export const SearchIcon = (p: P) => (
+  <S {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M20 20l-3.5-3.5" />
+  </S>
+);
+
 /** 삭제 — 쓰레기통. 뚜껑·몸통·안쪽 세로선. */
 export const TrashIcon = (p: P) => (
   <S {...p}>
