@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
 import { HeartIcon, MessageIcon, SearchIcon } from "@/components/icons";
 import {
+  GUIDE_PICK_MIN_LIKES,
   NANHAN_PICK_MIN_VOTES,
   NANHAN_PICK_PERCENT,
 } from "@/lib/constants";
@@ -234,7 +235,14 @@ function Guides() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    fetchFeed({ post_type: "정보공유", sort: "reactions", limit: 50 })
+    // min_votes는 뷰의 reaction_count 하한이다. 정보공유 글에서 그 값은
+    // 좋아요 수라, 무난템의 표 수 하한과 같은 조건을 그대로 쓴다.
+    fetchFeed({
+      post_type: "정보공유",
+      min_votes: GUIDE_PICK_MIN_LIKES,
+      sort: "reactions",
+      limit: 50,
+    })
       .then(setItems)
       .catch(() => setFailed(true));
   }, []);
@@ -242,7 +250,7 @@ function Guides() {
   return (
     <>
       <p className="px-4 pt-3 pb-2 text-[13.5px] leading-relaxed text-neutral-600">
-        커뮤니티가 쌓은 정보 글이에요. 도움된 순으로 모아뒀어요.
+        좋아요를 {GUIDE_PICK_MIN_LIKES}개 받은 정보 공유 글만 모아놨어요.
       </p>
 
       {failed && (
@@ -257,9 +265,9 @@ function Guides() {
       )}
       {items?.length === 0 && (
         <p className="px-4 py-10 text-center text-[14px] leading-relaxed text-neutral-600">
-          아직 정보 글이 없어요.
+          아직 조건을 채운 글이 없어요.
           <br />
-          커뮤니티에서 &lsquo;정보 공유&rsquo;로 첫 글을 남겨보세요.
+          좋아요 {GUIDE_PICK_MIN_LIKES}개를 넘겨야 올라와요.
         </p>
       )}
 

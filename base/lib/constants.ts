@@ -109,6 +109,15 @@ export const NANHAN_PICK_PERCENT = 60;
  */
 export const NANHAN_PICK_MIN_VOTES = 10;
 
+/**
+ * 도서관 '정보 공유' 서가에 오르려면 좋아요가 이만큼은 모여야 한다.
+ *
+ * 커뮤니티 탭의 정보공유는 올라온 걸 다 보여주는 곳이고, 여기는 쓸 만한 걸
+ * 찾는 곳이다. 하한이 없으면 두 곳이 같은 목록이 되어 서가를 따로 둘 이유가
+ * 없어진다.
+ */
+export const GUIDE_PICK_MIN_LIKES = 20;
+
 export const POLL_OPTION_MIN = 2;
 export const POLL_OPTION_MAX = 5;
 export const POST_IMAGE_MAX = 2;
