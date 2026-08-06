@@ -21,7 +21,7 @@ import {
 } from "@/components/icons";
 import { AppShell, Kicker, ScreenBody, TopBar } from "@/components/shell";
 import { Temperature } from "@/components/temperature";
-import { timeAgo } from "@/lib/format";
+import { timeAgo, timeLeft } from "@/lib/format";
 import {
   addComment,
   castNanhanVote,
@@ -86,7 +86,10 @@ export default function PostPage({
   }
 
   const { post } = data;
-  const closed = post.closed_at !== null;
+  // 손으로 닫았든 72시간이 지났든 뷰가 계산한 값 하나만 본다.
+  const closed = post.is_closed;
+  const votable =
+    post.post_type === "선택지투표" || post.post_type === "무난함판정";
 
   return (
     <AppShell>
@@ -98,11 +101,7 @@ export default function PostPage({
             postId={post.id}
             isMine={post.is_mine}
             // 표를 받는 글만 종료할 수 있다. 이미 닫혔으면 항목을 감춘다.
-            canClose={
-              post.is_mine &&
-              !closed &&
-              (post.post_type === "선택지투표" || post.post_type === "무난함판정")
-            }
+            canClose={post.is_mine && !closed && votable}
             onDone={reload}
           />
         }
@@ -119,11 +118,17 @@ export default function PostPage({
             ) : (
               <PostTypeBadge postType={post.post_type} />
             )}
-            {closed && (
-              <span className="rounded-xs bg-neutral-300 px-1.5 py-px text-[10.5px] font-bold text-neutral-700">
-                종료
-              </span>
-            )}
+            {votable &&
+              (closed ? (
+                <span className="rounded-xs bg-neutral-300 px-1.5 py-px text-[10.5px] font-bold text-neutral-700">
+                  종료
+                </span>
+              ) : (
+                // 언제까지 열려 있는지 알아야 "지금 눌러야 하나"가 정해진다.
+                <span className="rounded-xs bg-brand-tint px-1.5 py-px text-[10.5px] font-bold text-brand-dark">
+                  {timeLeft(post.closes_at) ?? "곧 종료"}
+                </span>
+              ))}
             <span className="ml-auto text-[11px] text-neutral-600">
               {timeAgo(post.created_at)}
             </span>

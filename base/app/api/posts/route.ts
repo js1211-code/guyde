@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     표 수: 2표 중 2표가 무난해요면 100%지만 그건 대중의 판정이 아니다.
     %만 보면 표가 적을수록 극단값이 나와서 오히려 위로 올라온다.
   */
-  if (closedOnly) query = query.not("closed_at", "is", null);
+  if (closedOnly) query = query.eq("is_closed", true);
   if (minVotes) query = query.gte("reaction_count", Number(minVotes));
 
   // 검색 — 제목과 본문 둘 다 본다. 제목만 보면 "그 글 본문에 있었는데"가
@@ -104,7 +104,7 @@ export async function GET(req: Request) {
   */
   const judged = new Set<string>();
   const judgeIds = rows
-    .filter((r) => r.post_type === "무난함판정" && r.closed_at === null)
+    .filter((r) => r.post_type === "무난함판정" && !r.is_closed)
     .map((r) => r.id);
 
   if (viewer && judgeIds.length) {
@@ -120,7 +120,7 @@ export async function GET(req: Request) {
     items: rows.map((row) => {
       const hide =
         row.post_type === "무난함판정" &&
-        row.closed_at === null &&
+        !row.is_closed &&
         !judged.has(row.id);
       return stripDevice(
         hide ? { ...row, nanhan_percent: null } : row,

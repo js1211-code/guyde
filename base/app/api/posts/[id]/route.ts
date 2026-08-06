@@ -52,8 +52,9 @@ export async function GET(
       .order("created_at", { ascending: false }),
   ]);
 
-  // 종료된 글은 결과가 공개다. 투표 여부와 무관하게 열린다.
-  const closed = post.closed_at !== null;
+  // 닫힌 글은 결과가 공개다. 투표 여부와 무관하게 열린다.
+  // 손으로 닫았든 72시간이 지났든 뷰의 is_closed 하나만 본다.
+  const closed = post.is_closed === true;
 
   const commentIds = (comments.data ?? []).map((c) => c.id);
   const myCommentLikes = deviceId && commentIds.length

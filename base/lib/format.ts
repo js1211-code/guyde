@@ -23,3 +23,22 @@ export function timeAgo(iso: string): string {
     d.getDate(),
   ).padStart(2, "0")}`;
 }
+
+/**
+ * 투표가 닫히기까지 남은 시간. 이미 지났으면 null.
+ *
+ * 분 단위로는 안 쓴다 — 72시간짜리 투표에서 "3시간 12분 남음"은 그 정밀도가
+ * 아무 결정도 바꾸지 않는데 매분 다시 그려야 한다. 한 시간 미만만 분으로 준다.
+ */
+export function timeLeft(iso: string): string | null {
+  const end = new Date(iso).getTime();
+  if (Number.isNaN(end)) return null;
+
+  const ms = end - Date.now();
+  if (ms <= 0) return null;
+
+  const hours = Math.floor(ms / 3_600_000);
+  if (hours >= 24) return `${Math.floor(hours / 24)}일 남음`;
+  if (hours >= 1) return `${hours}시간 남음`;
+  return `${Math.max(1, Math.floor(ms / 60_000))}분 남음`;
+}

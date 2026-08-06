@@ -38,7 +38,9 @@ export async function POST(
   if (!VOTABLE.includes(post.post_type)) {
     return fail("NOT_VOTABLE", 400, "투표가 있는 글만 종료할 수 있어요");
   }
-  // 이미 닫혀 있으면 성공으로 돌려준다. 원하는 상태는 이미 이뤄져 있다.
+  // 이미 손으로 닫았으면 성공으로 돌려준다. 원하는 상태는 이미 이뤄져 있다.
+  // (72시간이 지나 저절로 닫힌 글은 closed_at이 비어 있는데, 그때 도장을
+  //  찍어두면 "언제 닫혔나"가 실제와 달라진다 — 아래 update가 그냥 지나간다.)
   if (post.closed_at) return ok({ id, closed_at: post.closed_at });
 
   const closedAt = new Date().toISOString();

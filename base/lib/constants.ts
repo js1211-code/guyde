@@ -83,6 +83,15 @@ export const TEMP_EXPERT_GATE = 42.0;
  * 커뮤니티의 '무난무난' 탭은 판정글을 전부 보여준다 — 그쪽은 판정을 받는
  * 곳이고, 여기는 판정이 끝난 것만 모으는 곳이라 역할이 다르다.
  */
+/**
+ * 투표·판정이 열려 있는 시간. 지나면 저절로 닫힌다.
+ *
+ * ⚠️ 이 숫자가 db/patch_v3_5.sql 에도 박혀 있다(`interval '72 hours'`).
+ * SQL이 TS를 못 읽어서 어쩔 수 없다 — 바꿀 땐 반드시 같이 바꾼다.
+ * 어긋나면 화면은 "3시간 남음"인데 DB는 이미 표를 거부하는 상태가 된다.
+ */
+export const POLL_DURATION_HOURS = 72;
+
 export const NANHAN_PICK_PERCENT = 60;
 /**
  * 무난템 서가에 오르려면 표가 이만큼은 모여야 한다.

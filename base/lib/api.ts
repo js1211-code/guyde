@@ -27,8 +27,12 @@ export type FeedItem = {
   reaction_count: number;
   /** 판정 전에는 null. 종료됐거나 내가 판정한 글만 값이 온다. */
   nanhan_percent: number | null;
-  /** 투표가 끝난 시각. null이면 진행 중. */
+  /** 글쓴이가 손으로 닫은 시각. 72시간이 지나 저절로 닫힌 경우는 null이다. */
   closed_at: string | null;
+  /** 실제로 닫히는(닫힌) 시각 — 손으로 닫았으면 그때, 아니면 올린 지 72시간 뒤. */
+  closes_at: string;
+  /** 지금 닫혀 있나. 손으로 닫았든 시간이 지났든 이 값 하나만 보면 된다. */
+  is_closed: boolean;
   is_mine: boolean;
 };
 
