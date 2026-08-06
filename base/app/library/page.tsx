@@ -107,27 +107,54 @@ function Articles() {
       </Link>
 
       <Kicker className="px-4 pt-5 pb-2">ALL</Kicker>
-      {getLatestArticles().map((a) => (
-        <Link
-          key={a.id}
-          href={`/library/${a.id}`}
-          className="flex items-center gap-3 border-t border-dashed border-neutral-400 px-4 py-2.5"
-        >
-          <PhotoBox
-            src={a.cover_url}
-            alt=""
-            className="h-[64px] w-[64px] shrink-0"
-            iconSize={16}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] leading-snug font-semibold">{a.title}</p>
-            <p className="mt-1 flex items-center gap-1.5 text-[12px] text-neutral-600">
-              <span>{a.category}</span>
-              <span>· {a.read_minutes}분</span>
-            </p>
+      {getLatestArticles().map((a) =>
+        /*
+          준비중 글은 제목만 있고 본문이 없다. 누를 수 없게 <div>로 그린다 —
+          <Link>로 두고 상세에서 404를 내면 눌러본 사람이 고장으로 읽는다.
+          (주소를 직접 쳐도 안 열린다. getArticle()이 걸러낸다)
+        */
+        a.coming_soon ? (
+          <div
+            key={a.id}
+            className="flex items-center gap-3 border-t border-dashed border-neutral-400 px-4 py-2.5"
+          >
+            {/* 표지가 없으므로 자리만 잡는다. 사진칸을 비워두면 발행된 글과
+                줄 높이가 어긋나 목록이 들쭉날쭉해진다. */}
+            <div className="h-[64px] w-[64px] shrink-0 rounded-xl bg-band" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] leading-snug font-semibold text-neutral-500">
+                {a.title}
+              </p>
+              <p className="mt-1 flex items-center gap-1.5 text-[12px] text-neutral-500">
+                <span>{a.category}</span>
+                <span className="rounded-xs bg-band px-1.5 py-0.5 font-semibold">
+                  준비중
+                </span>
+              </p>
+            </div>
           </div>
-        </Link>
-      ))}
+        ) : (
+          <Link
+            key={a.id}
+            href={`/library/${a.id}`}
+            className="flex items-center gap-3 border-t border-dashed border-neutral-400 px-4 py-2.5"
+          >
+            <PhotoBox
+              src={a.cover_url}
+              alt=""
+              className="h-[64px] w-[64px] shrink-0"
+              iconSize={16}
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] leading-snug font-semibold">{a.title}</p>
+              <p className="mt-1 flex items-center gap-1.5 text-[12px] text-neutral-600">
+                <span>{a.category}</span>
+                <span>· {a.read_minutes}분</span>
+              </p>
+            </div>
+          </Link>
+        ),
+      )}
 
       <Kicker className="px-4 pt-5 pb-2">TEST</Kicker>
       <div className="flex gap-3 overflow-x-auto px-4 pb-4">
