@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
-import { HeartIcon, MessageIcon } from "@/components/icons";
+import { HeartIcon, MessageIcon, SearchIcon } from "@/components/icons";
 import {
   NANHAN_PICK_MIN_VOTES,
   NANHAN_PICK_PERCENT,
 } from "@/lib/constants";
-import { AppShell, Kicker, PageTitle, ScreenBody } from "@/components/shell";
+import { AppShell, Kicker, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
@@ -37,7 +37,20 @@ export default function LibraryPage() {
 
   return (
     <AppShell>
-      <PageTitle>도서관</PageTitle>
+      {/*
+        제목을 적지 않는다. 하단 탭에 '도서관'이 이미 켜져 있어서 같은 말을
+        두 번 하는 셈이고, 그 자리를 비우면 서가가 화면 위로 올라온다.
+        대신 검색 입구를 오른쪽에 둔다 — 커뮤니티와 같은 자리다.
+      */}
+      <div className="flex items-center justify-end px-4 pt-3 pb-1">
+        <Link
+          href="/search"
+          aria-label="글 검색"
+          className="-mr-1 p-1 text-neutral-700 transition-transform duration-100 active:scale-90"
+        >
+          <SearchIcon size={21} />
+        </Link>
+      </div>
 
       <div className="flex gap-4 border-b border-neutral-400 px-4">
         {SHELVES.map((s) => (
