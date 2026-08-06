@@ -78,10 +78,10 @@ select
   p.title                                            as post_title,
   -- 추천수 = 그 글에서 '무난해요'를 누른 사람 수. 저장값이 아니다.
   count(*) filter (where nv.choice = '무난해요')     as vouch_count,
-  count(nv.*)                                        as vote_count,
-  case when count(nv.*) = 0 then null
+  count(nv.device_id)                                as vote_count,
+  case when count(nv.device_id) = 0 then null
        else round(100.0 * count(*) filter (where nv.choice = '무난해요')
-                        / count(nv.*))
+                        / count(nv.device_id))
   end                                                as nanhan_percent,
   (p.closed_at is not null
    or now() >= p.created_at + interval '72 hours')    as is_closed
