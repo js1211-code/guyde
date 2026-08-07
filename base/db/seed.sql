@@ -397,7 +397,11 @@ insert into post_images (post_id, url, sort_order) values
   ('b0000012-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
   ('b0000014-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1779497056334-6148defa5f0f?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
   ('b0000017-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1618677603286-0ec56cb6e1b5?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
-  ('b0000022-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1608721279136-cd41b752fa41?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
+  -- ✅ 진짜 사진. 손에 들고 담요 위에서 찍은 컷이라 크기 감이 온다 —
+  --    '이 정도 병'을 묻는 글이라 손이 같이 나온 게 오히려 근거가 된다.
+  --    683x512 가로 사진이다. 상세는 원본 비율(natural)이라 그대로 뜨고,
+  --    목록 썸네일은 68px 정사각이라 object-cover 로 채워진다.
+  ('b0000022-0000-4000-8000-000000000001','https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000013/50b7b902-9250-4404-97b1-dc8d997a7f61.jpg',0),
   -- ✅ 진짜 사진. 마루 바닥에 위에서 내려찍은 컷이라 Unsplash 스튜디오
   --    컷과 결이 다르다 — 이 앱이 원하는 건 이쪽이다.
   --    Storage 에 올려둔 것이라 crop 파라미터가 없다(이미 900px로 줄임).
