@@ -110,12 +110,21 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 | `patch_v3_5.sql` | **투표 종료** — 72시간 자동 + 손 종료(`posts.closed_at`), 뷰에 `closes_at`·`is_closed`, 닫힌 글에 표를 막는 트리거 |
 | `patch_v3_6.sql` | **댓글 사진**(`comments.image_url`) · `comments_view`에 노출 |
 | `patch_v3_7.sql` | **사진만 있는 댓글 허용** — `comments` CHECK를 "본문이나 사진 중 하나"로 |
-| `seed.sql` | 커뮤니티 (등장인물 20 · 배경 유저 800 · 글 34 · 댓글 45) |
+| `seed.sql` | 커뮤니티 (등장인물 20 · 배경 유저 800 · 글 31 · 댓글 49) |
 | `seed_consulting.sql` | 고수 4명 + 대표 답변 + 고수 글 3 (**반드시 `seed.sql` 다음에**) |
-| `seed_picks.sql` | 무난템 서가에 오를 판정글 13 (**seed_consulting.sql 다음에**) |
+| `seed_picks.sql` | 무난템 서가에 오를 판정글 11 + 댓글 1 (**seed_consulting.sql 다음에**) |
 | `test_v2_1.sql` | 검증 23종 (검증 전용 DB에서만 실행) |
 | `test_v3.sql` | 컨설팅 제약 검증 17종 (검증 전용 DB에서만 실행) |
 | `test_v3_2.sql` | 답글 깊이·고수 판별 검증 11종 (검증 전용 DB에서만 실행) |
+
+> 🚨 **시드를 고쳤으면 `bash db/tools/verify.sh` 를 돌린다.**
+> 로컬에 일회용 DB를 만들어 위 14개 파일을 순서대로 **실제로 실행**하고,
+> 고아 사진 · 댓글이 글보다 먼저인 경우 · 42도 밑으로 내려간 고수를 센다.
+> 배포 DB는 건드리지 않는다(Postgres.app 이 없으면 그냥 건너뛴다).
+>
+> 글 하나를 지우면 그 글의 사진·표·선택지·댓글·댓글추천이 여러 절에 흩어져
+> 있어서 한 군데만 빠뜨려도 FK에 걸리는데, **눈으로 훑어서는 안 보이고 돌려봐야
+> 보인다.** 실제로 깨진 채로 커밋될 뻔한 걸 이 스크립트가 잡았다.
 
 > ⚠️ `seed_consulting.sql`은 반드시 `seed.sql` **다음에** 돌린다.
 > `seed.sql`이 일반 유저를 지우고 다시 넣는데, 그 유저들이 고수 댓글에
@@ -286,7 +295,7 @@ POST   /api/users/register            기기 등록·조회
 PATCH  /api/users/nickname            닉네임 변경   POST = 다시 뽑기
 GET    /api/users/me/posts            내 글
 GET    /api/users/me/comments         내 댓글(원본 글 제목 포함)
-GET    /api/posts                     피드 (?category= &post_type= &sort= &q= &closed= &min_votes=)
+GET    /api/posts                     피드 (?category= &post_type= &sort= &q= &closed= &min_votes= &min_nanhan= &limit= &offset=)
                                       sort=reactions 는 도서관 전용. 피드는 최신순 고정(F-13)
 POST   /api/posts                     글 작성
 GET    /api/posts/[id]                상세 (유형별 위젯 + 댓글)
