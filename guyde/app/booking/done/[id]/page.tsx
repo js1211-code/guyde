@@ -130,7 +130,7 @@ export default function BookingDetailPage({
               {booking.is_expert ? "수정 요청이 왔어요" : "수정을 요청했어요"}
             </p>
             {booking.revision_reason && (
-              <p className="mt-2 border-l-[3px] border-danger-line pl-2.5 text-[14px] leading-relaxed">
+              <p className="mt-2 border-l-[3px] border-danger-line pl-2.5 text-[14px] leading-relaxed whitespace-pre-line">
                 {booking.revision_reason}
               </p>
             )}
@@ -159,7 +159,7 @@ export default function BookingDetailPage({
                 <p className="text-[12.5px] font-bold text-danger">
                   이 답변에 요청된 수정
                 </p>
-                <p className="mt-1 text-[13.5px] leading-relaxed">
+                <p className="mt-1 text-[13.5px] leading-relaxed whitespace-pre-line">
                   {answer.feedback.reason}
                 </p>
               </div>
@@ -185,7 +185,7 @@ export default function BookingDetailPage({
                   {"★".repeat(booking.review.rating)}
                 </p>
                 {booking.review.body && (
-                  <p className="mt-1 text-[14px] leading-relaxed">
+                  <p className="mt-1 text-[14px] leading-relaxed whitespace-pre-line">
                     {booking.review.body}
                   </p>
                 )}

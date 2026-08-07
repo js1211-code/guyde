@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { CategoryBadge, PhotoBox } from "@/components/badge";
 import { ChevronLeftIcon } from "@/components/icons";
 import { AppShell, Kicker, ScreenBody } from "@/components/shell";
-import { ARTICLE_FIGURE, getArticle, getArticleIds } from "@/lib/mock";
+import { getArticle, getArticleIds } from "@/lib/mock";
 
 export function generateStaticParams() {
   return getArticleIds().map((id) => ({ id }));
@@ -60,24 +60,12 @@ export default async function ArticlePage({
         {article.sections.map((s) => (
           <section key={s.heading}>
             <h2 className="mt-4 mb-1.5 text-[15px] font-bold">{s.heading}</h2>
-            <p className="text-[14.5px] leading-relaxed text-neutral-700">
+            {/* 아티클 본문은 lib/mock.ts 에서 \n\n 으로 문단을 나눠 쓴다.
+                `whitespace-pre-line`이 없으면 그 문단이 전부 접혀서, 도서관에서
+                제일 긴 글들이 통째로 한 덩어리로 나온다. */}
+            <p className="text-[14.5px] leading-relaxed whitespace-pre-line text-neutral-700">
               {s.body}
             </p>
-            {/* 본문 삽화. 표지와 다른 사진을 쓴다 — 같은 사진이 한 화면에
-                두 번 나오면 글이 짧아 보인다. */}
-            {s.has_image && (
-              <figure className="mt-3">
-                <PhotoBox
-                  src={ARTICLE_FIGURE.url}
-                  alt=""
-                  className="h-[150px]"
-                  iconSize={20}
-                />
-                <figcaption className="mt-1 text-[11.5px] text-neutral-500">
-                  Photo by {ARTICLE_FIGURE.by} · Unsplash
-                </figcaption>
-              </figure>
-            )}
           </section>
         ))}
 

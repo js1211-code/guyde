@@ -157,7 +157,11 @@ export function AnswerView({
   return (
     <div>
       <Section title="① 진단">
-        <p className="text-[14.5px] leading-relaxed">{answer.diagnosis}</p>
+        {/* 고수가 textarea 에 문단을 나눠 쓰는 칸이다. `whitespace-pre-line`이
+            없으면 그 문단이 전부 접혀 한 덩어리로 나온다. */}
+        <p className="text-[14.5px] leading-relaxed whitespace-pre-line">
+          {answer.diagnosis}
+        </p>
       </Section>
 
       <Section title="② 피해야 할 것">
@@ -203,7 +207,9 @@ export function AnswerView({
                 왜 이 아이템인가요?
               </p>
               <div className="rounded-r-md border-l-[3px] border-brand bg-brand-tint py-2.5 pr-3 pl-3">
-                <p className="text-[13.5px] leading-relaxed">{item.reason}</p>
+                <p className="text-[13.5px] leading-relaxed whitespace-pre-line">
+                  {item.reason}
+                </p>
               </div>
             </div>
           ))}

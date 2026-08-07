@@ -178,7 +178,7 @@ export default function AnswerWritePage({
             <p className="text-[14px] font-bold text-danger">
               이 점을 고쳐달라고 했어요
             </p>
-            <p className="mt-2 text-[15px] leading-relaxed">
+            <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line">
               {booking.revision_reason ?? "사유가 기록되지 않았어요"}
             </p>
             <p className="mt-2.5 text-[12.5px] text-neutral-600">

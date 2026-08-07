@@ -101,7 +101,7 @@ export default function ReviewPage({
             {"★".repeat(booking.review.rating)}
           </p>
           {booking.review.body && (
-            <p className="mt-2 text-[14.5px] leading-relaxed text-neutral-700">
+            <p className="mt-2 text-[14.5px] leading-relaxed whitespace-pre-line text-neutral-700">
               {booking.review.body}
             </p>
           )}

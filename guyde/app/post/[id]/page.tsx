@@ -145,8 +145,17 @@ export default function PostPage({
           </div>
 
           <h1 className="text-[18.5px] leading-snug font-semibold">{post.title}</h1>
+          {/*
+            🚨 `whitespace-pre-line`을 빼지 말 것. 본문은 textarea 에서 온
+            생글자라 줄바꿈이 \n 으로 들어 있는데, 기본 white-space 는 그걸
+            공백 하나로 접는다 — 번호를 매겨 쓴 정보공유 글이 통째로 한
+            문단으로 뭉쳐 나온다. `pre-wrap` 이 아니라 `pre-line` 인 건
+            붙여넣기로 딸려온 들여쓰기·연속 공백까지 살릴 이유는 없어서다.
+            피드 카드(components/feed.tsx)는 반대로 접는 게 맞다 — 2줄
+            미리보기라 줄바꿈을 살리면 빈 줄에 한 줄을 다 쓴다.
+          */}
           {post.body && (
-            <p className="mt-1.5 text-[14.5px] leading-relaxed text-neutral-600">
+            <p className="mt-1.5 text-[14.5px] leading-relaxed whitespace-pre-line text-neutral-600">
               {post.body}
             </p>
           )}
@@ -798,9 +807,11 @@ function CommentRow({
 
         {/* 사진만 남긴 댓글은 본문이 빈 문자열이다. 빈 <p>를 그리면
             그만큼 줄 간격이 벌어져 사진이 아래로 떠 보인다. */}
+        {/* 본문과 같은 이유로 `whitespace-pre-line`. 고수 대표 답변은
+            문단을 나눠 쓴 긴 글이라 접히면 통째로 한 덩어리가 된다. */}
         {c.body.trim() && (
           <p
-            className={`leading-relaxed ${compact ? "text-[14.5px]" : "text-[15px]"}`}
+            className={`leading-relaxed whitespace-pre-line ${compact ? "text-[14.5px]" : "text-[15px]"}`}
           >
             {c.body}
           </p>

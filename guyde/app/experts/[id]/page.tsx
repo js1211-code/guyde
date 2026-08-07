@@ -97,7 +97,11 @@ export default function ExpertPage({
                 href={`/post/${h.post_id}`}
                 className="mb-2.5 block rounded-lg border border-brand-tint-b bg-brand-tint p-3 last:mb-0"
               >
-                <p className="text-[15px] leading-relaxed">“{h.body}”</p>
+                {/* 잘라내지 않고 통째로 인용한다. 줄바꿈을 접으면 문단을
+                    나눠 쓴 답변이 한 덩어리가 되어 오히려 더 길어 보인다. */}
+                <p className="text-[15px] leading-relaxed whitespace-pre-line">
+                  “{h.body}”
+                </p>
                 <span className="mt-2 flex items-center justify-between">
                   <span className="text-[12.5px] text-neutral-600">
                     {h.post_title}
@@ -121,7 +125,9 @@ export default function ExpertPage({
                 <span className="cond text-[13.5px] font-semibold text-brand">
                   {"★".repeat(r.rating)}
                 </span>
-                <p className="mt-1 text-[14.5px]">{r.body}</p>
+                <p className="mt-1 text-[14.5px] whitespace-pre-line">
+                  {r.body}
+                </p>
               </div>
             ))}
           </section>

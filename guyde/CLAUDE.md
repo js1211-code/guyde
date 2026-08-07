@@ -110,9 +110,9 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 | `patch_v3_5.sql` | **투표 종료** — 72시간 자동 + 손 종료(`posts.closed_at`), 뷰에 `closes_at`·`is_closed`, 닫힌 글에 표를 막는 트리거 |
 | `patch_v3_6.sql` | **댓글 사진**(`comments.image_url`) · `comments_view`에 노출 |
 | `patch_v3_7.sql` | **사진만 있는 댓글 허용** — `comments` CHECK를 "본문이나 사진 중 하나"로 |
-| `seed.sql` | 커뮤니티 (등장인물 20 · 배경 유저 800 · 글 31 · 댓글 49) |
+| `seed.sql` | 커뮤니티 (등장인물 20 · 배경 유저 800 · 글 31 · 댓글 47) |
 | `seed_consulting.sql` | 고수 4명 + 대표 답변 + 고수 글 3 (**반드시 `seed.sql` 다음에**) |
-| `seed_picks.sql` | 무난템 서가에 오를 판정글 11 + 댓글 1 (**seed_consulting.sql 다음에**) |
+| `seed_picks.sql` | 무난템 서가에 오를 판정글 7 + 댓글 1 (**seed_consulting.sql 다음에**) |
 | `test_v2_1.sql` | 검증 23종 (검증 전용 DB에서만 실행) |
 | `test_v3.sql` | 컨설팅 제약 검증 17종 (검증 전용 DB에서만 실행) |
 | `test_v3_2.sql` | 답글 깊이·고수 판별 검증 11종 (검증 전용 DB에서만 실행) |
@@ -395,7 +395,7 @@ POST   /api/bookings/[id]/feedback    만족 → 완료 / 수정요청 → 수�
   - URL에 `crop=faces,entropy&w=900&h=600`을 붙인다. 세로 사진을 CSS로만 자르면 얼굴이 날아가고 몸통 여백만 남아 빈 화면처럼 보인다 — CDN이 잘라낼 지점을 고르게 맡긴다.
   - ⚠️ `PhotoBox`에 `absolute inset-0`을 주지 말 것. PhotoBox가 이미 `relative`인데 Tailwind에서 `relative`가 `absolute`보다 뒤에 정의돼 이겨버리고, 높이가 0이 되어 사진이 통째로 사라진다. 부모 높이를 채우려면 `h-full w-full`을 쓴다.
   - 촬영자를 상세 화면에 표기한다. Unsplash 라이선스상 의무는 없지만 남의 사진을 쓰면서 안 밝히는 건 예의가 아니다.
-  - **본문 삽화(`ARTICLE_FIGURE`)는 표지와 다른 사진을 쓴다.** 같은 사진이 한 화면에 두 번 나오면 글이 짧아 보인다.
+  - ~~본문 삽화(`ARTICLE_FIGURE`)~~ **폐기.** 사진이 한 장뿐이라 아홉 편 전부에 같은 컷이 붙었다 — 스킨케어 글에도 헤어 글에도 개어놓은 반팔 사진이 떴고, `Photo by … · Unsplash` 한 줄도 글마다 똑같이 반복됐다. 표지는 글마다 달라서 그대로 둔다. 다시 넣으려면 **글마다 다른 사진**이 먼저다.
   - ⚠️ Unsplash 페이지 주소의 짧은 ID(`ogmenj2NGho`)는 이미지 파일명과 다르다. `unsplash.com/napi/photos/<id>`를 **브라우저에서** 열어 `urls.raw`를 받아야 한다 — 서버에서 fetch하면 401이 온다.
   - 인물 사진이 아니면 `crop=faces`를 빼고 `crop=entropy`만 쓴다. 옷만 찍힌 컷에 얼굴 기준을 주면 엉뚱한 데를 잘라낸다.
 - **아티클은 긴 글 9편 + 준비중 1편이다.** 서너 줄짜리를 여러 편 두면 목록은 꽉 차 보여도 하나를 여는 순간 빈다 — 도서관은 훑는 곳이 아니라 하나를 붙잡고 읽는 곳이다.

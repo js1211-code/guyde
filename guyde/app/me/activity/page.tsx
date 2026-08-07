@@ -125,7 +125,9 @@ function CommentList({ items }: { items: MyComment[] | null }) {
           <p className="mb-1 text-[12.5px] text-neutral-600">
             {c.post?.title ?? "삭제된 글"}
           </p>
-          <p className="text-[15px] leading-relaxed">{c.body}</p>
+          <p className="text-[15px] leading-relaxed whitespace-pre-line">
+            {c.body}
+          </p>
           <span className="mt-1.5 flex items-center gap-1 text-[12.5px] text-neutral-500">
             <ThumbsUpIcon size={13} />
             <span className="font-bold">{c.likes}</span>
