@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { Feed } from "@/components/feed";
 import { FirstRun } from "@/components/first-run";
 import { SearchIcon } from "@/components/icons";
@@ -31,7 +32,24 @@ export default function CommunityPage() {
       </header>
 
       <ScreenBody>
-        <Feed />
+        {/*
+          Feed 가 useSearchParams 로 게시판을 읽는다(?board=). 정적으로 미리
+          그리는 화면에서 그걸 쓰려면 Suspense 경계가 있어야 한다 — 없으면
+          빌드가 막힌다. 서버는 주소의 물음표 뒤를 모르므로 여기까지만 미리
+          그려두고, 나머지는 브라우저에서 채운다.
+
+          fallback 은 목록이 뜨기 전과 같은 문구다. 다른 걸 넣으면 첫 화면에
+          한 번, 목록을 받는 동안 또 한 번 서로 다른 자리표시자가 스친다.
+        */}
+        <Suspense
+          fallback={
+            <p className="px-4 py-10 text-center text-[14px] text-neutral-500">
+              불러오는 중…
+            </p>
+          }
+        >
+          <Feed />
+        </Suspense>
       </ScreenBody>
 
       <WriteFab />

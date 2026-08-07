@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CategoryBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
 import { HeartIcon, MessageIcon, VoteIcon } from "@/components/icons";
@@ -25,8 +26,38 @@ function filterFor(tab: FeedTab) {
   return { category: tab as Category };
 }
 
+/** 주소의 ?board= 를 게시판으로. 없거나 모르는 값이면 '전체'. */
+function boardFrom(raw: string | null): FeedTab {
+  return FEED_TABS.includes(raw as FeedTab) ? (raw as FeedTab) : "전체";
+}
+
 export function Feed() {
-  const [tab, setTab] = useState<FeedTab>("전체");
+  /*
+    🚨 고른 게시판은 **주소에 실어야 한다.** useState 로 들고 있으면 글을
+    누르는 순간 이 화면이 언마운트되고, 뒤로가기로 돌아올 때 초기값('전체')
+    으로 다시 만들어진다 — 무난무난을 보다 글 하나 열었다 돌아오면 전체로
+    튕겼다. 주소는 히스토리 항목에 남으므로 뒤로가기가 그대로 되살린다.
+
+    게시판을 옮길 때는 replace 다. push 면 탭을 세 번 옮긴 뒤 글을 열었을 때
+    뒤로가기를 네 번 눌러야 빠져나온다 — 게시판 전환은 방문이 아니라
+    같은 화면의 상태라서 히스토리에 쌓이면 안 된다.
+
+    덤으로 주소가 게시판을 가리키게 되어 새로고침과 링크 공유에도 남는다.
+  */
+  const router = useRouter();
+  const params = useSearchParams();
+  const tab = boardFrom(params.get("board"));
+  const setTab = useCallback(
+    (t: FeedTab) => {
+      // '전체'는 기본값이라 파라미터를 붙이지 않는다 — 기본 상태의 주소가
+      // 둘(/ 와 /?board=전체)이 되면 같은 화면이 다른 주소로 갈린다.
+      // 값에 '&'가 들어가는 게시판이 있다(바디&향수). 직접 잇지 말고 인코딩한다.
+      const qs = new URLSearchParams({ board: t }).toString();
+      router.replace(t === "전체" ? "/" : `/?${qs}`, { scroll: false });
+    },
+    [router],
+  );
+
   const [sort, setSort] = useState<Sort>("최신순");
   // 어느 탭의 결과인지 같이 들고 있는다. 탭이 바뀌면 그 자체가 로딩 신호라
   // 이펙트 안에서 상태를 한 번 더 비울 필요가 없다.

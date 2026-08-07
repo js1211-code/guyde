@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackButton } from "@/components/back-button";
 import { ChevronLeftIcon } from "@/components/icons";
 
 /**
@@ -76,12 +77,22 @@ export function ScreenBody({
 /** 뒤로가기 + 가운데 제목. 제목은 응축 서체가 기본. */
 export function TopBar({
   backHref,
+  historyBack = false,
   title,
   right,
   bordered = true,
   cond = true,
 }: {
   backHref?: string;
+  /**
+   * 정해진 곳으로 가는 대신 **직전 화면으로 되돌아간다**(backHref는 그때
+   * 돌아갈 데가 없을 때 쓰는 대비책이 된다).
+   *
+   * 기본값은 false다. 글쓰기·컨설팅처럼 단계가 정해진 흐름에서는 어디서
+   * 들어왔든 정해진 곳으로 나가야 하고, 되돌아가면 방금 지나온 단계로
+   * 다시 들어가 버린다. 어디서든 들어올 수 있는 화면에서만 켠다.
+   */
+  historyBack?: boolean;
   title?: React.ReactNode;
   right?: React.ReactNode;
   bordered?: boolean;
@@ -94,11 +105,14 @@ export function TopBar({
       }`}
     >
       <span className="flex w-5 items-center">
-        {backHref && (
-          <Link href={backHref} aria-label="뒤로">
-            <ChevronLeftIcon size={20} />
-          </Link>
-        )}
+        {backHref &&
+          (historyBack ? (
+            <BackButton fallbackHref={backHref} />
+          ) : (
+            <Link href={backHref} aria-label="뒤로">
+              <ChevronLeftIcon size={20} />
+            </Link>
+          ))}
       </span>
       {title ? (
         <span
