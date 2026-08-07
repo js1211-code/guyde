@@ -125,6 +125,8 @@ export async function fetchFeed(params: {
   /** 표가 이만큼 이상 모인 글만 (도서관 무난템 서가). */
   min_votes?: number;
   limit?: number;
+  /** 몇 번째 글부터. 피드가 다음 쪽을 이어 붙일 때 쓴다. */
+  offset?: number;
 }): Promise<FeedItem[]> {
   const q = new URLSearchParams();
   if (params.category) q.set("category", params.category);
@@ -135,6 +137,7 @@ export async function fetchFeed(params: {
   if (params.closed) q.set("closed", "true");
   if (params.min_votes) q.set("min_votes", String(params.min_votes));
   if (params.limit) q.set("limit", String(params.limit));
+  if (params.offset) q.set("offset", String(params.offset));
   const res = await apiFetch(`/api/posts?${q}`);
   const { items } = await json<{ items: FeedItem[] }>(res);
   return items;

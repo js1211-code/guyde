@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CategoryBadge, PhotoBox, PostTypeBadge } from "@/components/badge";
 import { HeartIcon, MessageIcon, VoteIcon } from "@/components/icons";
 import { Temperature } from "@/components/temperature";
 import { fetchFeed, type FeedItem } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 import {
+  FEED_PAGE_SIZE,
   FEED_TABS,
   isTypeTab,
   TYPE_TABS,
@@ -17,32 +18,106 @@ import {
 
 type Sort = "최신순" | "인기순";
 
+/** 탭 이름 → 서버 필터. 첫 쪽과 다음 쪽이 같은 조건을 써야 한다. */
+function filterFor(tab: FeedTab) {
+  if (tab === "전체") return {};
+  if (isTypeTab(tab)) return { post_type: TYPE_TABS[tab] };
+  return { category: tab as Category };
+}
+
 export function Feed() {
   const [tab, setTab] = useState<FeedTab>("전체");
   const [sort, setSort] = useState<Sort>("최신순");
   // 어느 탭의 결과인지 같이 들고 있는다. 탭이 바뀌면 그 자체가 로딩 신호라
   // 이펙트 안에서 상태를 한 번 더 비울 필요가 없다.
-  const [loaded, setLoaded] = useState<{ tab: FeedTab; rows: FeedItem[] } | null>(null);
+  //
+  // done = 서버에 더 없다. 마지막 쪽이 덜 차서 온 걸로 판단한다 — 개수를
+  // 따로 물어보면 요청이 한 번 더 늘고, 그 사이 글이 올라오면 어차피 어긋난다.
+  const [loaded, setLoaded] = useState<
+    { tab: FeedTab; rows: FeedItem[]; done: boolean } | null
+  >(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     let alive = true;
-    fetchFeed(
-      tab === "전체"
-        ? {}
-        : isTypeTab(tab)
-          ? { post_type: TYPE_TABS[tab] }
-          : { category: tab as Category },
-    )
-      .then((rows) => alive && setLoaded({ tab, rows }))
-      .catch(() => alive && setLoaded({ tab, rows: [] }));
+    fetchFeed({ ...filterFor(tab), limit: FEED_PAGE_SIZE })
+      .then(
+        (rows) =>
+          alive && setLoaded({ tab, rows, done: rows.length < FEED_PAGE_SIZE }),
+      )
+      .catch(() => alive && setLoaded({ tab, rows: [], done: true }));
     return () => {
       alive = false;
     };
   }, [tab]);
 
   const items = loaded?.tab === tab ? loaded.rows : null;
+  const done = loaded?.tab === tab ? loaded.done : true;
+
+  /*
+    다음 쪽. 한 번만 요청하고 끝내면 서버 기본값 밖의 글이 전체 게시판에서
+    통째로 사라진다 — 실제로 무난템 서가(limit 50)에는 있는데 커뮤니티
+    '전체'에는 없는 글이 스무 개쯤 있었다.
+
+    중복 요청은 ref로 막는다. state 가드는 같은 프레임에 두 번 들어오면
+    둘 다 옛 값을 읽고 통과한다(댓글이 두 개씩 달렸던 것과 같은 함정).
+  */
+  const fetching = useRef(false);
+  const loadMore = useCallback(() => {
+    if (fetching.current || !loaded || loaded.tab !== tab || loaded.done) return;
+    fetching.current = true;
+    setLoadingMore(true);
+
+    fetchFeed({ ...filterFor(tab), limit: FEED_PAGE_SIZE, offset: loaded.rows.length })
+      .then((rows) =>
+        setLoaded((prev) => {
+          // 불러오는 사이 탭을 옮겼으면 남의 탭 결과다. 버린다.
+          if (!prev || prev.tab !== tab) return prev;
+          // 쪽을 넘기는 사이 새 글이 올라오면 뒤로 밀린 글이 두 번 온다.
+          // key가 겹치면 React가 화면을 잘못 재사용하므로 id로 걸러낸다.
+          const seen = new Set(prev.rows.map((r) => r.id));
+          return {
+            tab,
+            rows: [...prev.rows, ...rows.filter((r) => !seen.has(r.id))],
+            done: rows.length < FEED_PAGE_SIZE,
+          };
+        }),
+      )
+      // 실패해도 done으로 두지 않는다 — 다시 바닥에 닿으면 또 시도한다.
+      .catch(() => {})
+      .finally(() => {
+        fetching.current = false;
+        setLoadingMore(false);
+      });
+  }, [loaded, tab]);
+
+  /*
+    바닥이 보이면 알아서 이어 붙인다. '더 보기'를 누르게 하면 안 누른 사람에게는
+    목록이 여전히 30건에서 끝난 것으로 보인다 — 그게 지금 고치는 증상이다.
+    버튼은 그대로 두되(관찰자가 없는 브라우저의 유일한 길), 평소엔 눌리기 전에
+    관찰자가 먼저 부른다.
+
+    loaded가 바뀔 때마다 loadMore가 새로 만들어져 이 이펙트도 다시 돈다.
+    한 쪽을 붙인 뒤에도 바닥이 여전히 보이면(화면이 길거나 쪽이 짧을 때)
+    그 자리에서 다음 쪽으로 이어진다.
+  */
+  const sentinel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinel.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => entries[0]?.isIntersecting && loadMore(),
+      // 바닥에 닿기 전에 미리 부른다. 닿고 나서 부르면 빈 화면을 한 박자 본다.
+      { rootMargin: "400px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [loadMore]);
 
   // 서버는 최신순으로만 준다(F-13). 인기순은 반응+댓글로 클라이언트에서 정렬.
+  // 정렬 대상은 **지금까지 받아온 글**이다. 바닥까지 내려 다 받고 나면 전체가
+  // 대상이 된다 — 서버가 반응 수만 보고 정렬해 주는 것과 기준이 달라서
+  // (여기는 반응+댓글) 쪽 나누기를 서버에 맡기지 않았다.
   const visible =
     items && sort === "인기순"
       ? [...items].sort(
@@ -138,6 +213,21 @@ export function Feed() {
         {visible?.map((item) => (
           <FeedCard key={item.id} item={item} />
         ))}
+
+        {/* 더 받을 게 남았을 때만 그린다. 다 받은 뒤에도 남겨두면 목록 끝에
+            영영 눌리지 않는 버튼이 붙어 아직 더 있는 것처럼 보인다. */}
+        {items !== null && !done && (
+          <div ref={sentinel} className="px-4 py-6 text-center">
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="text-[13.5px] text-neutral-600"
+            >
+              {loadingMore ? "불러오는 중…" : "더 보기"}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

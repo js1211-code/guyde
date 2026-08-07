@@ -38,6 +38,17 @@ export type FeedTab = (typeof FEED_TABS)[number];
 
 export const isTypeTab = (t: string): t is keyof typeof TYPE_TABS => t in TYPE_TABS;
 
+/**
+ * 피드 한 쪽에 담는 글 수.
+ *
+ * 🚨 **이건 상한이 아니라 쪽 크기다.** 예전에 피드가 한 번만 요청하고 끝나서
+ * 서버 기본값(30건) 밖의 글이 전체 게시판에서 통째로 사라졌다 — 도서관
+ * 무난템은 `limit: 50`이라 다 보이는데 커뮤니티 '전체'에는 없는 글이 생겨서,
+ * 서가가 별도 목록처럼 보였다. 시드에서 글 시각을 앞으로 당겨 가리기도 했다.
+ * 바닥에 닿으면 다음 쪽을 이어 붙이므로 이 숫자를 키워서 문제를 덮지 말 것.
+ */
+export const FEED_PAGE_SIZE = 30;
+
 /** 온도가 쌓이는 카테고리. '자유'는 잡담방이라 제외된다(F-06). */
 export const TEMP_CATEGORIES = CATEGORIES.filter((c) => c !== "자유");
 
