@@ -584,8 +584,51 @@ function Comments({
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   // 답글은 접어둔다. 원댓글이 답글에 밀려 안 보이면 흐름을 못 따라간다.
   const [opened, setOpened] = useState<Set<string>>(new Set());
+  // 쓰는 중이면 입력칸이 COMMENTS 머리 바로 밑으로 올라온다. 평소에는 목록
+  // 끝에 있어서, 댓글이 많은 글은 한참 내려가야 쓸 수 있었다.
+  const [composing, setComposing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const submitting = useRef(false);
+
+  /*
+    올라온 자리가 화면 밖이면 올린 의미가 없다 — 아래쪽을 보고 있다가 눌렀을
+    테니 입력칸이 시야에서 사라진다. COMMENTS 머리를 화면 위로 붙여서
+    머리·입력칸·목록이 한눈에 들어오게 한다.
+
+    ⚠️ 자리를 옮긴 **다음 프레임**에 스크롤해야 한다. 같은 프레임에 부르면
+       아직 옛 위치를 기준으로 계산해서 엉뚱한 데로 간다.
+  */
+  useEffect(() => {
+    if (!composing) return;
+    const id = requestAnimationFrame(() => {
+      headRef.current?.scrollIntoView({
+        block: "start",
+        // 탭바 모션과 같은 기준. 멀미로 꺼둔 사람에게 튀는 화면을 주지 않는다.
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [composing]);
+
+  /*
+    빈 칸으로 빠져나가면 제자리로. 쓰던 게 남아 있으면(글자·사진·답글 대상)
+    그대로 위에 둔다 — 놓치면 안 되는 것이 있는데 화면 밖으로 치우면 안 된다.
+
+    ⚠️ blur 직후에 판단하면 안 된다. 사진 버튼이나 등록 버튼을 누를 때도
+       blur가 먼저 오는데, 그 순간 접으면 누르려던 버튼이 발밑에서 움직인다.
+       한 박자 뒤에 초점이 아직 이 묶음 안에 있는지 보고 정한다.
+  */
+  function maybeCollapse() {
+    setTimeout(() => {
+      if (boxRef.current?.contains(document.activeElement)) return;
+      if (draft.trim() || photo || replyTo || uploading) return;
+      setComposing(false);
+    }, 0);
+  }
 
   // 서버는 평평한 목록을 추천순으로 준다. 답글을 부모 밑으로 다시 묶는다.
   // 답글끼리는 오래된 순 — 대화 순서가 뒤집히면 읽을 수가 없다.
@@ -613,6 +656,8 @@ function Comments({
     // 답글을 달면 그 묶음을 펼쳐둔다. 접혀 있으면 방금 쓴 게 안 보인다.
     if (replyTo) setOpened((prev) => new Set(prev).add(replyTo.id));
     setReplyTo(null);
+    // 다 냈으면 제자리로. 남은 게 없는데 위를 계속 차지하면 목록이 그만큼 밀린다.
+    setComposing(false);
     await onDone();
     setBusy(false);
     submitting.current = false;
@@ -620,6 +665,7 @@ function Comments({
 
   function startReply(c: Comment) {
     setReplyTo(c);
+    setComposing(true);
     inputRef.current?.focus();
   }
 
@@ -631,15 +677,25 @@ function Comments({
   }
 
   return (
-    <>
-      <div className="flex items-center justify-between px-4 pt-3 pb-2">
+    /*
+      🚨 입력칸은 **한 번만** 그린다. 자리를 옮기려고 두 군데에 조건부로 그리면
+         React가 한쪽을 버리고 다른 쪽을 새로 만든다 — 누르는 순간 초점이
+         날아가고 한글 조합도 끊긴다. 그래서 DOM은 그대로 두고 flex order 만
+         바꾼다. 머리 0 · 목록 2 · 입력칸은 쓸 때 1, 평소 3.
+    */
+    <div className="flex flex-col">
+      <div
+        ref={headRef}
+        className="flex items-center justify-between px-4 pt-3 pb-2"
+      >
         <Kicker className="text-[13.5px]">COMMENTS {data.comments.length}</Kicker>
         {roots.length > 0 && (
           <span className="text-[13px] font-bold text-brand">추천순</span>
         )}
       </div>
 
-      {roots.map((c) => {
+      <div className="order-2">
+        {roots.map((c) => {
         const replies = repliesOf.get(c.id) ?? [];
         const isOpen = opened.has(c.id);
         return (
@@ -682,11 +738,16 @@ function Comments({
                   ))}
               </div>
             )}
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+      </div>
 
-      <div className="border-t border-neutral-400">
+      <div
+        ref={boxRef}
+        onBlur={maybeCollapse}
+        className={`border-t border-neutral-400 ${composing ? "order-1" : "order-3"}`}
+      >
         {replyTo && (
           <div className="flex items-center gap-2 bg-neutral-100 px-4 py-1.5">
             <span className="flex-1 truncate text-[13px] text-neutral-600">
@@ -750,6 +811,7 @@ function Comments({
           <input
             ref={inputRef}
             value={draft}
+            onFocus={() => setComposing(true)}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               // isComposing이면 한글을 조합 중이라 Enter가 "확정"이지 "전송"이 아니다.
@@ -771,7 +833,7 @@ function Comments({
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
