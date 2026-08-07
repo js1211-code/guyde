@@ -23,6 +23,14 @@ export type FeedItem = {
   /** experts에 등록된 사람인지. 온도 42도를 넘겼다고 고수인 게 아니다. */
   is_expert: boolean;
   thumbnail_url: string | null;
+  /**
+   * 투표글의 선택지 사진 (sort_order 순).
+   *
+   * `thumbnail_url`과 별개다 — 투표글은 본문 사진칸이 없고 사진이
+   * `poll_options.image_url`에 붙어서 뷰의 썸네일에 안 잡힌다.
+   * 투표글이 아니면 빈 배열이다.
+   */
+  option_images: string[];
   comment_count: number;
   reaction_count: number;
   /** 판정 전에는 null. 종료됐거나 내가 판정한 글만 값이 온다. */

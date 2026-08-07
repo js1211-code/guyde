@@ -100,7 +100,14 @@ export function Feed() {
         (무난무난은 설명 자체가 틀리기도 했다 — 이 탭은 판정글을 전부 보여준다.
          60% 이상만 모은 곳은 도서관의 무난템 서가다.)
       */}
-      <div className="flex items-center gap-3 px-4 py-2">
+      {/*
+        정렬 줄 밑에 얇은 선을 둔다. 없으면 '최신순 인기순'이 첫 글의 머리처럼
+        붙어 읽혀서, 그게 목록 전체에 걸리는 스위치라는 게 안 보인다.
+
+        ⚠️ 색은 게시판 탭 줄(neutral-400)보다 한 단계 연하게 둔다. 같은 색이면
+           가로선 두 개가 나란히 놓여 어느 쪽이 위 묶음인지 흐려진다.
+      */}
+      <div className="flex items-center gap-3 border-b border-neutral-300 px-4 py-2">
         {(["최신순", "인기순"] as Sort[]).map((s) => (
           <button
             key={s}
@@ -140,10 +147,71 @@ export function Feed() {
  * 피드 카드. 검색 결과도 이걸 쓴다 — 같은 글이 화면마다 다르게 생기면
  * 검색이 별개의 목록처럼 읽힌다.
  */
+/**
+ * 투표글 선택지 사진을 옆으로 넘겨 보는 띠.
+ *
+ * 왜 카드에서 미리 보여주나 — 투표글은 "이 둘 중에 뭐가 나아?"를 묻는 글인데
+ * 목록에서 사진이 안 보이면 제목만으로는 무엇을 고르는 건지 알 수 없다.
+ * 열어봐야 아는 카드는 목록에서 걸러지지 않는다.
+ *
+ * 한 장씩 보여주고 넘기게 한 이유: 390px 폭에 두 장을 나란히 놓으면 한 장이
+ * 180px가 되어 옷의 핏이 안 보인다. 어차피 카드는 훑는 자리고 나란히 놓고
+ * 비교하는 건 상세에서 한다.
+ *
+ * ⚠️ 이 띠는 <Link> 안에 있다. 손가락으로 미는 건 스크롤이라 클릭이 안 뜨지만,
+ *    사진을 브라우저 기본 드래그로 끌면 링크째 끌려간다 — `draggable={false}`로 막는다.
+ */
+function OptionPhotos({ urls }: { urls: string[] }) {
+  const [now, setNow] = useState(0);
+
+  return (
+    <div className="mt-2">
+      <div
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          // 칸 폭으로 나눠 지금 몇 번째인지 센다. scrollLeft를 그대로 쓰면
+          // 넘기는 도중에도 값이 계속 바뀌어 점이 떨린다.
+          setNow(Math.round(el.scrollLeft / el.clientWidth));
+        }}
+        className="rail flex snap-x snap-mandatory gap-0 overflow-x-auto rounded-xl"
+      >
+        {/* -webkit-user-drag: none — 안 막으면 사진을 끌었을 때 브라우저 기본
+            드래그가 걸려 링크째 끌려간다(넘기려던 게 드래그가 된다). */}
+        {urls.map((u) => (
+          <div
+            key={u}
+            className="w-full shrink-0 snap-center [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
+          >
+            <PhotoBox src={u} alt="" className="h-[190px] w-full" iconSize={20} />
+          </div>
+        ))}
+      </div>
+
+      {/* 점은 두 장 이상일 때만. 한 장짜리에 점 하나가 뜨면 더 있는 줄 안다. */}
+      {urls.length > 1 && (
+        <div className="mt-1.5 flex justify-center gap-1">
+          {urls.map((u, i) => (
+            <span
+              key={u}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                i === now ? "bg-brand" : "bg-neutral-300"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FeedCard({ item }: { item: FeedItem }) {
-  const hasPhoto = Boolean(item.thumbnail_url);
+  // 투표글은 사진이 poll_options에 붙어서 thumbnail_url에 안 잡힌다.
+  // 그쪽이 있으면 그걸 띠로 보여주고, 없을 때만 기존 68px 썸네일로 간다.
+  const optionPhotos = item.option_images ?? [];
+  const hasOptionPhotos = optionPhotos.length > 0;
+  const hasPhoto = !hasOptionPhotos && Boolean(item.thumbnail_url);
   // 썸네일이 없을 때만 본문 2줄 미리보기를 보여준다 (F-15)
-  const showPreview = !hasPhoto && item.body.trim().length > 0;
+  const showPreview = !hasPhoto && !hasOptionPhotos && item.body.trim().length > 0;
 
   const meta = (
     <div className="mt-2 flex items-center gap-3 text-[12.5px] text-neutral-600">
@@ -222,6 +290,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
               {item.body}
             </p>
           )}
+          {hasOptionPhotos && <OptionPhotos urls={optionPhotos} />}
           {meta}
           {author}
         </>

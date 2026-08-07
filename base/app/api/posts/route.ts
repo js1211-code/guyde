@@ -116,14 +116,45 @@ export async function GET(req: Request) {
     for (const v of mine ?? []) judged.add(v.post_id);
   }
 
+  /*
+    투표글의 선택지 사진.
+
+    posts_feed의 thumbnail_url은 post_images만 본다. 그런데 투표글은 본문
+    사진칸이 없고 사진이 poll_options.image_url에 붙으므로, 목록에서 사진이
+    통째로 안 보였다 — A/B로 물어보는 글인데 정작 뭘 고르는지가 안 보인다.
+
+    여기서도 한 번에 몰아서 가져온다(글마다 물으면 N+1). 순서는 sort_order를
+    따른다 — 첫 장이 1번 선택지여야 카드와 상세가 같은 순서로 읽힌다.
+  */
+  const optionImages = new Map<string, string[]>();
+  const pollIds = rows.filter((r) => r.post_type === "선택지투표").map((r) => r.id);
+
+  if (pollIds.length) {
+    const { data: opts } = await db
+      .from("poll_options")
+      .select("post_id, image_url, sort_order")
+      .in("post_id", pollIds)
+      .not("image_url", "is", null)
+      .order("sort_order");
+    for (const o of opts ?? []) {
+      const list = optionImages.get(o.post_id) ?? [];
+      list.push(o.image_url as string);
+      optionImages.set(o.post_id, list);
+    }
+  }
+
   return ok({
     items: rows.map((row) => {
       const hide =
         row.post_type === "무난함판정" &&
         !row.is_closed &&
         !judged.has(row.id);
+      const withPhotos = {
+        ...row,
+        option_images: optionImages.get(row.id) ?? [],
+      };
       return stripDevice(
-        hide ? { ...row, nanhan_percent: null } : row,
+        hide ? { ...withPhotos, nanhan_percent: null } : withPhotos,
         viewer,
       );
     }),
