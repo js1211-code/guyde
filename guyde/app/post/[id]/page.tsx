@@ -618,17 +618,28 @@ function Comments({
     빈 칸으로 빠져나가면 제자리로. 쓰던 게 남아 있으면(글자·사진·답글 대상)
     그대로 위에 둔다 — 놓치면 안 되는 것이 있는데 화면 밖으로 치우면 안 된다.
 
-    ⚠️ blur 직후에 판단하면 안 된다. 사진 버튼이나 등록 버튼을 누를 때도
-       blur가 먼저 오는데, 그 순간 접으면 누르려던 버튼이 발밑에서 움직인다.
-       한 박자 뒤에 초점이 아직 이 묶음 안에 있는지 보고 정한다.
+    🚨 **blur로 판단하면 안 된다.** 폰에서는 입력칸 밖의 빈 자리를 탭해도
+       초점이 안 풀린다(iOS·안드로이드 공통). blur에만 걸어놨더니 데스크톱
+       에서는 내려오는데 폰에서는 영영 위에 남았다 — 스크롤해도 초점은
+       그대로라 접힐 일이 없다. 그래서 **바깥을 눌렀는지를 직접** 본다.
+
+    누른 김에 초점도 거둔다. 자판이 떠 있는 채로 입력칸만 사라지면
+    화면 절반이 이유 없이 가려진 상태가 된다.
+
+    캡처 단계에서 듣는다. 밑에 있는 다른 손잡이가 먼저 먹고 멈춰도
+    바깥을 눌렀다는 사실 자체는 달라지지 않는다.
   */
-  function maybeCollapse() {
-    setTimeout(() => {
-      if (boxRef.current?.contains(document.activeElement)) return;
+  useEffect(() => {
+    if (!composing) return;
+    function onDown(e: PointerEvent) {
+      if (boxRef.current?.contains(e.target as Node)) return;
       if (draft.trim() || photo || replyTo || uploading) return;
+      inputRef.current?.blur();
       setComposing(false);
-    }, 0);
-  }
+    }
+    document.addEventListener("pointerdown", onDown, true);
+    return () => document.removeEventListener("pointerdown", onDown, true);
+  }, [composing, draft, photo, replyTo, uploading]);
 
   // 서버는 평평한 목록을 추천순으로 준다. 답글을 부모 밑으로 다시 묶는다.
   // 답글끼리는 오래된 순 — 대화 순서가 뒤집히면 읽을 수가 없다.
@@ -745,7 +756,6 @@ function Comments({
 
       <div
         ref={boxRef}
-        onBlur={maybeCollapse}
         className={`border-t border-neutral-400 ${composing ? "order-1" : "order-3"}`}
       >
         {replyTo && (
