@@ -144,24 +144,19 @@ export function Feed() {
 }
 
 /**
- * 피드 카드. 검색 결과도 이걸 쓴다 — 같은 글이 화면마다 다르게 생기면
- * 검색이 별개의 목록처럼 읽힌다.
- */
-/**
- * 투표글 선택지 사진을 옆으로 넘겨 보는 띠.
+ * 판단을 요구하는 글(선택지투표·무난함판정)의 사진을 옆으로 넘겨 보는 띠.
  *
- * 왜 카드에서 미리 보여주나 — 투표글은 "이 둘 중에 뭐가 나아?"를 묻는 글인데
- * 목록에서 사진이 안 보이면 제목만으로는 무엇을 고르는 건지 알 수 없다.
+ * 왜 카드에서 크게 보여주나 — 이 둘은 "이거 어때?"를 사진으로 묻는 글이라,
+ * 목록에서 사진이 안 보이거나 작으면 무엇을 판단해달라는 건지 알 수 없다.
  * 열어봐야 아는 카드는 목록에서 걸러지지 않는다.
+ *
+ * 한 장이면 점 없이 그냥 한 장이다 — 판정글은 대개 사진이 하나다.
  *
  * 한 장씩 보여주고 넘기게 한 이유: 390px 폭에 두 장을 나란히 놓으면 한 장이
  * 180px가 되어 옷의 핏이 안 보인다. 어차피 카드는 훑는 자리고 나란히 놓고
  * 비교하는 건 상세에서 한다.
- *
- * ⚠️ 이 띠는 <Link> 안에 있다. 손가락으로 미는 건 스크롤이라 클릭이 안 뜨지만,
- *    사진을 브라우저 기본 드래그로 끌면 링크째 끌려간다 — `draggable={false}`로 막는다.
  */
-function OptionPhotos({ urls }: { urls: string[] }) {
+function JudgePhotos({ urls }: { urls: string[] }) {
   const [now, setNow] = useState(0);
 
   return (
@@ -215,14 +210,38 @@ function OptionPhotos({ urls }: { urls: string[] }) {
   );
 }
 
+/**
+ * 피드 카드. 검색 결과도 이걸 쓴다 — 같은 글이 화면마다 다르게 생기면
+ * 검색이 별개의 목록처럼 읽힌다.
+ */
 export function FeedCard({ item }: { item: FeedItem }) {
-  // 투표글은 사진이 poll_options에 붙어서 thumbnail_url에 안 잡힌다.
-  // 그쪽이 있으면 그걸 띠로 보여주고, 없을 때만 기존 68px 썸네일로 간다.
-  const optionPhotos = item.option_images ?? [];
-  const hasOptionPhotos = optionPhotos.length > 0;
-  const hasPhoto = !hasOptionPhotos && Boolean(item.thumbnail_url);
+  /*
+    사진을 크게 보여줄지 작게 보여줄지는 **글 유형이 정한다.**
+
+      선택지투표 · 무난함판정 → 큰 띠 (사진이 곧 질문이다)
+      정보공유 · 일반질문     → 68px 썸네일 (사진은 거들 뿐이다)
+
+    앞의 둘은 "이거 어때?"를 사진으로 묻는 글이라, 목록에서 사진이 작으면
+    무엇을 판단해달라는 건지 알 수가 없다. 뒤의 둘은 제목과 본문이 질문이고
+    사진은 곁들이라 썸네일로 충분하다 — 다 키우면 목록이 사진첩이 된다.
+
+    투표글 사진은 poll_options 에 있어서 thumbnail_url 에 안 잡힌다.
+    판정글 사진은 post_images 라 thumbnail_url 에 잡힌다. 출처가 달라
+    둘을 여기서 하나로 합친다.
+  */
+  const 판단글 = item.post_type === "선택지투표" || item.post_type === "무난함판정";
+  const bigPhotos = 판단글
+    ? item.post_type === "선택지투표"
+      ? (item.option_images ?? [])
+      : item.thumbnail_url
+        ? [item.thumbnail_url]
+        : []
+    : [];
+
+  const hasBigPhotos = bigPhotos.length > 0;
+  const hasPhoto = !hasBigPhotos && Boolean(item.thumbnail_url);
   // 썸네일이 없을 때만 본문 2줄 미리보기를 보여준다 (F-15)
-  const showPreview = !hasPhoto && !hasOptionPhotos && item.body.trim().length > 0;
+  const showPreview = !hasPhoto && !hasBigPhotos && item.body.trim().length > 0;
 
   const meta = (
     <div className="mt-2 flex items-center gap-3 text-[12.5px] text-neutral-600">
@@ -301,7 +320,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
               {item.body}
             </p>
           )}
-          {hasOptionPhotos && <OptionPhotos urls={optionPhotos} />}
+          {hasBigPhotos && <JudgePhotos urls={bigPhotos} />}
           {meta}
           {author}
         </>

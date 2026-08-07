@@ -310,25 +310,39 @@ function Poll({
       <>
         <div className="mt-3 flex flex-col gap-2">
           {poll.options.map((o) => (
-            <button
+            /*
+              줄 전체가 버튼이 아니라 **사진 + 투표 버튼** 두 조각이다.
+
+              사진을 누르면 원본이 크게 뜬다(ZoomablePhoto). 52px짜리 썸네일만
+              보고 고르라고 하면 옷의 핏도 가방의 크기도 안 보인다 — 정작
+              결정하는 자리에서 사진이 제일 작았다.
+
+              ⚠️ 그래서 바깥을 <button>으로 둘 수 없다. ZoomablePhoto가 자기
+                 버튼을 갖고 있어서 버튼 안에 버튼이 되면 안 된다.
+                 투표 버튼은 flex-1이라 사진 오른쪽 전부를 먹는다 — 누를 자리는
+                 줄어들지 않는다.
+            */
+            <div
               key={o.id}
-              type="button"
-              disabled={busy || closed}
-              onClick={() => vote(o.id)}
-              className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3 text-left text-[15.5px] font-semibold"
+              className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3"
             >
               {withPhotos && (
-                // 사진을 눌러도 확대가 아니라 투표다 — 고르는 화면이라
-                // 여기서 사진을 열면 투표가 한 단계 멀어진다.
-                <PhotoBox
+                <ZoomablePhoto
                   src={o.image_url}
                   alt=""
                   className="h-[52px] w-[52px] shrink-0"
                   iconSize={16}
                 />
               )}
-              {o.text}
-            </button>
+              <button
+                type="button"
+                disabled={busy || closed}
+                onClick={() => vote(o.id)}
+                className="flex-1 self-stretch text-left text-[15.5px] font-semibold"
+              >
+                {o.text}
+              </button>
+            </div>
           ))}
         </div>
         <p className="mt-2.5 text-center text-[13px] text-neutral-600">
@@ -349,13 +363,21 @@ function Poll({
           const pct = o.percent ?? 0;
 
           return (
+            /*
+              결과 줄은 막대 전체가 투표(취소) 버튼이라, 투표 전 줄처럼 조각을
+              나눌 수가 없다 — 나누면 % 쪽이 안 눌린다.
+
+              그래서 사진을 버튼 **위에 덮는다**. 버튼 안에는 같은 크기의 빈
+              자리만 두어 배치를 그대로 유지하고, 사진은 형제로 절대 배치한다.
+              버튼 안에 버튼을 넣지 않으면서 줄 전체가 계속 눌린다.
+            */
+            <div key={o.id} className="relative">
             <button
-              key={o.id}
               type="button"
               disabled={busy || closed}
               // mine이어도 막지 않는다 — 그게 취소하는 유일한 방법이다.
               onClick={() => vote(o.id)}
-              className={`relative flex items-center overflow-hidden rounded-lg border text-left ${
+              className={`relative flex w-full items-center overflow-hidden rounded-lg border text-left ${
                 withPhotos ? "h-[60px]" : "h-[38px]"
               } ${
                 mine
@@ -378,14 +400,8 @@ function Poll({
               />
               <span className="relative flex w-full items-center justify-between gap-2 px-3 text-[14px]">
                 <span className="flex min-w-0 items-center gap-2.5">
-                  {withPhotos && (
-                    <PhotoBox
-                      src={o.image_url}
-                      alt=""
-                      className="h-[44px] w-[44px] shrink-0"
-                      iconSize={14}
-                    />
-                  )}
+                  {/* 사진이 놓일 빈 자리. 실제 사진은 아래에서 이 위에 덮는다. */}
+                  {withPhotos && <span aria-hidden className="h-[44px] w-[44px] shrink-0" />}
                   <span className={leading ? "font-bold" : "text-neutral-700"}>
                     {o.text}
                   </span>
@@ -400,6 +416,19 @@ function Poll({
                 </span>
               </span>
             </button>
+
+            {/* 버튼 위에 덮는 사진. 여기만 누르면 확대, 나머지는 투표다. */}
+            {withPhotos && (
+              <div className="absolute top-1/2 left-3 z-10 h-[44px] w-[44px] -translate-y-1/2">
+                <ZoomablePhoto
+                  src={o.image_url}
+                  alt=""
+                  className="h-[44px] w-[44px]"
+                  iconSize={14}
+                />
+              </div>
+            )}
+            </div>
           );
         })}
       </div>
