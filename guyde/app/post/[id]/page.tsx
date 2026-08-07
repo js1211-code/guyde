@@ -715,8 +715,17 @@ function Comments({
         grow 로 남는 높이를 여기서 먹는다. 입력칸이 밑(order-3)에 있을 때
         그만큼 바닥으로 밀린다. `flex-1`이 아니라 `grow`인 건 basis를 0으로
         만들지 않기 위해서다 — 댓글이 많을 때 목록이 제 높이를 잃으면 안 된다.
+
+        댓글이 하나도 없으면 점선을 여기서 대신 긋는다. 댓글이 있을 때는 줄마다
+        제 윗변을 그리는데(CommentRow 감싸개의 border-t), 목록이 비면 그 선이
+        하나도 안 생겨서 머리와 입력칸 사이가 통째로 빈 판이 된다 — 댓글칸이
+        어디서부터인지가 안 보인다. 있을 때 켜면 첫 줄에 선이 두 겹으로 겹친다.
       */}
-      <div className="order-2 grow">
+      <div
+        className={`order-2 grow ${
+          roots.length === 0 ? "border-t border-dashed border-neutral-400" : ""
+        }`}
+      >
         {roots.map((c) => {
         const replies = repliesOf.get(c.id) ?? [];
         const isOpen = opened.has(c.id);
