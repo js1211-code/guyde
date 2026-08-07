@@ -171,14 +171,15 @@ function JudgePhotos({ urls }: { urls: string[] }) {
         className="rail flex snap-x snap-mandatory gap-0 overflow-x-auto rounded-xl"
       >
         {/*
-          🚨 object-contain 이다. 여기서만 자르지 않는다.
+          비율을 1:1로 고정하고 잘라서 채운다(object-cover).
 
-          목록 썸네일은 칸을 채우려고 잘라내지만(object-cover), 이 띠는 A/B를
-          **비교하는** 자리다. 자르면 어느 쪽이 나아 보이는지가 가방이 아니라
-          크롭 때문에 갈린다 — 정사각 사진은 위아래가, 세로 사진은 좌우가
-          날아간다. 비교 대상은 온전히 보여야 한다.
+          비율을 사진에 맡기면 카드 높이가 글마다 달라져서 목록이 들쭉날쭉해지고,
+          자르지 않고 넣으면 세로 사진 좌우에 빈 자리가 크게 남아 정작 사진이
+          작아진다. 미리보기는 훑는 자리라 크기가 고르게 맞는 쪽이 낫다.
 
-          남는 자리는 PhotoBox 의 크림 바탕이 채운다.
+          ⚠️ 여기서 잘리는 건 괜찮지만 **고르는 자리에서는 안 된다.** 상세의
+             선택지 사진은 눌러서 원본을 크게 볼 수 있다(ZoomablePhoto) —
+             잘린 것만 보고 투표하게 두지 않는다.
 
           -webkit-user-drag: none — 안 막으면 사진을 끌었을 때 브라우저 기본
           드래그가 걸려 링크째 끌려간다(넘기려던 게 드래그가 된다).
@@ -186,9 +187,9 @@ function JudgePhotos({ urls }: { urls: string[] }) {
         {urls.map((u) => (
           <div
             key={u}
-            className="w-full shrink-0 snap-center [&_img]:object-contain [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
+            className="aspect-square w-full shrink-0 snap-center [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
           >
-            <PhotoBox src={u} alt="" className="h-[190px] w-full" iconSize={20} />
+            <PhotoBox src={u} alt="" className="h-full w-full" iconSize={20} />
           </div>
         ))}
       </div>

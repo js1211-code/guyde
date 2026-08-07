@@ -327,12 +327,20 @@ function Poll({
               className="flex items-center gap-2.5 rounded-lg border border-neutral-500 px-3.5 py-3"
             >
               {withPhotos && (
-                <ZoomablePhoto
-                  src={o.image_url}
-                  alt=""
-                  className="h-[52px] w-[52px] shrink-0"
-                  iconSize={16}
-                />
+                /*
+                  ⚠️ 크기를 ZoomablePhoto 의 className 으로 주면 안 된다.
+                     안쪽 버튼이 `block w-full` 을 갖고 있어서 그게 이겨버리고
+                     사진이 줄 전체를 먹는다 — 라벨이 오른쪽 끝으로 밀린다.
+                     감싸개가 크기를 정하고 안쪽은 h-full w-full 로 채운다.
+                */
+                <span className="block h-[52px] w-[52px] shrink-0">
+                  <ZoomablePhoto
+                    src={o.image_url}
+                    alt=""
+                    className="h-full w-full"
+                    iconSize={16}
+                  />
+                </span>
               )}
               <button
                 type="button"
@@ -423,7 +431,7 @@ function Poll({
                 <ZoomablePhoto
                   src={o.image_url}
                   alt=""
-                  className="h-[44px] w-[44px]"
+                  className="h-full w-full"
                   iconSize={14}
                 />
               </div>
