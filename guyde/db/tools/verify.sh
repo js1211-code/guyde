@@ -17,7 +17,7 @@
 # 검증이 실패한 것은 다르므로 종료 코드로 구분한다(0 = 건너뜀).
 set -uo pipefail
 
-cd "$(dirname "$0")/../.."          # base/
+cd "$(dirname "$0")/../.."          # guyde/
 BIN=/Applications/Postgres.app/Contents/Versions/latest/bin
 DB=guyde_verify
 
