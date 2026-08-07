@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Chip, PhotoBox, PhotoSlot } from "@/components/badge";
-import { ImageIcon, PlusIcon } from "@/components/icons";
+import { ChevronRightIcon, ImageIcon, PlusIcon } from "@/components/icons";
 import {
   AppShell,
   BottomBar,
@@ -42,14 +42,18 @@ export default function WritePage() {
   );
 }
 
-/** ③ 어떻게 물어볼까요 */
+/**
+ * ③ 어떻게 물어볼까요
+ *
+ * 고르면 그 자리에서 넘어간다 — 고른 걸 확인시키는 '다음'은 한 번 더 누르게
+ * 할 뿐이고, 어차피 다음 화면 머리에 고른 유형이 적혀 있어서 확인이 된다.
+ * 잘못 골라도 그 화면의 뒤로가기로 바로 돌아온다.
+ */
 function TypeSelect({ onNext }: { onNext: (t: PostType) => void }) {
-  const [picked, setPicked] = useState<PostType | null>(null);
-
   return (
     <AppShell>
       <TopBar backHref="/" title="글쓰기" />
-      <ScreenBody className="px-4 pt-5">
+      <ScreenBody className="px-4 pt-5 pb-5">
         <h1 className="mb-4 text-[20.5px] leading-snug font-bold">
           어떻게 물어볼까요?
         </h1>
@@ -58,26 +62,25 @@ function TypeSelect({ onNext }: { onNext: (t: PostType) => void }) {
             <button
               key={t}
               type="button"
-              onClick={() => setPicked(t)}
-              aria-pressed={picked === t}
-              className={`relative rounded-xl p-3.5 text-left ${
-                picked === t
-                  ? "border-2 border-brand bg-brand-tint"
-                  : "border border-neutral-400"
-              }`}
-            >              <p className="text-[16px] font-bold">{POST_TYPE_LABEL[t]}</p>
-              <p className="mt-1 text-[13.5px] leading-relaxed text-neutral-600">
-                {POST_TYPE_HINT[t]}
-              </p>
+              onClick={() => onNext(t)}
+              // 누른 티가 나야 한다 — 화면이 바뀌기 전까지 아무 반응이 없으면
+              // 안 눌린 줄 알고 한 번 더 누른다.
+              className="flex items-center gap-3 rounded-xl border border-neutral-400 p-3.5 text-left active:border-brand active:bg-brand/15"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block text-[16px] font-bold">
+                  {POST_TYPE_LABEL[t]}
+                </span>
+                <span className="mt-1 block text-[13.5px] leading-relaxed text-neutral-600">
+                  {POST_TYPE_HINT[t]}
+                </span>
+              </span>
+              {/* 고르는 칸이 아니라 넘어가는 칸이라는 표시 */}
+              <ChevronRightIcon size={18} className="shrink-0 text-neutral-500" />
             </button>
           ))}
         </div>
       </ScreenBody>
-      <BottomBar bordered={false}>
-        <PrimaryButton disabled={!picked} onClick={() => picked && onNext(picked)}>
-          다음
-        </PrimaryButton>
-      </BottomBar>
     </AppShell>
   );
 }
