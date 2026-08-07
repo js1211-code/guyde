@@ -368,10 +368,18 @@ insert into poll_options (post_id, text, sort_order, image_url) values
   ('b0000003-0000-4000-8000-000000000001','6mm', 0, null),
   ('b0000003-0000-4000-8000-000000000001','9mm', 1, null),
 
+  -- ✅ 진짜 사진 두 장. 둘 다 흰 배경 쇼핑몰 상품 컷이라 조명·배경·거리가
+  --    같다 — A/B가 성립하는 조건이다(b0000019 주석과 같은 이유).
+  --    옛 Unsplash 컷은 둘 다 야외 인물 사진에 큼직한 영문 프린트가 박힌
+  --    티였다. 라벨은 '네이비 셔츠'인데 사진은 셔츠도 아니었고, 야자수
+  --    그림자가 옷을 반쯤 덮고 있어서 옷이 아니라 사진을 비교하게 됐다.
+  --    ⚠️ 두 장의 크기가 많이 다르다(1500x1700 / 408x490). 선택지 칸은
+  --       비율을 정해 채우므로 나란히 봐도 티가 안 나지만, 그레이 쪽은
+  --       원본이 작아서 크게 띄우면 뭉갠 티가 난다.
   ('b0000005-0000-4000-8000-000000000001','네이비 셔츠', 0,
-   'https://images.unsplash.com/photo-1643854194543-c08711e63daa?auto=format&fit=crop&crop=entropy&w=800&h=1000&q=70'),
+   'https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000001/3b630103-f956-450a-90e1-82e1bca9e9b0.png'),
   ('b0000005-0000-4000-8000-000000000001','그레이 반팔', 1,
-   'https://images.unsplash.com/photo-1592955715335-32e7a2c35def?auto=format&fit=crop&crop=entropy&w=800&h=1000&q=70'),
+   'https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000001/50b1942c-760a-46f0-bb09-c2452be6f13a.jpg'),
 
   ('b0000009-0000-4000-8000-000000000001','시트러스 쪽', 0,
    'https://images.unsplash.com/photo-1594125311687-3b1b3eafa9f4?auto=format&fit=crop&crop=entropy&w=800&h=1000&q=70'),
@@ -438,7 +446,7 @@ insert into post_images (post_id, url, sort_order) values
 --    exist`로 죽었다. 그래서 시각을 값 목록으로 들고 간다.
 
 -- 배경 유저를 앞에서부터 잘라 쓴다. 표 수가 곧 그 글의 온도다.
--- 초핫 글은 412 : 389 접전 — 그래야 댓글에서 싸움이 난다.
+-- 초핫 글은 412 : 388 접전 — 그래야 댓글에서 싸움이 난다.
 with v as (
   select device_id, row_number() over (order by device_id) as n
   from users where device_id::text like '00000000-0000-4000-8a00-%'
@@ -448,7 +456,7 @@ select o.post_id, o.id, v.device_id
 from (values
   -- 초핫
   ('b0000001-0000-4000-8000-000000000001', 0,   1, 412),
-  ('b0000001-0000-4000-8000-000000000001', 1, 413, 801),
+  ('b0000001-0000-4000-8000-000000000001', 1, 413, 800),
   -- 핫
   ('b0000003-0000-4000-8000-000000000001', 0,   1,  96),
   ('b0000003-0000-4000-8000-000000000001', 1,  97, 158),
