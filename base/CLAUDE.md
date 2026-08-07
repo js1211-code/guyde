@@ -94,7 +94,7 @@
 - 환경변수(.env.local): `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`(서버 전용, `NEXT_PUBLIC_` 접두사 절대 금지)
 - 환경변수 **이름을 바꾸면 3곳을 함께 바꾼다**: `.env.local` · `lib/supabase/*.ts` · 이 문서(+ Notion). 그리고 **dev 서버 재시작**(HMR로 반영 안 됨).
 
-## 데이터베이스 (23 테이블 + 뷰 4)
+## 데이터베이스 (22 테이블 + 뷰 3)
 SQL은 `db/`에 있고 **이 순서로** 실행한다.
 
 | 파일 | 내용 |
@@ -110,10 +110,9 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 | `patch_v3_5.sql` | **투표 종료** — 72시간 자동 + 손 종료(`posts.closed_at`), 뷰에 `closes_at`·`is_closed`, 닫힌 글에 표를 막는 트리거 |
 | `patch_v3_6.sql` | **댓글 사진**(`comments.image_url`) · `comments_view`에 노출 |
 | `patch_v3_7.sql` | **사진만 있는 댓글 허용** — `comments` CHECK를 "본문이나 사진 중 하나"로 |
-| `patch_v3_8.sql` | **무난템 카드** — `nanhan_picks` 테이블 + `nanhan_picks_view` |
 | `seed.sql` | 커뮤니티 (등장인물 20 · 배경 유저 800 · 글 34 · 댓글 45) |
 | `seed_consulting.sql` | 고수 4명 + 대표 답변 + 고수 글 3 (**반드시 `seed.sql` 다음에**) |
-| `seed_picks.sql` | 무난템 판정글 14 + 카드 17 (**seed_consulting.sql 다음에**) |
+| `seed_picks.sql` | 무난템 서가에 오를 판정글 13 (**seed_consulting.sql 다음에**) |
 | `test_v2_1.sql` | 검증 23종 (검증 전용 DB에서만 실행) |
 | `test_v3.sql` | 컨설팅 제약 검증 17종 (검증 전용 DB에서만 실행) |
 | `test_v3_2.sql` | 답글 깊이·고수 판별 검증 11종 (검증 전용 DB에서만 실행) |
@@ -123,8 +122,8 @@ SQL은 `db/`에 있고 **이 순서로** 실행한다.
 > 눌러둔 추천도 FK로 같이 날아간다. 순서가 뒤바뀌면 고수 온도가 36.5로 떨어져
 > 고수 목록이 통째로 빈다(42.0 미만은 목록에서 걸러진다).
 
-테이블: `users` `posts` `post_images` `poll_options` `poll_votes` `nanhan_votes` `post_likes` `comments` `comment_likes` `nanhan_picks` `articles` `quizzes` `quiz_results` `experts` `reviews` `bookings` `booking_images` `consulting_answers` `outfit_items` `feedbacks` `refunds` `heart_transactions` `reports`
-뷰: `posts_feed`(피드 카드 집계) · `comments_view`(댓글 + 작성자 온도 + `is_expert`) · `outfit_totals`(착장 합계 + 예산 대비 %) · `nanhan_picks_view`(무난템 카드 + 실제 판정 결과)
+테이블: `users` `posts` `post_images` `poll_options` `poll_votes` `nanhan_votes` `post_likes` `comments` `comment_likes` `articles` `quizzes` `quiz_results` `experts` `reviews` `bookings` `booking_images` `consulting_answers` `outfit_items` `feedbacks` `refunds` `heart_transactions` `reports`
+뷰: `posts_feed`(피드 카드 집계) · `comments_view`(댓글 + 작성자 온도 + `is_expert`) · `outfit_totals`(착장 합계 + 예산 대비 %)
 
 > `expert_slots`는 patch_v3에서 폐기됐다. 달력·시간 슬롯 예약은 더 이상 없다.
 함수: `create_post` `cast_poll_vote` `cast_nanhan_vote` `calc_temperature` + 트리거 3종
@@ -260,14 +259,11 @@ v3는 **"무엇을 살지"를 문서로 받는** 서비스다. 달력·슬롯·�
 - 도서관 머리는 **커뮤니티와 같다** — 왼쪽 로고, 오른쪽 검색. 탭을 옮겨도 화면 윗줄이 제자리에 있는 것처럼 보여야 한다(로고 x16·y12, 검색 x349로 두 화면이 픽셀 단위로 같다).
   - '도서관'이라는 제목은 적지 않는다 — 하단 탭에 이미 켜져 있어 같은 말을 두 번 하는 셈이다.
   - ⚠️ 커뮤니티 머리는 로고 밑에 태그라인이 있어 `items-start`로 위를 맞춘다. 도서관도 **같은 정렬**을 써야 탭을 옮길 때 로고가 위아래로 튀지 않는다(`items-center`로 두니 3px 어긋났다).
-- 도서관 서가 3개: `아티클`(편집 글, mock) / `무난템`(아이템 카드, `nanhan_picks`) / `정보 공유`(커뮤니티 글, 실제 posts)
+- 도서관 서가 3개: `아티클`(편집 글, mock) / `무난템`(조건을 통과한 판정글) / `정보 공유`(커뮤니티 글). 뒤의 둘은 실제 posts다.
   - 하단에 **테스트 3종**(피부 타입·얼굴형 헤어·향수 취향). 각 4문항, 결과는 유형별 3개씩 총 9종. 선택지 가중치의 합으로 결과를 정하고 **동점이면 선언 순서**가 이긴다 — 무작위면 같은 답에 다른 결과가 나와서 테스트로 안 읽힌다. 데이터는 `lib/mock.ts`.
-  - **무난템은 판정글이 아니라 아이템 카드다**(`nanhan_picks`, patch_v3_8). 판정글은 "이거 무난해요?"라는 *질문*이라, 답을 찾으러 온 사람에게 질문 목록을 주는 꼴이었다. 카드가 **무엇을 / 얼마에 / 왜 무난한가**를 정리해서 답한다.
-    - 🚨 **추천수를 카드에 저장하지 않는다.** 카드는 반드시 판정글에 매여 있고(`post_id` not null unique), 추천수는 그 글의 '무난해요' 표를 **뷰가 매번 센다**. 박아넣으면 아무도 못 바꾸는 숫자가 화면에 뜨는데, 이 서비스는 "판단자는 대중"이 전부라 그 숫자가 가짜면 서가째로 가짜가 된다.
-    - 그래서 **카드를 누르면 상품이 아니라 판정글로 간다.** 근거를 직접 확인할 수 있어야 카드를 믿을 이유가 생긴다.
-    - `why`는 DB에서 30자 이상을 강제한다. 한 줄로 때우면 카드가 그냥 상품 목록이 된다.
-  - **무난템 서가 조건 3개**: 무난함 `NANHAN_PICK_PERCENT`(60%) 이상 · **종료된 글** · **`NANHAN_PICK_MIN_VOTES`(10)표 이상**. 카드를 만들었다고 통과시키지 않는다 — 조건은 `GET /api/picks`가 매번 확인하므로 표가 뒤집히면 카드가 저절로 서가에서 빠진다.
-    - ⚠️ **뷰(`nanhan_picks_view`)는 조건을 걸지 않고 값만 내보낸다.** 뷰가 미리 걸러버리면 "조건을 놓친 카드"가 어디에도 안 보여서 왜 서가에 없는지 확인할 방법이 사라진다. 거르는 건 API가 한다.
+  - 🚨 **무난템은 별도 테이블이 아니다.** 커뮤니티 '무난무난' 게시판을 **그대로 쓰고 조건으로 거르기만** 한다. 카드로 정리하는 모델(`nanhan_picks`)을 만들었다가 걷어냈다 — 여기 있는 건 우리가 만든 상품 목록이 아니라 대중이 판정을 끝낸 커뮤니티 글이고, 생김새가 달라지면 그 사실이 가려진다.
+    - 그래서 **피드와 같은 `FeedCard`를 쓴다.** 같은 글이 화면마다 다르게 생기면 서가가 별개의 목록처럼 읽힌다.
+  - **무난템 서가 조건 3개**: 무난함 `NANHAN_PICK_PERCENT`(60%) 이상 · **종료된 글** · **`NANHAN_PICK_MIN_VOTES`(10)표 이상**. 전부 `GET /api/posts`의 파라미터(`min_nanhan`·`closed`·`min_votes`)로 건다 — 서버가 걸러야 서가마다 기준이 갈리지 않는다.
     - 종료를 요구하는 이유: 아직 표가 들어오는 중인 글을 "무난한 것"으로 실으면 다음에 봤을 때 숫자가 달라져 있다.
     - 표 하한을 두는 이유: %만 보면 표가 적을수록 극단값이 나온다. 2표 중 2표가 무난해요면 100%지만 그건 대중의 판정이 아니고, 하한이 없으면 오히려 그런 글이 위로 올라온다.
   - **'정보 공유' 서가는 좋아요 `GUIDE_PICK_MIN_LIKES`(20)개 이상만 싣는다.** 커뮤니티 탭의 정보공유는 올라온 걸 다 보여주는 곳이고 서가는 쓸 만한 걸 찾는 곳이라, 하한이 없으면 두 곳이 같은 목록이 되어 서가를 따로 둘 이유가 없어진다.
@@ -305,7 +301,6 @@ POST   /api/posts/[id]/comments       댓글 작성
 POST|DELETE /api/comments/[id]/like   댓글 추천
 POST   /api/uploads                   사진 업로드
 GET    /api/link-preview?url=        링크 OG 미리보기 (못 읽으면 found:false)
-GET    /api/picks                     도서관 무난템 카드 (조건은 서버가 건다)
 
 GET    /api/experts                   고수 목록 (42도 미만 제외)
 GET    /api/experts/[id]              프로필 + 대표 답변(실제 댓글) + 후기

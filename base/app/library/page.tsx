@@ -10,10 +10,11 @@ import {
   NANHAN_PICK_PERCENT,
 } from "@/lib/constants";
 import { Logo } from "@/components/logo";
+import { FeedCard } from "@/components/feed";
 import { AppShell, Kicker, ScreenBody } from "@/components/shell";
 import { TabBar } from "@/components/tab-bar";
 import { Temperature } from "@/components/temperature";
-import { fetchFeed, fetchPicks, type FeedItem, type PickItem } from "@/lib/api";
+import { fetchFeed, type FeedItem } from "@/lib/api";
 import { getHeroArticle, getLatestArticles, getQuizzes } from "@/lib/mock";
 
 const SHELVES = ["아티클", "무난템", "정보 공유"] as const;
@@ -23,7 +24,7 @@ type Shelf = (typeof SHELVES)[number];
  * ⑪ 도서관 — 서가 두 개.
  *
  *   아티클   : 우리가 쓴 편집된 읽을거리 (아직 lib/mock.ts)
- *   무난템   : 무난함 판정에서 60% 이상 받은 것만
+ *   무난템   : 판정이 끝난 무난무난 글 중 조건을 통과한 것만
  *   정보 공유: 커뮤니티가 쌓은 글
  *
  * 커뮤니티 피드에도 '정보공유' 탭이 있지만 성격이 다르다.
@@ -176,26 +177,34 @@ function Articles() {
 }
 
 /**
- * 무난템 — 판정이 끝난 것을 아이템 카드로 정리한 서가.
+ * 무난템 — 커뮤니티 '무난무난' 게시판에서 **조건을 통과한 글만** 모은 서가.
  *
- * 예전에는 판정글을 그대로 다시 보여줬는데, 판정글은 "이거 무난해요?"라는
- * **질문**이다. 답을 찾으러 온 사람에게 질문 목록을 주는 셈이었다.
- * 지금은 무엇을 / 얼마에 / 왜 무난한가를 카드가 정리해서 답한다.
+ * 카드로 따로 정리하지 않는다. 게시판 구조를 그대로 쓰고 거르기만 한다 —
+ * 여기 있는 건 우리가 만든 상품 목록이 아니라 대중이 이미 판정을 끝낸
+ * 커뮤니티 글이고, 생김새가 달라지면 그 사실이 가려진다.
  *
- * 🚨 추천수는 카드에 저장된 숫자가 아니라 **매인 판정글의 '무난해요' 표**다.
- *    카드에 박아넣으면 아무도 못 바꾸는 숫자가 화면에 뜨는데, 이 서비스는
- *    "판단자는 대중"이 전부라 그 숫자가 가짜면 서가째로 가짜가 된다.
- *    그래서 카드를 눌러도 상품 페이지가 아니라 **판정글**로 간다 — 근거를
- *    직접 확인할 수 있어야 카드를 믿을 이유가 생긴다.
+ * 커뮤니티의 '무난무난' 탭과 다른 건 조건뿐이다. 그쪽은 판정을 **받는**
+ * 곳이라 0표짜리도 전부 올라오고, 여기는 판정이 **끝난** 것만 모인다.
+ *
+ * 카드는 피드와 같은 FeedCard 를 쓴다. 같은 글이 화면마다 다르게 생기면
+ * 서가가 별개의 목록처럼 읽힌다.
  */
 function Picks() {
-  const [items, setItems] = useState<PickItem[] | null>(null);
+  const [items, setItems] = useState<FeedItem[] | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    // 조건(60% · 종료 · 10표)은 서버가 건다. 화면에서 걸면 서가마다
-    // 기준이 갈린다.
-    fetchPicks({ limit: 50 })
+    // 조건은 전부 서버가 건다. 화면에서 걸면 서가마다 기준이 갈린다.
+    fetchFeed({
+      post_type: "무난함판정",
+      min_nanhan: NANHAN_PICK_PERCENT,
+      // 아직 표가 들어오는 중인 글을 "무난한 것"으로 실으면 다음에 봤을 때
+      // 숫자가 달라져 있다. 결론이 난 글만 싣는다.
+      closed: true,
+      min_votes: NANHAN_PICK_MIN_VOTES,
+      sort: "reactions",
+      limit: 50,
+    })
       .then(setItems)
       .catch(() => setFailed(true));
   }, []);
@@ -204,7 +213,7 @@ function Picks() {
     <>
       <p className="px-4 pt-3 pb-2 text-[13.5px] leading-relaxed text-neutral-600">
         판정이 끝난 글 중 {NANHAN_PICK_MIN_VOTES}표 이상 모여{" "}
-        {NANHAN_PICK_PERCENT}% 넘게 무난하다고 나온 것만 정리했어요.
+        {NANHAN_PICK_PERCENT}% 넘게 무난하다고 나온 것만 모았어요.
       </p>
 
       {failed && (
@@ -219,65 +228,15 @@ function Picks() {
       )}
       {items?.length === 0 && (
         <p className="px-4 py-10 text-center text-[14px] leading-relaxed text-neutral-600">
-          아직 조건을 채운 게 없어요.
+          아직 조건을 채운 글이 없어요.
           <br />
           판정이 끝나고 {NANHAN_PICK_MIN_VOTES}표를 넘겨야 올라와요.
         </p>
       )}
 
-      <div className="flex flex-col gap-2.5 px-4 pt-1 pb-4">
-        {items?.map((item) => (
-          <Link
-            key={item.id}
-            href={`/post/${item.post_id}`}
-            className="rounded-2xl border border-neutral-400 p-3 transition-colors active:bg-brand/8"
-          >
-            <div className="flex gap-3">
-              <PhotoBox
-                src={item.thumb_url}
-                alt=""
-                className="h-[76px] w-[76px] shrink-0"
-                iconSize={18}
-              />
-              <div className="min-w-0 flex-1">
-                <div className="mb-1 flex items-center gap-1.5">
-                  <CategoryBadge>{item.category}</CategoryBadge>
-                  <span className="rounded-xs border border-brand-tint-b bg-brand-tint px-1.5 py-px text-[11.5px] font-bold text-brand-dark">
-                    무난함 {item.nanhan_percent}%
-                  </span>
-                </div>
-                <p className="text-[15.5px] leading-snug font-bold">{item.name}</p>
-                <p className="mt-0.5 text-[13px] leading-snug text-neutral-600">
-                  {item.one_liner}
-                </p>
-                <p className="cond mt-1 text-[12.5px] text-neutral-500">
-                  {item.price_band} · {item.vouch_count.toLocaleString("ko-KR")}명이
-                  무난하대요
-                </p>
-              </div>
-            </div>
-
-            {/* 왜 무난한지가 이 서가의 존재 이유다. 접어두면 카드가 그냥
-                상품 목록이 되므로 펼쳐 둔다. */}
-            <p className="mt-2.5 border-t border-dashed border-neutral-400 pt-2.5 text-[13.5px] leading-relaxed text-neutral-700">
-              {item.why}
-            </p>
-
-            {item.tags.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {item.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full bg-band px-2 py-0.5 text-[11.5px] text-neutral-600"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            )}
-          </Link>
-        ))}
-      </div>
+      {items?.map((item) => (
+        <FeedCard key={item.id} item={item} />
+      ))}
     </>
   );
 }

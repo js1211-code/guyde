@@ -144,69 +144,61 @@ export function Feed() {
 }
 
 /**
- * 판단을 요구하는 글(선택지투표·무난함판정)의 사진을 옆으로 넘겨 보는 띠.
+ * 카드 오른쪽 68px 썸네일. 사진이 여러 장이면 **칸 안에서 넘겨 본다.**
  *
- * 왜 카드에서 크게 보여주나 — 이 둘은 "이거 어때?"를 사진으로 묻는 글이라,
- * 목록에서 사진이 안 보이거나 작으면 무엇을 판단해달라는 건지 알 수 없다.
- * 열어봐야 아는 카드는 목록에서 걸러지지 않는다.
+ * 왜 칸을 안 키우나 — 목록은 훑는 자리다. 사진을 카드 폭만큼 키우면 글 하나가
+ * 화면을 다 먹어서 한 번에 두세 개밖에 안 보이고, 사진 있는 글과 없는 글의
+ * 높이가 크게 갈려 목록이 들쭉날쭉해진다. 크게 보는 건 상세에서 한다.
  *
- * 한 장이면 점 없이 그냥 한 장이다 — 판정글은 대개 사진이 하나다.
+ * 투표글은 선택지마다 사진이 붙어서 여러 장인 경우가 많은데, 첫 장만 보여주면
+ * 나머지가 있다는 것조차 알 수 없다. 그래서 인스타처럼 넘길 수 있게 하고
+ * 오른쪽 위에 `1/2`를 띄운다 — **넘길 게 더 있다는 표시가 곧 개수 표시다.**
  *
- * 한 장씩 보여주고 넘기게 한 이유: 390px 폭에 두 장을 나란히 놓으면 한 장이
- * 180px가 되어 옷의 핏이 안 보인다. 어차피 카드는 훑는 자리고 나란히 놓고
- * 비교하는 건 상세에서 한다.
+ * 점(dot)을 안 쓰는 이유: 68px 밑에 점을 달면 그만큼 카드가 높아져서 사진 있는
+ * 글만 줄이 밀린다. 칸 안에 얹는 숫자는 자리를 차지하지 않는다.
  */
-function JudgePhotos({ urls }: { urls: string[] }) {
+function ThumbStrip({ urls }: { urls: string[] }) {
   const [now, setNow] = useState(0);
 
+  // 한 장이면 넘길 것도 셀 것도 없다. 스크롤 칸을 만들지 않는다 —
+  // 한 장짜리에 `1/1`이 뜨면 더 있는 줄 안다.
+  if (urls.length <= 1) {
+    /* ⚠️ 68px을 변수로 빼서 `h-[${n}px]`처럼 조립하지 말 것 — Tailwind는
+       소스를 글자로 훑어서 클래스를 만들기 때문에 조립한 이름은 못 찾고
+       스타일이 통째로 빠진다. 아래 감싸개와 같은 값을 손으로 맞춘다. */
+    return <PhotoBox src={urls[0]} alt="" className="h-[68px] w-[68px] shrink-0" />;
+  }
+
   return (
-    <div className="mt-2">
+    <div className="relative h-[68px] w-[68px] shrink-0">
       <div
         onScroll={(e) => {
           const el = e.currentTarget;
           // 칸 폭으로 나눠 지금 몇 번째인지 센다. scrollLeft를 그대로 쓰면
-          // 넘기는 도중에도 값이 계속 바뀌어 점이 떨린다.
+          // 넘기는 도중에도 값이 계속 바뀌어 숫자가 떨린다.
           setNow(Math.round(el.scrollLeft / el.clientWidth));
         }}
-        className="rail flex snap-x snap-mandatory gap-0 overflow-x-auto rounded-xl"
+        className="rail flex h-full w-full snap-x snap-mandatory overflow-x-auto"
       >
         {/*
-          비율을 1:1로 고정하고 잘라서 채운다(object-cover).
-
-          비율을 사진에 맡기면 카드 높이가 글마다 달라져서 목록이 들쭉날쭉해지고,
-          자르지 않고 넣으면 세로 사진 좌우에 빈 자리가 크게 남아 정작 사진이
-          작아진다. 미리보기는 훑는 자리라 크기가 고르게 맞는 쪽이 낫다.
-
-          ⚠️ 여기서 잘리는 건 괜찮지만 **고르는 자리에서는 안 된다.** 상세의
-             선택지 사진은 눌러서 원본을 크게 볼 수 있다(ZoomablePhoto) —
-             잘린 것만 보고 투표하게 두지 않는다.
-
-          -webkit-user-drag: none — 안 막으면 사진을 끌었을 때 브라우저 기본
-          드래그가 걸려 링크째 끌려간다(넘기려던 게 드래그가 된다).
+          ⚠️ 카드 전체가 <Link>다. `-webkit-user-drag: none`을 안 주면 사진을
+             끌었을 때 브라우저 기본 드래그가 걸려 **링크째 끌려간다** —
+             넘기려던 동작이 드래그가 된다.
         */}
         {urls.map((u) => (
           <div
             key={u}
-            className="aspect-square w-full shrink-0 snap-center [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
+            className="h-full w-full shrink-0 snap-center [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
           >
-            <PhotoBox src={u} alt="" className="h-full w-full" iconSize={20} />
+            <PhotoBox src={u} alt="" className="h-full w-full" iconSize={14} />
           </div>
         ))}
       </div>
 
-      {/* 점은 두 장 이상일 때만. 한 장짜리에 점 하나가 뜨면 더 있는 줄 안다. */}
-      {urls.length > 1 && (
-        <div className="mt-1.5 flex justify-center gap-1">
-          {urls.map((u, i) => (
-            <span
-              key={u}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                i === now ? "bg-brand" : "bg-neutral-300"
-              }`}
-            />
-          ))}
-        </div>
-      )}
+      {/* 사진 위에 얹히므로 어두운 판을 깔아야 흰 사진에서도 읽힌다. */}
+      <span className="cond pointer-events-none absolute top-1 right-1 rounded-full bg-black/55 px-1.5 text-[10px] leading-[15px] font-semibold text-white">
+        {now + 1}/{urls.length}
+      </span>
     </div>
   );
 }
@@ -217,32 +209,28 @@ function JudgePhotos({ urls }: { urls: string[] }) {
  */
 export function FeedCard({ item }: { item: FeedItem }) {
   /*
-    사진을 크게 보여줄지 작게 보여줄지는 **글 유형이 정한다.**
+    사진은 **유형과 상관없이** 오른쪽 68px 칸에 뜬다. 목록은 훑는 자리라
+    한 글이 화면을 다 먹으면 안 되고, 유형마다 크기가 다르면 같은 목록이
+    두 가지 리듬으로 읽힌다.
 
-      선택지투표 · 무난함판정 → 큰 띠 (사진이 곧 질문이다)
-      정보공유 · 일반질문     → 68px 썸네일 (사진은 거들 뿐이다)
+    사진의 출처만 유형에 따라 다르다:
+      선택지투표 → poll_options.image_url (본문 사진칸이 없다)
+      나머지     → post_images (= posts_feed 의 thumbnail_url)
 
-    앞의 둘은 "이거 어때?"를 사진으로 묻는 글이라, 목록에서 사진이 작으면
-    무엇을 판단해달라는 건지 알 수가 없다. 뒤의 둘은 제목과 본문이 질문이고
-    사진은 곁들이라 썸네일로 충분하다 — 다 키우면 목록이 사진첩이 된다.
-
-    투표글 사진은 poll_options 에 있어서 thumbnail_url 에 안 잡힌다.
-    판정글 사진은 post_images 라 thumbnail_url 에 잡힌다. 출처가 달라
-    둘을 여기서 하나로 합친다.
+    투표글이 thumbnail_url 에 안 잡히는 건 그래서다. 출처가 다를 뿐 보여주는
+    자리는 같으므로 여기서 목록 하나로 합친다 — 여러 장이면 ThumbStrip 이
+    칸 안에서 넘기게 해준다.
   */
-  const 판단글 = item.post_type === "선택지투표" || item.post_type === "무난함판정";
-  const bigPhotos = 판단글
-    ? item.post_type === "선택지투표"
+  const photos =
+    item.post_type === "선택지투표"
       ? (item.option_images ?? [])
       : item.thumbnail_url
         ? [item.thumbnail_url]
-        : []
-    : [];
+        : [];
 
-  const hasBigPhotos = bigPhotos.length > 0;
-  const hasPhoto = !hasBigPhotos && Boolean(item.thumbnail_url);
+  const hasPhoto = photos.length > 0;
   // 썸네일이 없을 때만 본문 2줄 미리보기를 보여준다 (F-15)
-  const showPreview = !hasPhoto && !hasBigPhotos && item.body.trim().length > 0;
+  const showPreview = !hasPhoto && item.body.trim().length > 0;
 
   const meta = (
     <div className="mt-2 flex items-center gap-3 text-[12.5px] text-neutral-600">
@@ -307,11 +295,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
             {meta}
             {author}
           </div>
-          <PhotoBox
-            src={item.thumbnail_url}
-            alt=""
-            className="h-[68px] w-[68px] shrink-0"
-          />
+          <ThumbStrip urls={photos} />
         </div>
       ) : (
         <>
@@ -321,7 +305,6 @@ export function FeedCard({ item }: { item: FeedItem }) {
               {item.body}
             </p>
           )}
-          {hasBigPhotos && <JudgePhotos urls={bigPhotos} />}
           {meta}
           {author}
         </>
