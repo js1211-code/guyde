@@ -110,7 +110,10 @@ insert into post_images (post_id, url, sort_order) values
   --    여기서는 그게 맞다: 얼굴에 얹기 전에 물어보는 글이라 물건만 있으면 된다.
   --    1000x995 거의 정사각. Storage 에 올려둔 것이라 crop 파라미터가 없다.
   ('b0001007-0000-4000-8000-000000000001','https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000015/4f0f98b7-fb7b-4916-83ea-6b9b5ccf2219.jpg',0),
-  ('b0001008-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1671438118097-479e63198629?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
+  -- ✅ 진짜 사진. 옷걸이에 건 상품 컷이라 줄무늬 간격과 카라 모양이 그대로
+  --    보인다 — '아저씨 같나'를 가르는 게 정확히 그 둘이라 몸에 걸친 컷보다
+  --    이쪽이 낫다. 688x830. Storage 에 올려둔 것이라 crop 파라미터가 없다.
+  ('b0001008-0000-4000-8000-000000000001','https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000009/d00291fa-a28e-4b04-b6a4-75d90116ce23.jpg',0),
   -- ✅ 진짜 사진. 마룻바닥에 그냥 놓고 찍은 컷이라 Unsplash 스튜디오 컷과
   --    결이 다르다 — 길이를 묻는 글이라 발목·기장이 그대로 보이는 게 근거다.
   --    780x1040(3:4). Storage 에 올려둔 것이라 crop 파라미터가 없다.
