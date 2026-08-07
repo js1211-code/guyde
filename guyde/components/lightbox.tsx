@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { PhotoBox } from "@/components/badge";
 
 /**
@@ -58,14 +59,30 @@ export function ZoomablePhoto({
         />
       </button>
 
-      {origin && (
-        <Overlay
-          src={src}
-          alt={alt}
-          origin={origin}
-          onClose={() => setOrigin(null)}
-        />
-      )}
+      {/*
+        🚨 확대본은 반드시 body 로 내보낸다(portal).
+
+        확대본은 `position: fixed`로 화면 전체를 덮는데, **transform 이 걸린
+        조상이 하나라도 있으면 fixed 의 기준이 화면이 아니라 그 조상이 된다**
+        (CSS Transforms: 변환된 요소는 fixed 자손의 containing block 이 된다).
+        종료된 투표의 결과 줄이 정확히 그 경우다 — 사진이 막대 위에 얹혀 있고
+        그 감싸개가 `-translate-y-1/2`라, 확대본이 44×44 썸네일 칸 안에 갇혀
+        새까만 조각으로 뜨고 배경만 스크롤이 잠긴다. 고장으로 읽힌다.
+
+        감싸개에서 transform 을 빼는 것으로는 못 막는다. 이 컴포넌트는 글 본문·
+        댓글·투표 선택지 어디에나 놓이므로, 언제든 transform 이 걸린 자리에
+        다시 들어갈 수 있다. 기준을 화면으로 되돌리는 유일한 방법이 portal 이다.
+      */}
+      {origin &&
+        createPortal(
+          <Overlay
+            src={src}
+            alt={alt}
+            origin={origin}
+            onClose={() => setOrigin(null)}
+          />,
+          document.body,
+        )}
     </>
   );
 }
@@ -217,7 +234,17 @@ function Overlay({
 
   return (
     // 셸이 max-w-[430px]이라 fixed가 아니면 그 폭 안에 갇힌다.
-    <div role="dialog" aria-modal="true" className="fixed inset-0 z-[100]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      /*
+        portal 로 body 에 붙어 있어도 React 는 **원래 자리의 조상**으로 이벤트를
+        올려보낸다. 확대본을 닫으려고 누른 게 사진이 놓였던 줄(투표 선택지·
+        댓글)까지 전달되면 엉뚱한 게 눌린다 — 여기서 끊는다.
+      */
+      onClick={(e) => e.stopPropagation()}
+      className="fixed inset-0 z-[100]"
+    >
       <div
         ref={backdropRef}
         onClick={close}
