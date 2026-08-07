@@ -76,10 +76,13 @@ export function Feed() {
           // 쪽을 넘기는 사이 새 글이 올라오면 뒤로 밀린 글이 두 번 온다.
           // key가 겹치면 React가 화면을 잘못 재사용하므로 id로 걸러낸다.
           const seen = new Set(prev.rows.map((r) => r.id));
+          const fresh = rows.filter((r) => !seen.has(r.id));
           return {
             tab,
-            rows: [...prev.rows, ...rows.filter((r) => !seen.has(r.id))],
-            done: rows.length < FEED_PAGE_SIZE,
+            rows: [...prev.rows, ...fresh],
+            // 한 건도 새로 안 왔으면 거기서 멈춘다. 안 그러면 offset이 제자리라
+            // 같은 쪽을 계속 다시 부르는 무한 요청이 된다.
+            done: rows.length < FEED_PAGE_SIZE || fresh.length === 0,
           };
         }),
       )
