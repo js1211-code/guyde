@@ -112,7 +112,13 @@ export default function PostPage({
         }
       />
 
-      <ScreenBody>
+      {/*
+        세로 flex 로 둔다. 댓글이 없거나 적어서 내용이 화면을 못 채우면 남는
+        높이를 댓글 목록이 흡수해서 입력칸을 바닥까지 밀어낸다 — 안 그러면
+        댓글 0개인 글에서 입력칸이 화면 한가운데에 떠 있는다(실제로 밑에
+        433px가 비어 있었다).
+      */}
+      <ScreenBody className="flex flex-col">
         <article className="border-b-8 border-neutral-200 px-4 pt-3.5 pb-4">
           <div className="mb-2 flex items-center gap-1.5">
             <CategoryBadge>{post.category}</CategoryBadge>
@@ -694,7 +700,7 @@ function Comments({
          날아가고 한글 조합도 끊긴다. 그래서 DOM은 그대로 두고 flex order 만
          바꾼다. 머리 0 · 목록 2 · 입력칸은 쓸 때 1, 평소 3.
     */
-    <div className="flex flex-col">
+    <div className="flex grow flex-col">
       <div
         ref={headRef}
         className="flex items-center justify-between px-4 pt-3 pb-2"
@@ -705,7 +711,12 @@ function Comments({
         )}
       </div>
 
-      <div className="order-2">
+      {/*
+        grow 로 남는 높이를 여기서 먹는다. 입력칸이 밑(order-3)에 있을 때
+        그만큼 바닥으로 밀린다. `flex-1`이 아니라 `grow`인 건 basis를 0으로
+        만들지 않기 위해서다 — 댓글이 많을 때 목록이 제 높이를 잃으면 안 된다.
+      */}
+      <div className="order-2 grow">
         {roots.map((c) => {
         const replies = repliesOf.get(c.id) ?? [];
         const isOpen = opened.has(c.id);
