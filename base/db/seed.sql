@@ -398,7 +398,12 @@ insert into post_images (post_id, url, sort_order) values
   ('b0000014-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1779497056334-6148defa5f0f?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
   ('b0000017-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1618677603286-0ec56cb6e1b5?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
   ('b0000022-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1608721279136-cd41b752fa41?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
-  ('b0000026-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1625860191460-10a66c7384fb?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
+  -- ✅ 진짜 사진. 마루 바닥에 위에서 내려찍은 컷이라 Unsplash 스튜디오
+  --    컷과 결이 다르다 — 이 앱이 원하는 건 이쪽이다.
+  --    Storage 에 올려둔 것이라 crop 파라미터가 없다(이미 900px로 줄임).
+  --    ⚠️ 주소에 Supabase 프로젝트 ID가 박혀 있다. 프로젝트를 옮기면 이 줄도
+  --       같이 바꿔야 한다 — Unsplash 주소와 달리 우리 저장소를 가리킨다.
+  ('b0000026-0000-4000-8000-000000000001','https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000007/f568cade-dc40-4f57-98fe-c036d59f9570.jpg',0),
   -- 판정글은 아니지만 있으면 글이 확 사는 것들
   ('b0000011-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1622473590925-e3616c0a41bf?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
   ('b0000023-0000-4000-8000-000000000001','https://images.unsplash.com/photo-1587522384446-64daf3e2689a?auto=format&fit=crop&crop=entropy&w=900&h=1125&q=70',0),
