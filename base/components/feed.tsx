@@ -175,12 +175,23 @@ function OptionPhotos({ urls }: { urls: string[] }) {
         }}
         className="rail flex snap-x snap-mandatory gap-0 overflow-x-auto rounded-xl"
       >
-        {/* -webkit-user-drag: none — 안 막으면 사진을 끌었을 때 브라우저 기본
-            드래그가 걸려 링크째 끌려간다(넘기려던 게 드래그가 된다). */}
+        {/*
+          🚨 object-contain 이다. 여기서만 자르지 않는다.
+
+          목록 썸네일은 칸을 채우려고 잘라내지만(object-cover), 이 띠는 A/B를
+          **비교하는** 자리다. 자르면 어느 쪽이 나아 보이는지가 가방이 아니라
+          크롭 때문에 갈린다 — 정사각 사진은 위아래가, 세로 사진은 좌우가
+          날아간다. 비교 대상은 온전히 보여야 한다.
+
+          남는 자리는 PhotoBox 의 크림 바탕이 채운다.
+
+          -webkit-user-drag: none — 안 막으면 사진을 끌었을 때 브라우저 기본
+          드래그가 걸려 링크째 끌려간다(넘기려던 게 드래그가 된다).
+        */}
         {urls.map((u) => (
           <div
             key={u}
-            className="w-full shrink-0 snap-center [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
+            className="w-full shrink-0 snap-center [&_img]:object-contain [&_img]:[-webkit-user-drag:none] [&_img]:select-none"
           >
             <PhotoBox src={u} alt="" className="h-[190px] w-full" iconSize={20} />
           </div>

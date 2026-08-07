@@ -271,7 +271,7 @@ insert into posts (id, device_id, category, post_type, title, body) values
   ('b0000019-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000016',
    '옷','선택지투표',
    '가방 이 중에 뭐가 무난해',
-   '출퇴근용'),
+   '이번에 회사 취업했는데 가방 뭐사지'),
 
   ('b0000020-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000017',
    '자유','일반질문',
@@ -383,10 +383,14 @@ insert into poll_options (post_id, text, sort_order, image_url) values
   ('b0000010-0000-4000-8000-000000000001','메탈테', 1,
    'https://images.unsplash.com/photo-1663771780986-fda25253e9b8?auto=format&fit=crop&crop=entropy&w=800&h=1000&q=70'),
 
-  ('b0000019-0000-4000-8000-000000000001','백팩', 0,
-   'https://images.unsplash.com/photo-1642375352634-ad952121fdb3?auto=format&fit=crop&crop=entropy&w=800&h=1000&q=70'),
-  ('b0000019-0000-4000-8000-000000000001','토트백', 1,
-   'https://images.unsplash.com/photo-1581605405669-fcdf81165afa?auto=format&fit=crop&crop=entropy&w=800&h=1000&q=70');
+  -- ✅ 진짜 사진. 이름을 '1'·'2'로 둔 이유: 라벨에 '백팩'처럼 종류를 적으면
+  --    사진을 보기 전에 이름만으로 고르게 된다. 이 글은 사진을 보고 고르는
+  --    글이라 라벨이 판단을 앞지르면 안 된다.
+  --    두 장 다 흰 배경 정사각 제품 컷이라 조명·각도가 같다 — A/B가 성립한다.
+  ('b0000019-0000-4000-8000-000000000001','1', 0,
+   'https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000016/9d4b64c3-212a-4099-a285-36163e82e028.jpg'),
+  ('b0000019-0000-4000-8000-000000000001','2', 1,
+   'https://cawpqtmdprpeonwnlvbp.supabase.co/storage/v1/object/public/post-images/00000000-0000-4000-8000-000000000016/659d3112-f84c-4a12-a334-1b9e797b8bf4.jpg');
 
 -- ---------- 5) 글 사진 ----------
 -- 무난함판정은 사진이 없으면 판정할 근거가 없다. 예외 없이 붙인다.
