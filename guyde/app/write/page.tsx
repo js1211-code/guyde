@@ -163,7 +163,18 @@ function Composer({
         // 다른 유형에서 올려둔 사진이 상태에 남아 있을 수 있으므로 여기서도 끊는다.
         image_urls: isPoll ? [] : images,
       });
-      router.push(`/post/${id}`);
+      /*
+        🚨 push가 아니라 **replace**다. 글 상세의 ←는 진짜 뒤로가기라
+        (TopBar의 historyBack), push로 두면 방금 빠져나온 글쓰기 화면으로
+        되돌아간다 — 그것도 유형을 고르는 첫 단계로. 다 쓴 글을 되돌아가
+        다시 쓸 이유가 없는데도 커뮤니티로 나가려면 뒤로가기를 두 번 눌러야
+        했다.
+
+        글쓰기는 지나온 단계지 방문한 화면이 아니다. 히스토리에서
+        `/write`를 새 글이 대신 차지하면 ← 한 번에 커뮤니티로 나간다.
+        글 수정도 같은 이유로 replace를 쓴다(app/post/[id]/edit).
+      */
+      router.replace(`/post/${id}`);
     } catch (e) {
       setError(
         e instanceof ApiError && e.detail
