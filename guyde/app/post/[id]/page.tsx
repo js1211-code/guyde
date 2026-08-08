@@ -824,7 +824,20 @@ function Comments({
           </div>
         )}
 
-        <div className="flex items-center gap-2 px-4 py-2">
+        {/*
+          🚨 자판이 내려가 있을 때는 **안전 영역만큼 밑을 띄운다.** 글 상세엔
+             탭바가 없어서 이 바가 화면 맨 밑에 닿는데, 홈 인디케이터가 있는
+             기기는 그 자리를 OS가 쓰고 있어서 입력칸이 잘려 보인다. 앱의
+             다른 바닥 요소(탭바·결제 바)가 전부 쓰는 규칙과 같다.
+
+          자판이 떠 있을 때는 도로 8px다. 자판이 이미 그 자리를 덮고 있어서,
+          그대로 두면 입력칸과 자판 사이에 이유 없는 틈만 생긴다.
+        */}
+        <div
+          className={`flex items-center gap-2 px-4 pt-2 ${
+            keyboard ? "pb-2" : "pb-[max(0.5rem,var(--safe-bottom))]"
+          }`}
+        >
           {/* 사진 한 장까지. 파일 선택창은 감춰두고 라벨로 감싼다. */}
           <label
             aria-label="사진 넣기"
