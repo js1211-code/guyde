@@ -599,30 +599,28 @@ function Comments({
   const submitting = useRef(false);
 
   /*
-    자판이 먹은 높이를 잰다.
+    화면 바닥에서 자판이 가리고 있는 높이를 잰다.
 
-    폰에서 자판이 뜨면 **보이는 창(visual viewport)만 줄고 레이아웃은 그대로**
-    다. 셸이 position:fixed + inset-0 이라 화면(844)에 그대로 붙어 있으니,
-    목록 끝에 있는 입력칸은 자판 뒤에 깔려 자기가 뭘 치는지 안 보인다.
-    그래서 차이를 직접 재서 그만큼 자리를 비운다.
+    폰에서 자판이 뜨면 **보이는 창(visual viewport)만 줄고 레이아웃 뷰포트는
+    그대로**다. 셸이 position:fixed + inset-0 이라 화면 높이(844)에 붙어
+    있으니, 목록 끝에 있는 입력칸은 자판 뒤에 깔려 자기가 뭘 치는지 안 보인다.
+
+        보이는 구간 = 레이아웃 y  offsetTop ‥ offsetTop + height
+        가려진 아랫단 = innerHeight − (offsetTop + height)
 
     ⚠️ innerHeight는 자판이 떠도 안 줄어든다(레이아웃 뷰포트라서). 그래서
        이 뺄셈이 성립한다 — 둘 다 줄어드는 값이면 항상 0이 나온다.
-    ⚠️ visualViewport가 없는 브라우저(데스크톱 구형)에서는 0으로 남는다.
-       자판도 없으니 맞는 값이다.
-
-    🚨 자판은 페이지를 통째로 밀어올리기도 한다(window.scrollY가 커진다).
-       셸은 fixed라 같이 안 움직여서 상단바가 화면 밖으로 나간다. 문서는
-       overflow:hidden이라 원래 스크롤될 일이 없으니, 0이 아니면 자판이
-       민 것이다 — 되돌려 놓는다. 되돌린 뒤엔 0이라 스스로를 다시 부르지
-       않는다.
+    ⚠️ offsetTop을 빼는 걸 빠뜨리지 말 것. 자판이 화면을 밀어올린 만큼은
+       이미 가려진 아랫단에서 빠져 있다. 안 빼면 그만큼 두 번 세서 입력칸이
+       자판보다 훨씬 위로 뜬다.
+    ⚠️ visualViewport가 없는 브라우저에서는 0으로 남는다. 자판도 없으니
+       맞는 값이다.
   */
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
     function measure() {
       setKeyboard(Math.max(0, window.innerHeight - vv!.height - vv!.offsetTop));
-      if (window.scrollY !== 0) window.scrollTo(0, 0);
     }
     measure();
     vv.addEventListener("resize", measure);
@@ -634,33 +632,6 @@ function Comments({
       window.removeEventListener("scroll", measure);
     };
   }, []);
-
-  /*
-    입력칸을 자판 **바로 위**에 세운다. 목록 끝까지 굴리면 밑에 깔아둔
-    자판 높이만큼의 빈 칸이 화면 바닥을 차지하고, 입력칸은 딱 그 위에 선다.
-
-    ⚠️ 초점 하나로는 부족하고 keyboard 값이 바뀔 때도 다시 맞춰야 한다.
-       자판은 300ms 남짓 걸려 올라오는데, 초점이 잡히는 순간에는 아직 높이가
-       0이라 그때 굴려봐야 자판 뒤로 다시 들어간다.
-
-    ⚠️ 다음 프레임에 굴린다. 같은 프레임에는 빈 칸이 아직 안 그려져 있어서
-       scrollHeight가 옛 값이다.
-  */
-  useEffect(() => {
-    if (!focused) return;
-    const id = requestAnimationFrame(() => {
-      const sc = boxRef.current?.closest(".scroll-area");
-      if (!sc) return;
-      sc.scrollTo({
-        top: sc.scrollHeight,
-        // 탭바 모션과 같은 기준. 멀미로 꺼둔 사람에게 튀는 화면을 주지 않는다.
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
-      });
-    });
-    return () => cancelAnimationFrame(id);
-  }, [focused, keyboard]);
 
   // 서버는 평평한 목록을 추천순으로 준다. 답글을 부모 밑으로 다시 묶는다.
   // 답글끼리는 오래된 순 — 대화 순서가 뒤집히면 읽을 수가 없다.
@@ -712,8 +683,14 @@ function Comments({
       🚨 입력칸은 **한 번만** 그린다. 자리를 옮기려고 두 군데에 조건부로 그리면
          React가 한쪽을 버리고 다른 쪽을 새로 만든다 — 누르는 순간 초점이
          날아가고 한글 조합도 끊긴다. 입력칸은 늘 목록 끝, 한 자리에 둔다.
+
+      🚨 감싸개 없이 **조각(fragment)으로 편다.** 넷이 그대로 ScreenBody의
+         자식이 되어야 한다 — `sticky`는 제 부모 상자 밖으로 못 나가는데,
+         댓글 묶음으로 한 번 감싸면 그 상자가 글 밑에서 시작해서 위로 굴려
+         올렸을 때 입력칸이 화면에 못 붙는다(실측 1071, 붙었어야 할 자리는
+         508). ScreenBody가 부모면 상자가 곧 글 전체라 어디서든 붙는다.
     */
-    <div className="flex grow flex-col">
+    <>
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <Kicker className="text-[13.5px]">COMMENTS {data.comments.length}</Kicker>
         {roots.length > 0 && (
@@ -785,7 +762,37 @@ function Comments({
         })}
       </div>
 
-      <div ref={boxRef} className="border-t border-neutral-400">
+      {/*
+        🚨 쓰는 동안 입력칸은 **화면 바닥에 붙어 자판 바로 위에 선다.**
+
+        `sticky`로 화면 바닥에 붙이되 **붙는 자리를 자판 높이만큼 올려**
+        잡는다(`bottom: 자판높이`). 굴려서 맞추던 것을 걷어냈다 — 폰에서는
+        자판이 올라오는 동안 OS도 화면을 같이 굴려서, 우리가 굴려놓은 자리가
+        남아주질 않았다. **실기기에서 입력칸이 끝내 안 따라왔다.** 붙여놓으면
+        굴리기의 결과에 기대지 않는다.
+
+        위 뺄셈이 offsetTop을 같이 보기 때문에, OS가 화면을 밀어올린 상태든
+        아니든 결과는 늘 "보이는 구간의 아랫변"이다.
+
+        🚨 `transform`으로 밀어 올리지 말 것. 밑에 깔아둔 빈 칸이 이미 입력칸을
+           자판 위로 올려놓은 상태라, 끝까지 굴리면 거기서 한 번 더 올라가
+           자판보다 한참 위에 뜬다(508이어야 할 게 172가 됐다). `bottom`은
+           **붙는 한계선**이라 제자리보다 위로는 절대 안 올린다 — 두 장치가
+           겹쳐도 결과가 같다.
+
+        답글도 이래야 맞다. 목록 한가운데서 답글을 달 때 화면이 바닥으로
+        튀면 방금 읽던 댓글을 놓친다 — 자리는 그대로 두고 입력칸만 올라온다.
+
+        ⚠️ `bg-paper`를 빼지 말 것. 떠 있는 동안 밑으로 댓글이 지나간다.
+        ⚠️ 자판이 없으면 bottom이 0이라 평소 모습 그대로다.
+      */}
+      <div
+        ref={boxRef}
+        style={{ bottom: keyboard }}
+        className={`border-t border-neutral-400 ${
+          focused ? "sticky z-10 bg-paper" : ""
+        }`}
+      >
         {replyTo && (
           <div className="flex items-center gap-2 bg-neutral-100 px-4 py-1.5">
             <span className="flex-1 truncate text-[13px] text-neutral-600">
@@ -877,14 +884,14 @@ function Comments({
       </div>
 
       {/*
-        자판이 깔고 앉을 자리. 입력칸 **밑**에 이만큼을 비워두면, 끝까지 굴렸을
-        때 이 빈 칸이 자판에 가리고 입력칸은 그 위에 선다 — 자판 바로 위다.
+        자판이 깔고 앉을 자리. 입력칸이 위로 밀려 올라간 만큼 밑을 늘려두지
+        않으면 **마지막 댓글이 자판 뒤에 갇혀** 끝까지 굴려도 못 읽는다.
 
-        자판이 없으면 높이가 0이라 아무 자리도 안 먹는다. 화면에 그려지는 게
-        아니라 굴릴 수 있는 길이만 늘리는 것이므로 테두리도 색도 주지 않는다.
+        자판이 없으면 높이가 0이라 아무 자리도 안 먹는다. 그려지는 게 아니라
+        굴릴 수 있는 길이만 늘리는 것이므로 테두리도 색도 주지 않는다.
       */}
       <div aria-hidden style={{ height: keyboard }} className="shrink-0" />
-    </div>
+    </>
   );
 }
 
