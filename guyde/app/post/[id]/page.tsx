@@ -590,27 +590,69 @@ function Comments({
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   // 답글은 접어둔다. 원댓글이 답글에 밀려 안 보이면 흐름을 못 따라간다.
   const [opened, setOpened] = useState<Set<string>>(new Set());
-  // 쓰는 중이면 입력칸이 COMMENTS 머리 바로 밑으로 올라온다. 평소에는 목록
-  // 끝에 있어서, 댓글이 많은 글은 한참 내려가야 쓸 수 있었다.
-  const [composing, setComposing] = useState(false);
+  // 입력칸에 초점이 있는지. 자판이 떠 있는 동안만 자리를 맞춘다.
+  const [focused, setFocused] = useState(false);
+  // 자판이 먹은 높이(px). 자판이 없으면 0이라 평소에는 아무 일도 안 일어난다.
+  const [keyboard, setKeyboard] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const submitting = useRef(false);
 
   /*
-    올라온 자리가 화면 밖이면 올린 의미가 없다 — 아래쪽을 보고 있다가 눌렀을
-    테니 입력칸이 시야에서 사라진다. COMMENTS 머리를 화면 위로 붙여서
-    머리·입력칸·목록이 한눈에 들어오게 한다.
+    자판이 먹은 높이를 잰다.
 
-    ⚠️ 자리를 옮긴 **다음 프레임**에 스크롤해야 한다. 같은 프레임에 부르면
-       아직 옛 위치를 기준으로 계산해서 엉뚱한 데로 간다.
+    폰에서 자판이 뜨면 **보이는 창(visual viewport)만 줄고 레이아웃은 그대로**
+    다. 셸이 position:fixed + inset-0 이라 화면(844)에 그대로 붙어 있으니,
+    목록 끝에 있는 입력칸은 자판 뒤에 깔려 자기가 뭘 치는지 안 보인다.
+    그래서 차이를 직접 재서 그만큼 자리를 비운다.
+
+    ⚠️ innerHeight는 자판이 떠도 안 줄어든다(레이아웃 뷰포트라서). 그래서
+       이 뺄셈이 성립한다 — 둘 다 줄어드는 값이면 항상 0이 나온다.
+    ⚠️ visualViewport가 없는 브라우저(데스크톱 구형)에서는 0으로 남는다.
+       자판도 없으니 맞는 값이다.
+
+    🚨 자판은 페이지를 통째로 밀어올리기도 한다(window.scrollY가 커진다).
+       셸은 fixed라 같이 안 움직여서 상단바가 화면 밖으로 나간다. 문서는
+       overflow:hidden이라 원래 스크롤될 일이 없으니, 0이 아니면 자판이
+       민 것이다 — 되돌려 놓는다. 되돌린 뒤엔 0이라 스스로를 다시 부르지
+       않는다.
   */
   useEffect(() => {
-    if (!composing) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    function measure() {
+      setKeyboard(Math.max(0, window.innerHeight - vv!.height - vv!.offsetTop));
+      if (window.scrollY !== 0) window.scrollTo(0, 0);
+    }
+    measure();
+    vv.addEventListener("resize", measure);
+    vv.addEventListener("scroll", measure);
+    window.addEventListener("scroll", measure);
+    return () => {
+      vv.removeEventListener("resize", measure);
+      vv.removeEventListener("scroll", measure);
+      window.removeEventListener("scroll", measure);
+    };
+  }, []);
+
+  /*
+    입력칸을 자판 **바로 위**에 세운다. 목록 끝까지 굴리면 밑에 깔아둔
+    자판 높이만큼의 빈 칸이 화면 바닥을 차지하고, 입력칸은 딱 그 위에 선다.
+
+    ⚠️ 초점 하나로는 부족하고 keyboard 값이 바뀔 때도 다시 맞춰야 한다.
+       자판은 300ms 남짓 걸려 올라오는데, 초점이 잡히는 순간에는 아직 높이가
+       0이라 그때 굴려봐야 자판 뒤로 다시 들어간다.
+
+    ⚠️ 다음 프레임에 굴린다. 같은 프레임에는 빈 칸이 아직 안 그려져 있어서
+       scrollHeight가 옛 값이다.
+  */
+  useEffect(() => {
+    if (!focused) return;
     const id = requestAnimationFrame(() => {
-      headRef.current?.scrollIntoView({
-        block: "start",
+      const sc = boxRef.current?.closest(".scroll-area");
+      if (!sc) return;
+      sc.scrollTo({
+        top: sc.scrollHeight,
         // 탭바 모션과 같은 기준. 멀미로 꺼둔 사람에게 튀는 화면을 주지 않는다.
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
           ? "auto"
@@ -618,34 +660,7 @@ function Comments({
       });
     });
     return () => cancelAnimationFrame(id);
-  }, [composing]);
-
-  /*
-    빈 칸으로 빠져나가면 제자리로. 쓰던 게 남아 있으면(글자·사진·답글 대상)
-    그대로 위에 둔다 — 놓치면 안 되는 것이 있는데 화면 밖으로 치우면 안 된다.
-
-    🚨 **blur로 판단하면 안 된다.** 폰에서는 입력칸 밖의 빈 자리를 탭해도
-       초점이 안 풀린다(iOS·안드로이드 공통). blur에만 걸어놨더니 데스크톱
-       에서는 내려오는데 폰에서는 영영 위에 남았다 — 스크롤해도 초점은
-       그대로라 접힐 일이 없다. 그래서 **바깥을 눌렀는지를 직접** 본다.
-
-    누른 김에 초점도 거둔다. 자판이 떠 있는 채로 입력칸만 사라지면
-    화면 절반이 이유 없이 가려진 상태가 된다.
-
-    캡처 단계에서 듣는다. 밑에 있는 다른 손잡이가 먼저 먹고 멈춰도
-    바깥을 눌렀다는 사실 자체는 달라지지 않는다.
-  */
-  useEffect(() => {
-    if (!composing) return;
-    function onDown(e: PointerEvent) {
-      if (boxRef.current?.contains(e.target as Node)) return;
-      if (draft.trim() || photo || replyTo || uploading) return;
-      inputRef.current?.blur();
-      setComposing(false);
-    }
-    document.addEventListener("pointerdown", onDown, true);
-    return () => document.removeEventListener("pointerdown", onDown, true);
-  }, [composing, draft, photo, replyTo, uploading]);
+  }, [focused, keyboard]);
 
   // 서버는 평평한 목록을 추천순으로 준다. 답글을 부모 밑으로 다시 묶는다.
   // 답글끼리는 오래된 순 — 대화 순서가 뒤집히면 읽을 수가 없다.
@@ -673,16 +688,15 @@ function Comments({
     // 답글을 달면 그 묶음을 펼쳐둔다. 접혀 있으면 방금 쓴 게 안 보인다.
     if (replyTo) setOpened((prev) => new Set(prev).add(replyTo.id));
     setReplyTo(null);
-    // 다 냈으면 제자리로. 남은 게 없는데 위를 계속 차지하면 목록이 그만큼 밀린다.
-    setComposing(false);
     await onDone();
     setBusy(false);
     submitting.current = false;
   }
 
+  // 목록 한가운데서 눌러도 입력칸으로 데려간다 — 초점이 잡히면 위 effect가
+  // 자판 바로 위로 굴린다. 누구에게 다는 답글인지는 입력칸 위 띠가 알려준다.
   function startReply(c: Comment) {
     setReplyTo(c);
-    setComposing(true);
     inputRef.current?.focus();
   }
 
@@ -697,14 +711,10 @@ function Comments({
     /*
       🚨 입력칸은 **한 번만** 그린다. 자리를 옮기려고 두 군데에 조건부로 그리면
          React가 한쪽을 버리고 다른 쪽을 새로 만든다 — 누르는 순간 초점이
-         날아가고 한글 조합도 끊긴다. 그래서 DOM은 그대로 두고 flex order 만
-         바꾼다. 머리 0 · 목록 2 · 입력칸은 쓸 때 1, 평소 3.
+         날아가고 한글 조합도 끊긴다. 입력칸은 늘 목록 끝, 한 자리에 둔다.
     */
     <div className="flex grow flex-col">
-      <div
-        ref={headRef}
-        className="flex items-center justify-between px-4 pt-3 pb-2"
-      >
+      <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <Kicker className="text-[13.5px]">COMMENTS {data.comments.length}</Kicker>
         {roots.length > 0 && (
           <span className="text-[13px] font-bold text-brand">추천순</span>
@@ -712,9 +722,10 @@ function Comments({
       </div>
 
       {/*
-        grow 로 남는 높이를 여기서 먹는다. 입력칸이 밑(order-3)에 있을 때
-        그만큼 바닥으로 밀린다. `flex-1`이 아니라 `grow`인 건 basis를 0으로
-        만들지 않기 위해서다 — 댓글이 많을 때 목록이 제 높이를 잃으면 안 된다.
+        grow 로 남는 높이를 여기서 먹는다. 그만큼 입력칸이 바닥으로 밀린다 —
+        안 그러면 댓글 0개인 글에서 입력칸이 화면 한가운데에 뜬다.
+        `flex-1`이 아니라 `grow`인 건 basis를 0으로 만들지 않기 위해서다 —
+        댓글이 많을 때 목록이 제 높이를 잃으면 안 된다.
 
         댓글이 하나도 없으면 점선을 여기서 대신 긋는다. 댓글이 있을 때는 줄마다
         제 윗변을 그리는데(CommentRow 감싸개의 border-t), 목록이 비면 그 선이
@@ -722,7 +733,7 @@ function Comments({
         어디서부터인지가 안 보인다. 있을 때 켜면 첫 줄에 선이 두 겹으로 겹친다.
       */}
       <div
-        className={`order-2 grow ${
+        className={`grow ${
           roots.length === 0 ? "border-t border-dashed border-neutral-400" : ""
         }`}
       >
@@ -774,10 +785,7 @@ function Comments({
         })}
       </div>
 
-      <div
-        ref={boxRef}
-        className={`border-t border-neutral-400 ${composing ? "order-1" : "order-3"}`}
-      >
+      <div ref={boxRef} className="border-t border-neutral-400">
         {replyTo && (
           <div className="flex items-center gap-2 bg-neutral-100 px-4 py-1.5">
             <span className="flex-1 truncate text-[13px] text-neutral-600">
@@ -841,7 +849,11 @@ function Comments({
           <input
             ref={inputRef}
             value={draft}
-            onFocus={() => setComposing(true)}
+            onFocus={() => setFocused(true)}
+            // 초점이 풀리면 자판도 내려가므로 자리를 다시 맞출 일이 없다.
+            // 폰에서 blur가 늦게·안 올 수도 있는데, 그때는 자판 높이가 0이 되면서
+            // 빈 칸이 스스로 걷힌다 — 이 값 하나에 화면이 걸려 있지 않다.
+            onBlur={() => setFocused(false)}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               // isComposing이면 한글을 조합 중이라 Enter가 "확정"이지 "전송"이 아니다.
@@ -863,6 +875,15 @@ function Comments({
           </button>
         </div>
       </div>
+
+      {/*
+        자판이 깔고 앉을 자리. 입력칸 **밑**에 이만큼을 비워두면, 끝까지 굴렸을
+        때 이 빈 칸이 자판에 가리고 입력칸은 그 위에 선다 — 자판 바로 위다.
+
+        자판이 없으면 높이가 0이라 아무 자리도 안 먹는다. 화면에 그려지는 게
+        아니라 굴릴 수 있는 길이만 늘리는 것이므로 테두리도 색도 주지 않는다.
+      */}
+      <div aria-hidden style={{ height: keyboard }} className="shrink-0" />
     </div>
   );
 }
