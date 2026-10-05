@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GUYDE
 
-## Getting Started
+**GUY를 위한 GUIDE.**
 
-First, run the development server:
+자기관리 질문을 올리면 대중이 검증한 "무난함"을 돌려받는 남성 자기관리 커뮤니티 웹앱.
+
+멋져지는 법을 알려주는 곳이 아니라 **안 망하는 선**을 알려주는 곳이다.
+판단자는 전문가가 아니라 대중이고, 핵심 지표는 "답변 받은 글 비율"이다.
+
+## 배포본
+
+| | 주소 | 특징 |
+|---|---|---|
+| 일반 | https://guyde.vercel.app | 방문자마다 새 신원이 발급된다 |
+| 고수 | https://guyde-expert.vercel.app | 고수 계정으로 고정 — 시연용 |
+
+같은 코드이고 환경변수만 다르다. 홈 화면에 추가하면 주소창 없이 앱처럼 뜬다(PWA).
+
+## 로그인이 없다
+
+회원가입도 비밀번호도 없다. 처음 열면 기기에 UUID 하나가 저장되고,
+서버는 그걸 보고 `[형용사] [동물] #[네자리]` 꼴의 닉네임을 발급한다.
+글도 댓글도 같은 닉네임과 온도로 보인다 — 익명과 실명을 섞지 않는다.
+
+온도는 36.5도에서 시작해 댓글을 쓰고 추천을 받으면 오른다.
+질문해서 오르는 길은 없고 **알려줘서 오르는 길만** 있다.
+
+## 무엇을 할 수 있나
+
+- **커뮤니티** — 네 가지 방식으로 묻는다: 정보공유 · 일반질문 · 선택지투표 · 무난함판정.
+  투표는 72시간 열려 있고, **표를 던지기 전에는 결과가 안 보인다.**
+- **도서관** — 아티클, 대중이 판정을 끝낸 무난템, 도움된 순으로 세운 정보공유 글, 그리고 테스트 3종.
+- **컨설팅** — 사전 설문을 내면 고수가 48시간 안에 진단과 착장 한 세트를 문서로 보낸다. 결제는 연동하지 않았다.
+
+## 띄우는 법
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd guyde
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`guyde/.env.local`에 세 가지가 필요하다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=        # 서버 전용. NEXT_PUBLIC_ 을 붙이면 안 된다
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+DB는 `db/`의 SQL을 파일 이름 순서대로 돌린다. 시드까지 넣어야 화면이 비지 않는다.
 
-## Learn More
+```bash
+npm run build        # 빌드
+npm run lint         # 린트
+npx tsc --noEmit     # 타입 검사
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 무엇으로 만들었나
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabase(PostgreSQL + Storage) · Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Supabase Auth는 쓰지 않는다. 기기 UUID는 Supabase가 검증할 수 없어서
+**모든 테이블을 막아두고** 데이터 접근은 전부 서버 라우트 핸들러를 지나간다.
 
-## Deploy on Vercel
+## 폴더
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+guyde/
+  app/         화면과 API 라우트
+  components/  공용 컴포넌트
+  lib/         공용 로직 · 상수
+  db/          스키마 · 패치 · 시드 SQL
+  public/      아이콘 · 매니페스트
+  CLAUDE.md    개발 지침 — 왜 그렇게 짰는지가 여기 있다
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 아직 안 한 것
+
+결제 연동, 알림, 팔로우, 유저가 고수가 되는 경로. 해커톤 데모라 범위를 좁혔다.
+
+`app/test`는 **데모용 기기 전환 통로**다. 실서비스 전에 폴더째 지운다.
