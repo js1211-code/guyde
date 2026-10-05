@@ -48,7 +48,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=        # 서버 전용. NEXT_PUBLIC_ 을 붙이면 안 된다
 ```
 
-DB는 `db/`의 SQL을 파일 이름 순서대로 돌린다. 시드까지 넣어야 화면이 비지 않는다.
+DB는 `guyde/db/`의 SQL을 파일 이름 순서대로 돌린다. 시드까지 넣어야 화면이 비지 않는다.
 
 ```bash
 npm run build        # 빌드
