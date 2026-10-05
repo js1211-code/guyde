@@ -1,0 +1,281 @@
+@import "tailwindcss";
+
+/*
+  GUYDE 디자인 시스템 v3 — Claude Design "BASE Mobile UI v3"(2026-08-03 개정판)에서 가져옴.
+
+  v2 → v3에서 바뀐 것:
+  - 브랜드가 다크 버건디(#6B2436) → 다크 브라운(#4A3222) → 더 진한 브라운(#2A1C17)
+  - 종이 질감의 따뜻한 배경(#fdfbf9 / #f6f3ef)
+  - 모서리가 직각 → 둥근 모서리. 예전엔 전역에서 border-radius:0을 강제했는데,
+    개정 디자인이 8~18px과 pill을 240곳 넘게 쓴다. 강제를 걷어내고 스케일로 관리한다.
+  - 등록마크(+)는 폐기했다. 간격을 채우려고 넣은 장식이라 화면마다 눈에 걸렸다.
+    해칭(.hatch)은 남는다 — 투표에서 진 쪽을 색 없이 표현하는 실제 기능이다.
+
+  Tailwind v4는 @theme의 --color-* / --radius-* 를 그대로 유틸리티로 만든다.
+  --color-brand → text-brand / bg-brand / border-brand
+  --radius-xl   → rounded-xl
+*/
+@theme {
+  /* 포인트: 다크 브라운 */
+  --color-brand: #2a1c17;
+  /*
+    brand보다 한 단계 더 진한 자리. 새 브라운이 이미 충분히 어두워서
+    여기서 더 내리면 검정으로 읽힌다 — 같은 값을 가리킨다.
+    토큰은 남겨둔다. 쓰는 곳(틴트 위 글자 등)이 여럿이라 지우면 그 의도가
+    사라지고, 나중에 색을 다시 나눌 때 붙일 자리가 없어진다.
+  */
+  --color-brand-dark: #2a1c17;
+  --color-brand-tint: #f5eee6;
+  --color-brand-tint-b: #e3d3c1;
+
+  /*
+    온도는 42.0°C(고수 게이트)를 경계로 색이 바뀐다.
+    아래는 초록(평범한 사람), 위는 금색(고수). lib/constants.ts의
+    TEMP_EXPERT_GATE와 반드시 같은 값을 기준으로 해야 한다.
+  */
+  --color-temp: #7c9a3d;
+  --color-temp-hot: #d4a017;
+
+  /* 종이 — 카드는 밝고(bg) 바탕은 한 톤 어둡다(paper) */
+  --color-bg: #fdfbf9;
+  /*
+    앱 바탕. 원래 따뜻한 종이색(#f6f3ef)이었는데 순백으로 바꿨다 —
+    글 읽는 화면이 크림빛이면 사진이 누렇게 보인다.
+  */
+  --color-paper: #ffffff;
+  /*
+    글과 글 사이를 나누는 띠. 옛 바탕색을 그대로 물려받았다.
+    바탕이 흰색이 되면서 "틈으로 바탕이 비친다"가 더는 성립하지 않아,
+    구분선이 자기 색을 직접 들고 있어야 한다.
+  */
+  --color-band: #f6f3ef;
+  --color-ink: #1d1f20;
+
+  /* neutral 스케일은 Tailwind 기본값을 디자인 시스템 값으로 의도적으로 덮어쓴다.
+     v3에서 따뜻한 쪽으로 옮겼다 — 회색이 아니라 바랜 종이에 가깝다. */
+  --color-neutral-100: #f7f4f0;
+  --color-neutral-200: #f1ede8;
+  --color-neutral-300: #ddd8d1;
+  --color-neutral-400: #bdb7ae;
+  --color-neutral-500: #9b948a;
+  --color-neutral-600: #7c766d;
+  --color-neutral-700: #5d5852;
+  --color-neutral-800: #423e39;
+  --color-neutral-900: #2b2825;
+
+  /* 상태색 — 착장 합계 배지, 수정 요청, 완료 표시에 쓴다 */
+  --color-ok: #4c7a32;
+  --color-ok-deep: #355c22;
+  --color-ok-tint: #e3efda;
+  --color-warn: #b35c00;
+  --color-danger: #b23b2e;
+  --color-danger-tint: #fbf1f0;
+  --color-danger-line: #d98c84;
+  /* 필수 표시(*) — 뱃지 대신 별표 하나로 표시한다.
+     빨강은 이미 오류를 뜻해서, 아직 틀린 게 없는 필수 항목에 쓰면
+     처음부터 잘못한 것처럼 보인다. */
+  --color-required: #c97a2b;
+
+  /* 모서리 스케일 — 디자인이 실제로 쓰는 값만 둔다 */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-3xl: 18px;
+  --radius-full: 9999px;
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-cond: var(--font-barlow-condensed), "Pretendard Variable", sans-serif;
+}
+
+/*
+  문서는 스크롤하지 않는다. 스크롤은 오직 .scroll-area 안에서만 일어난다.
+
+  🚨 이걸 빼면 iOS에서 탭바가 위아래로 흔들린다.
+  문서에 스크롤 여지가 남아 있으면 손가락을 놓을 때 화면 전체가 고무줄처럼
+  튕기는데(overscroll bounce), 그때 position:fixed 인 셸이 통째로 같이
+  끌려다닌다. 문서가 실제로 넘치지 않아도 iOS는 바운스를 허용한다 —
+  그래서 높이만 맞춰서는 안 되고 overflow와 overscroll-behavior를 같이 잠가야 한다.
+*/
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 숫자·영문 라벨 전용 응축 서체 */
+.cond {
+  font-family: var(--font-cond);
+}
+
+/* 투표에서 진 쪽을 채우는 사선 해칭 — 색을 쓰지 않고 열세를 표현한다 */
+.hatch {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    var(--color-neutral-300) 3px,
+    var(--color-neutral-300) 4px
+  );
+}
+
+/*
+  기기 안전 영역.
+
+  설치형(standalone) + viewportFit:cover + black-translucent 조합이라
+  화면이 상태바와 홈 인디케이터 **밑까지** 올라간다. 여백을 안 주면
+  아이폰 노치/다이내믹 아일랜드가 상단바를 덮어서 뒤로가기가 안 눌린다.
+
+  env()를 그대로 쓰지 않고 변수로 한 번 감싸는 이유:
+  데스크톱 브라우저에서는 env()가 항상 0이라 이 여백을 눈으로 확인할 수가
+  없다. 변수로 두면 검사할 때 값만 덮어써서 실제 기기와 같은 상태를 만든다.
+*/
+:root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+/*
+  스플래시 — 마크가 먼저 뜨고, 워드마크가 뒤따르고, 점이 맥박친다.
+  디자인 파일의 타이밍(0.8s / 1.2s / 1.4s 무한)을 그대로 가져왔다.
+
+  덮는 시간은 1.6초. 이보다 길면 로딩이 아니라 기다림이 된다.
+  사라진 뒤에는 visibility:hidden 이라 밑의 화면을 클릭할 수 있다 —
+  opacity:0만으로는 투명한 판이 화면 전체를 덮은 채 남는다.
+*/
+.splash {
+  animation: splash-exit 2s ease-in-out forwards;
+}
+
+@keyframes splash-exit {
+  0%, 80%   { opacity: 1; visibility: visible; }
+  100%      { opacity: 0; visibility: hidden; }
+}
+
+.splash-mark {
+  animation: splash-fade 0.8s ease-in-out both;
+}
+.splash-word {
+  /* both — 시작 전에도 opacity:0을 유지한다. 안 그러면 한 프레임 번쩍인다. */
+  animation: splash-fade 1.2s ease-in-out both;
+}
+.splash-dot {
+  animation: splash-pulse 1.4s infinite;
+}
+.splash-dot:nth-child(2) { animation-delay: 0.2s; }
+.splash-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes splash-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes splash-pulse {
+  0%, 60%, 100% { opacity: 0.3; }
+  30%           { opacity: 1; }
+}
+
+/* 카드 그림자 — 디자인이 쓰는 값 하나로 통일 */
+.card {
+  background: var(--color-bg);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
+/*
+  폼 요소 리셋 — 반드시 @layer base 안에 둔다.
+  레이어 밖에 두면 Tailwind 유틸리티(@layer utilities)를 specificity와 무관하게
+  전부 이겨버려서, 버튼에 붙인 bg-*, text-*, font-* 가 통째로 무시된다.
+
+  border-radius:0 은 "직각 디자인"이라서가 아니라 브라우저 기본 버튼 모서리가
+  새어 들어오는 걸 막는 UA 리셋이다. @layer base < @layer utilities 라서
+  요소에 rounded-* 를 붙이면 그쪽이 이긴다 — 둥근 모서리는 각자 명시한다.
+*/
+@layer base {
+  input,
+  textarea,
+  button,
+  select {
+    border-radius: 0;
+    font: inherit;
+    color: inherit;
+    background: transparent;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-neutral-500);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 1px;
+}
+
+/* 스크롤바가 화면 폭을 흔들지 않게 얇게 */
+.scroll-area {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  /*
+    끝까지 내린 뒤 더 당겨도 그 힘이 문서로 넘어가지 않게 막는다.
+    이게 없으면 목록 끝에서 한 번 더 당길 때 바깥이 딸려 움직여서
+    탭바가 흔들린다.
+  */
+  overscroll-behavior-y: contain;
+}
+.scroll-area::-webkit-scrollbar {
+  width: 3px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--color-neutral-400);
+}
+
+/*
+  움직임을 줄여달라고 설정한 사람에게는 전부 끈다.
+  멀미·전정기관 문제로 실제로 켜두는 설정이라 무시하면 안 된다.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+  가로로만 흐르는 줄(카테고리 탭 등). 세로 스크롤이 붙으면 손가락이 위아래로
+  밀려서 탭을 고르다 화면이 흔들린다. 스크롤바 자체도 숨긴다.
+*/
+.rail {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* 피드 카드 본문 2줄 미리보기 (F-15) */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

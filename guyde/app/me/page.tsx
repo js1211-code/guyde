@@ -1,0 +1,144 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { ChevronRightIcon, LockIcon, PencilIcon } from "@/components/icons";
+import { AppShell, PageTitle, ScreenBody } from "@/components/shell";
+import { TabBar } from "@/components/tab-bar";
+import { Temperature, TemperatureProgress } from "@/components/temperature";
+import { TEMP_EXPERT_GATE } from "@/lib/constants";
+import { useMe } from "@/lib/use-me";
+
+const MENU = [
+  { label: "내 글", href: "/me/activity" },
+  { label: "내 댓글", href: "/me/activity?tab=comments" },
+  { label: "내 컨설팅", href: "/me/bookings" },
+];
+
+/** ⑱ 내정보 */
+export default function MePage() {
+  const { me, renameNickname } = useMe();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const qualified = (me?.temperature ?? 0) >= TEMP_EXPERT_GATE;
+
+  async function save() {
+    try {
+      await renameNickname(draft);
+      setEditing(false);
+      setError(null);
+    } catch (e) {
+      setError(
+        e instanceof Error && e.message === "NICKNAME_TAKEN"
+          ? "이미 있는 닉네임이에요"
+          : "바꾸지 못했어요",
+      );
+    }
+  }
+
+  return (
+    <AppShell>
+      <PageTitle>내정보</PageTitle>
+
+      <ScreenBody className="px-4">
+        {editing ? (
+          <div className="flex items-center gap-2">
+
+            <input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              className="flex-1 rounded-md border border-neutral-400 px-3 py-2 text-[16px] font-bold"
+              autoFocus
+            />
+            <button
+              type="button"
+              onClick={save}
+              className="cond text-[14px] font-bold text-brand"
+            >
+              저장
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5">
+
+            <span className="text-[19.5px] font-bold">{me?.nickname ?? "…"}</span>
+            <button
+              type="button"
+              aria-label="닉네임 변경"
+              onClick={() => {
+                setDraft(me?.nickname ?? "");
+                setEditing(true);
+              }}
+            >
+              <PencilIcon size={16} className="text-neutral-500" />
+            </button>
+          </div>
+        )}
+        {error && <p className="mt-1 text-[13px] text-temp">{error}</p>}
+
+        <div className="mt-1.5">
+
+          <Temperature value={me?.temperature ?? 36.5} size={24} />
+        </div>
+
+        <TemperatureProgress value={me?.temperature ?? 36.5} />
+
+        {/* 자격이 희소하다는 신호가 목적이라 잠긴 상태로도 노출한다 (F-72) */}
+        {/*
+          세 갈래다.
+            이미 고수      → 개설하기를 보여주면 안 된다. 이미 됐다.
+            42도 넘음      → 자격은 갖췄지만 임명은 별개라 아직 잠겨 있다.
+            42도 못 넘음   → 잠김 + 남은 온도 안내
+          예전엔 온도만 보고 갈라서, 고수 계정에도 '고수 개설하기'가 떴다 —
+          온도로 고수를 판별하면 안 된다는 규칙을 이 화면이 어기고 있었다.
+        */}
+        {me?.is_expert ? (
+          <div className="mt-4 flex items-center justify-center gap-2 rounded-md border border-temp-hot bg-temp-hot/15 py-3">
+            <span className="text-[15px] font-bold text-brand-dark">
+              고수로 활동 중이에요
+            </span>
+          </div>
+        ) : (
+          <div
+            className={`mt-4 flex items-center justify-center gap-2 rounded-md border py-3 ${
+              qualified
+                ? "border-brand bg-brand-tint"
+                : "border-neutral-300 bg-neutral-200 opacity-55"
+            }`}
+          >
+            {!qualified && <LockIcon size={16} className="text-neutral-600" />}
+            <span
+              className={`text-[15px] font-bold ${
+                qualified ? "text-brand-dark" : "text-neutral-600"
+              }`}
+            >
+              고수 개설하기
+            </span>
+          </div>
+        )}
+
+
+        <nav className="mt-5">
+          {MENU.map((item, i) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`flex items-center justify-between py-3 ${
+                i === 0
+                  ? "border-t border-neutral-400"
+                  : "border-t border-dashed border-neutral-400"
+              } ${i === MENU.length - 1 ? "border-b border-neutral-400" : ""}`}
+            >
+              <span className="text-[15px] font-medium">{item.label}</span>
+              <ChevronRightIcon size={16} className="text-neutral-500" />
+            </Link>
+          ))}
+        </nav>
+      </ScreenBody>
+
+      <TabBar />
+    </AppShell>
+  );
+}

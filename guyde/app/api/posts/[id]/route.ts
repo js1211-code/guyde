@@ -1,0 +1,343 @@
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  deviceRequired,
+  fail,
+  getDeviceId,
+  ok,
+  stripDevice,
+} from "@/lib/api/http";
+
+/**
+ * S3 글 상세 (F-30·31·32·34·38·41·43)
+ *
+ * 글 유형에 따라 붙는 위젯이 다르므로 필요한 것만 채워서 내려준다.
+ *   정보공유   → likes
+ *   선택지투표 → poll
+ *   무난함판정 → nanhan
+ *   일반질문   → 없음 (댓글만)
+ *
+ * X-Device-Id는 선택이다. 없으면 "내가 뭘 눌렀는지"만 비워서 읽기 전용으로 준다.
+ */
+export async function GET(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> },
+) {
+  const { id } = await ctx.params;
+  const deviceId = getDeviceId(req);
+  const db = createAdminClient();
+
+  /*
+    ⚠️ 순서대로 await 하지 말 것.
+
+    이 핸들러는 Supabase에 여러 번 물어본다. 그런데 함수가 도는 지역과 DB가
+    멀면 한 번 왕복에 수백 ms가 든다 — 네 번 줄세우면 그게 그대로 더해져서
+    글 하나 여는 데 2초가 걸린다(실제로 배포본에서 1.8~3.1초였다).
+
+    서로 의존하지 않는 질의는 같은 묶음으로 보낸다. 지금은 두 묶음이다:
+      ① 글 · 사진 · 댓글            (서로 독립)
+      ② 내가 누른 댓글추천 · 유형별 위젯 (①의 결과가 있어야 한다)
+  */
+  const [postRes, images, comments] = await Promise.all([
+    db.from("posts_feed").select("*").eq("id", id).maybeSingle(),
+    db
+      .from("post_images")
+      .select("id, url, sort_order")
+      .eq("post_id", id)
+      .order("sort_order"),
+    db
+      .from("comments_view")
+      .select("*")
+      .eq("post_id", id)
+      // F-43 추천 많은 순 → 최신순.
+      // 답글은 클라이언트가 부모 밑에 다시 묶으면서 오래된 순으로 뒤집는다 —
+      // 답글끼리는 대화 순서가 중요해서 추천순으로 세우면 흐름이 끊긴다.
+      .order("likes", { ascending: false })
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const { data: post, error } = postRes;
+  if (error) return fail("DB_ERROR", 500, error.message);
+  if (!post) return fail("POST_NOT_FOUND", 404);
+
+  // 닫힌 글은 결과가 공개다. 투표 여부와 무관하게 열린다.
+  // 손으로 닫았든 72시간이 지났든 뷰의 is_closed 하나만 본다.
+  const closed = post.is_closed === true;
+
+  const commentIds = (comments.data ?? []).map((c) => c.id);
+
+  // ② 묶음. 유형별 위젯은 셋 중 하나만 도므로 실제로는 두 질의가 나란히 간다.
+  const [myCommentLikes, poll, nanhan, likes] = await Promise.all([
+    deviceId && commentIds.length
+      ? db
+          .from("comment_likes")
+          .select("comment_id")
+          .eq("device_id", deviceId)
+          .in("comment_id", commentIds)
+      : Promise.resolve({ data: [] as { comment_id: string }[] }),
+    post.post_type === "선택지투표"
+      ? loadPoll(db, id, deviceId, closed)
+      : Promise.resolve(null),
+    post.post_type === "무난함판정"
+      ? loadNanhan(db, id, deviceId, closed)
+      : Promise.resolve(null),
+    post.post_type === "정보공유"
+      ? loadLikes(db, id, deviceId)
+      : Promise.resolve(null),
+  ]);
+
+  const likedComments = new Set(
+    (myCommentLikes.data ?? []).map((r) => r.comment_id),
+  );
+
+  return ok({
+    post: {
+      ...stripDevice(post, deviceId),
+      images: images.data ?? [],
+    },
+    poll,
+    nanhan,
+    likes,
+    // is_mine으로 자기 댓글 추천 버튼을 비활성한다 (F-42).
+    // device_id 자체는 내보내지 않는다 — 그게 곧 신원이라서.
+    comments: (comments.data ?? []).map((c) => ({
+      ...stripDevice(c, deviceId),
+      liked_by_me: likedComments.has(c.id),
+    })),
+  });
+}
+
+/**
+ * 글 수정 — 글쓴이만, 제목과 본문만.
+ *
+ * 유형(post_type)과 선택지는 바꿀 수 없다. 투표가 이미 쌓인 글의 선택지를
+ * 갈아끼우면 사람들이 고른 표가 엉뚱한 항목에 붙는다. 유형을 바꾸면
+ * 그 표가 통째로 갈 곳을 잃는다. 카테고리도 막는다 — '자유' 글은 온도에서
+ * 빠지므로, 옮기는 것만으로 온도를 올리거나 내릴 수 있다.
+ *
+ * edited_at은 기록만 하고 **화면에는 안 띄운다.** "수정됨" 딱지가 붙으면
+ * 오타 하나 고친 글에도 남아서 계속 눈에 걸린다. 컬럼은 남겨둔다 —
+ * 나중에 필요해지면 화면만 붙이면 되고, 안 남기면 그때 근거가 없다.
+ *
+ * 남의 글은 403이 아니라 404다 — 403이면 "그 글이 있긴 하다"가 새어 나간다.
+ */
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const deviceId = getDeviceId(req);
+  if (!deviceId) return deviceRequired();
+
+  const { id } = await params;
+
+  let payload: { title?: string; body?: string };
+  try {
+    payload = await req.json();
+  } catch {
+    return fail("INVALID_JSON", 400);
+  }
+
+  const title = payload.title?.trim();
+  const body = payload.body?.trim();
+  if (!title) return fail("TITLE_REQUIRED", 400);
+  if (!body) return fail("BODY_REQUIRED", 400);
+
+  const db = createAdminClient();
+
+  const { data: post, error } = await db
+    .from("posts")
+    .select("id, device_id, title, body")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) return fail("DB_ERROR", 500, error.message);
+  if (!post || post.device_id !== deviceId) return fail("POST_NOT_FOUND", 404);
+
+  // 아무것도 안 바뀌었으면 굳이 쓰지 않는다. 들어왔다 그냥 나간 글까지
+  // 고친 것으로 기록되면 그 시각이 아무 뜻도 없어진다.
+  if (post.title === title && post.body === body) {
+    return ok({ id, edited: false });
+  }
+
+  const { error: updateError } = await db
+    .from("posts")
+    .update({ title, body, edited_at: new Date().toISOString() })
+    .eq("id", id);
+  if (updateError) return fail("DB_ERROR", 500, updateError.message);
+
+  return ok({ id, edited: true });
+}
+
+/**
+ * 글 삭제 — 글쓴이만.
+ *
+ * 사진·선택지·투표·판정·좋아요·댓글은 FK가 연쇄로 지운다.
+ * 남의 글은 403이 아니라 404다 — 403이면 "그 글이 있긴 하다"가 새어 나간다.
+
+ */
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const deviceId = getDeviceId(req);
+  if (!deviceId) return deviceRequired();
+
+  const { id } = await params;
+  const db = createAdminClient();
+
+  const { data: post, error } = await db
+    .from("posts")
+    .select("id, device_id")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) return fail("DB_ERROR", 500, error.message);
+  if (!post || post.device_id !== deviceId) return fail("POST_NOT_FOUND", 404);
+
+  const { error: delError } = await db.from("posts").delete().eq("id", id);
+  if (delError) return fail("DB_ERROR", 500, delError.message);
+
+  return ok({ deleted: id });
+}
+
+type Db = ReturnType<typeof createAdminClient>;
+
+/** F-32 선택지별 득표수 + 내 표. 투표 전에는 결과를 감춘다(종료되면 공개). */
+async function loadPoll(
+  db: Db,
+  postId: string,
+  deviceId: string | null,
+  closed: boolean,
+) {
+  const [options, votes, mine] = await Promise.all([
+    db
+      .from("poll_options")
+      .select("id, text, sort_order, image_url")
+      .eq("post_id", postId)
+      .order("sort_order"),
+    db.from("poll_votes").select("option_id").eq("post_id", postId),
+    deviceId
+      ? db
+          .from("poll_votes")
+          .select("option_id")
+          .eq("post_id", postId)
+          .eq("device_id", deviceId)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const tally = new Map<string, number>();
+  for (const v of votes.data ?? []) {
+    tally.set(v.option_id, (tally.get(v.option_id) ?? 0) + 1);
+  }
+  const total = votes.data?.length ?? 0;
+  const myOptionId = mine.data?.option_id ?? null;
+  const rows = options.data ?? [];
+  const counts = rows.map((o) => tally.get(o.id) ?? 0);
+  const percents = toPercents(counts, total);
+
+  // 투표해야 결과가 공개된다 (F-32). 종료된 글은 그 시점 숫자가 결론이라 공개.
+  const revealed = closed || myOptionId !== null;
+
+  return {
+    total_votes: total,
+    my_option_id: myOptionId,
+    revealed,
+    options: rows.map((o, i) => ({
+      ...o,
+      vote_count: revealed ? counts[i] : null,
+      percent: revealed && total > 0 ? percents[i] : null,
+    })),
+  };
+}
+
+/**
+ * 득표율을 정수로 나누되 합이 정확히 100이 되게 한다(최대잔여법).
+ * 선택지마다 따로 반올림하면 62.5→63, 37.5→38 처럼 합이 101%가 되어
+ * 화면에서 바로 티가 난다.
+ */
+function toPercents(counts: number[], total: number): number[] {
+  if (total <= 0) return counts.map(() => 0);
+
+  const exact = counts.map((c) => (c / total) * 100);
+  const out = exact.map(Math.floor);
+  let left = 100 - out.reduce((a, b) => a + b, 0);
+
+  // 소수부가 큰 순서로 남은 1%씩 나눠준다
+  const byFraction = exact
+    .map((v, i) => ({ i, frac: v - Math.floor(v) }))
+    .sort((a, b) => b.frac - a.frac);
+
+  for (let k = 0; k < byFraction.length && left > 0; k++, left--) {
+    out[byFraction[k].i] += 1;
+  }
+  return out;
+}
+
+/**
+ * F-34·35 무난해요/애매해요 카운트 + 내 선택.
+ *
+ * 선택지투표와 같은 규칙이다 — **판정하기 전에는 결과를 안 준다.**
+ * 서버에서부터 null로 내려야 클라이언트를 뜯어봐도 안 보인다.
+ *
+ * 종료된 글은 누구에게나 공개한다. 종료 시점의 숫자가 결론이라서, 그때부터는
+ * 감출 이유가 없다 — 도서관 무난템 서가도 종료된 글만 올린다.
+ */
+async function loadNanhan(
+  db: Db,
+  postId: string,
+  deviceId: string | null,
+  closed: boolean,
+) {
+  const [votes, mine] = await Promise.all([
+    db.from("nanhan_votes").select("choice").eq("post_id", postId),
+    deviceId
+      ? db
+          .from("nanhan_votes")
+          .select("choice")
+          .eq("post_id", postId)
+          .eq("device_id", deviceId)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const rows = votes.data ?? [];
+  const nanhan = rows.filter((r) => r.choice === "무난해요").length;
+  const ambiguous = rows.length - nanhan;
+  const myChoice = mine.data?.choice ?? null;
+  const revealed = closed || myChoice !== null;
+
+  return {
+    무난해요: revealed ? nanhan : null,
+    애매해요: revealed ? ambiguous : null,
+    // 총 표수도 감춘다. 남겨두면 "몇 명이 봤나"로 결과를 짐작하게 된다.
+    total_votes: revealed ? rows.length : null,
+    my_choice: myChoice,
+    revealed,
+    // 0표면 배지에서 %를 뺀다 — 뷰가 계산한 값과 같은 값 (F-35)
+    percent:
+      revealed && rows.length > 0
+        ? Math.round((nanhan / rows.length) * 100)
+        : null,
+  };
+}
+
+/** F-38 정보 공유 글 좋아요 */
+async function loadLikes(db: Db, postId: string, deviceId: string | null) {
+  const [count, mine] = await Promise.all([
+    db
+      .from("post_likes")
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId),
+    deviceId
+      ? db
+          .from("post_likes")
+          .select("post_id")
+          .eq("post_id", postId)
+          .eq("device_id", deviceId)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  return {
+    count: count.count ?? 0,
+    liked_by_me: Boolean(mine.data),
+  };
+}
